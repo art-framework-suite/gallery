@@ -78,6 +78,7 @@ add_subdirectory(tools)
 
 # source
 add_subdirectory (art)
+add_subdirectory (canvas)
 
 # testing
 add_subdirectory(test)
