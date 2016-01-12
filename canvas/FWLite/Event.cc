@@ -1,0 +1,141 @@
+#include "canvas/FWLite/Event.h"
+
+#include "canvas/FWLite/DataGetterHelper.h"
+#include "canvas/FWLite/EventHistoryGetter.h"
+#include "canvas/FWLite/EventNavigator.h"
+#include "canvas/Utilities/Exception.h"
+#include "canvas/Utilities/TypeID.h"
+
+#include "TFile.h"
+
+namespace canvas {
+
+  Event::Event(std::vector<std::string> const& fileNames,
+               bool useTTreeCache,
+               unsigned int eventsToLearnUsedBranches) :
+    eventNavigator_(std::make_unique<EventNavigator>(fileNames)),
+    dataGetterHelper_(std::make_unique<DataGetterHelper>(eventNavigator_.get(),
+                                                         std::make_shared<EventHistoryGetter>(eventNavigator_.get()))),
+    useTTreeCache_(useTTreeCache),
+    eventsToLearnUsedBranches_(eventsToLearnUsedBranches),
+    eventsProcessed_(0)
+  {
+    if (eventsToLearnUsedBranches_ < 1) eventsToLearnUsedBranches_ = 1;
+    if (!atEnd()) {
+      bool initializeTheCache = false;
+      dataGetterHelper_->updateFile(eventNavigator_->getTFile(), eventNavigator_->getTTree(), initializeTheCache);
+    }
+  }
+
+  Event::~Event() {
+  }
+
+  art::EventAuxiliary const& Event::eventAuxiliary() const {
+    return eventNavigator_->eventAuxiliary();
+  }
+
+  art::History const& Event::history() const {
+    return eventNavigator_->history();
+  }
+
+  art::ProcessHistoryID const& Event::processHistoryID() const {
+    return eventNavigator_->processHistoryID();
+  }
+
+  art::ProcessHistory const& Event::processHistory() const {
+    return eventNavigator_->processHistory();
+  }
+
+  long long Event::numberOfEventsInFile() const {
+    return eventNavigator_->entriesInCurrentFile();
+  }
+
+  long long Event::eventEntry() const {
+    return eventNavigator_->eventEntry();
+  }
+
+  long long Event::fileEntry() const {
+    return eventNavigator_->fileEntry();
+  }
+
+  bool Event::isValid() const {
+    return eventNavigator_->isValid();
+  }
+
+  bool Event::atEnd() const {
+    return eventNavigator_->atEnd();
+  }
+
+  void Event::toBegin() {
+    long long oldEventEntry = eventEntry();
+    long long oldFileEntry = fileEntry();
+    eventNavigator_->toBegin();
+    if (oldEventEntry == eventEntry() && oldFileEntry == fileEntry()) {
+      return;
+    }
+    updateAfterEventChange(oldFileEntry);
+  }
+
+  Event& Event::operator++() {
+    long long oldFileEntry = fileEntry();
+    eventNavigator_->next();
+    updateAfterEventChange(oldFileEntry);
+    return *this;
+  }
+
+  void Event::updateAfterEventChange(long long oldFileEntry) {
+    ++eventsProcessed_;
+    if (atEnd()) return;
+    if (oldFileEntry != fileEntry()) {
+      bool initializeTheCache = useTTreeCache_ && eventsProcessed_ >= eventsToLearnUsedBranches_;
+      dataGetterHelper_->updateFile(eventNavigator_->getTFile(), eventNavigator_->getTTree(), initializeTheCache);
+    } else {
+      dataGetterHelper_->updateEvent();
+      if (useTTreeCache_ && eventsProcessed_ == eventsToLearnUsedBranches_) {
+        dataGetterHelper_->initializeTTreeCache();
+      }
+    }
+  }
+
+  void Event::next() {
+    operator++();
+  }
+
+  TFile* Event::getTFile() const {
+    return eventNavigator_->getTFile();
+  }
+
+  TTree* Event::getTTree() const {
+    return eventNavigator_->getTTree();
+  }
+
+  void Event::getByLabel(std::type_info const& typeInfoOfWrapper,
+                         InputTag const& inputTag,
+                         void* ptrToPtrToWrapper) const {
+    dataGetterHelper_->getByLabel(typeInfoOfWrapper,
+                                  inputTag,
+                                  ptrToPtrToWrapper);
+  }
+
+  void Event::throwProductNotFoundException(std::type_info const& typeInfo,
+                                            InputTag const& tag) const {
+
+    art::TypeID type(typeInfo);
+    throw art::Exception(art::errors::ProductNotFound)
+      << "Failed to find product for \n  type = '"
+      << type.className()
+      << "'\n  module = '" << tag.label()
+      << "'\n  productInstance = '"
+      << ((!tag.instance().empty()) ? tag.instance().c_str() : "")
+      << "'\n  process='"
+      << ((!tag.process().empty()) ? tag.process().c_str() : "")
+      << "'\n";
+  }
+
+  void Event::checkForEnd() const {
+    if (atEnd()) {
+      throw art::Exception(art::errors::LogicError)
+        << "You have requested data past the last event\n";
+    }
+  }
+}

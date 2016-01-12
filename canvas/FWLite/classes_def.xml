@@ -1,0 +1,8 @@
+<lcgdict>
+ <class name="canvas::Event" ClassVersion="0">
+  <version ClassVersion="0" checksum="3435035450"/>
+ </class>
+ <class name="canvas::InputTag" ClassVersion="0">
+  <version ClassVersion="0" checksum="2268278140"/>
+ </class>
+</lcgdict>
