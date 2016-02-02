@@ -82,7 +82,6 @@ add_subdirectory (canvas)
 
 # testing
 add_subdirectory(test)
-add_subdirectory(testcanvas)
 
 # ups - table and config files
 add_subdirectory(ups)
