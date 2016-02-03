@@ -1,8 +1,8 @@
-#include "canvas/FWLite/Event.h"
+#include "gallery/Event.h"
 
-#include "canvas/FWLite/DataGetterHelper.h"
-#include "canvas/FWLite/EventHistoryGetter.h"
-#include "canvas/FWLite/EventNavigator.h"
+#include "gallery/DataGetterHelper.h"
+#include "gallery/EventHistoryGetter.h"
+#include "gallery/EventNavigator.h"
 #include "canvas/Utilities/Exception.h"
 #include "canvas/Utilities/TypeID.h"
 

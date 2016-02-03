@@ -36,11 +36,11 @@
 // for a change in the file entry number using the Event
 // interface.
 
-#include "canvas/FWLite/BranchData.h"
-#include "canvas/FWLite/BranchMapReader.h"
-#include "canvas/FWLite/HistoryGetterBase.h"
-#include "canvas/FWLite/InputTag.h"
-#include "canvas/FWLite/TypeLabelInstanceKey.h"
+#include "gallery/BranchData.h"
+#include "gallery/BranchMapReader.h"
+#include "gallery/HistoryGetterBase.h"
+#include "gallery/InputTag.h"
+#include "gallery/TypeLabelInstanceKey.h"
 
 #include "canvas/Persistency/Common/EDProductGetterFinder.h"
 #include "canvas/Persistency/Provenance/BranchID.h"

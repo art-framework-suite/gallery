@@ -1,7 +1,7 @@
 
-#include "canvas/FWLite/DataGetterHelper.h"
+#include "gallery/DataGetterHelper.h"
 
-#include "canvas/FWLite/EventNavigator.h"
+#include "gallery/EventNavigator.h"
 
 #include "canvas/Persistency/Provenance/BranchDescription.h"
 #include "canvas/Persistency/Provenance/BranchListIndex.h"

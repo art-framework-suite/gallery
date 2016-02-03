@@ -1,6 +1,6 @@
-#include "canvas/FWLite/EventNavigator.h"
+#include "gallery/EventNavigator.h"
 
-#include "canvas/FWLite/throwFunctions.h"
+#include "gallery/throwFunctions.h"
 #include "canvas/Persistency/Provenance/rootNames.h"
 #include "canvas/Utilities/Exception.h"
 

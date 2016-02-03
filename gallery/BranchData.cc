@@ -1,6 +1,6 @@
-#include "canvas/FWLite/BranchData.h"
+#include "gallery/BranchData.h"
 
-#include "canvas/FWLite/EventNavigator.h"
+#include "gallery/EventNavigator.h"
 #include "canvas/Persistency/Common/EDProduct.h"
 #include "canvas/Persistency/Common/RefCoreStreamer.h"
 #include "canvas/Utilities/Exception.h"

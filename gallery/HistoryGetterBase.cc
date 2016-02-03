@@ -1,4 +1,4 @@
-#include "canvas/FWLite/HistoryGetterBase.h"
+#include "gallery/HistoryGetterBase.h"
 
 namespace canvas {
 

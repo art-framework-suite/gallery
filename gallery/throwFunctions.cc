@@ -1,4 +1,4 @@
-#include "canvas/FWLite/throwFunctions.h"
+#include "gallery/throwFunctions.h"
 
 #include "canvas/Utilities/Exception.h"
 

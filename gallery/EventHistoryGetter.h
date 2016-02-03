@@ -1,7 +1,7 @@
 #ifndef art_FWLite_EventHistoryGetter_h
 #define art_FWLite_EventHistoryGetter_h
 
-#include "canvas/FWLite/HistoryGetterBase.h"
+#include "gallery/HistoryGetterBase.h"
 
 namespace canvas {
 

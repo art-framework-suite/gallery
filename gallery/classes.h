@@ -1,5 +1,5 @@
-#include "canvas/FWLite/Event.h"
-#include "canvas/FWLite/InputTag.h"
+#include "gallery/Event.h"
+#include "gallery/InputTag.h"
 
 // Local Variables:
 // mode: c++

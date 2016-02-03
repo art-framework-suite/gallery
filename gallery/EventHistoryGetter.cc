@@ -1,6 +1,6 @@
-#include "canvas/FWLite/EventHistoryGetter.h"
+#include "gallery/EventHistoryGetter.h"
 
-#include "canvas/FWLite/EventNavigator.h"
+#include "gallery/EventNavigator.h"
 
 namespace canvas {
 

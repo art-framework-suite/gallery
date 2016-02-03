@@ -1,5 +1,5 @@
 
-#include "canvas/FWLite/InputTag.h"
+#include "gallery/InputTag.h"
 #include "canvas/Utilities/Exception.h"
 
 #include "boost/algorithm/string/classification.hpp"

@@ -5,8 +5,8 @@
 // and EventNavigator to iterate over events in a set
 // of input files and find products in them.
 
-#include "canvas/FWLite/InputTag.h"
-#include "canvas/FWLite/ValidHandle.h"
+#include "gallery/InputTag.h"
+#include "gallery/ValidHandle.h"
 #include "canvas/Persistency/Common/Wrapper.h"
 
 #include "canvas/Persistency/Provenance/EventAuxiliary.h"

@@ -1,7 +1,7 @@
-#include "canvas/FWLite/BranchMapReader.h"
+#include "gallery/BranchMapReader.h"
 
-#include "canvas/FWLite/HistoryGetterBase.h"
-#include "canvas/FWLite/throwFunctions.h"
+#include "gallery/HistoryGetterBase.h"
+#include "gallery/throwFunctions.h"
 #include "canvas/Persistency/Provenance/BranchType.h"
 #include "canvas/Persistency/Provenance/History.h"
 #include "canvas/Persistency/Provenance/ProductID.h"
