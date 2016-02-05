@@ -16,9 +16,10 @@ set(canvas_FWLite_sources
 )
 
 set( canvas_FWLite_libraries
-        canvas_Utilities
         canvas_Persistency_Common
         canvas_Persistency_Provenance
+        canvas_Utilities
+        cetlib
         ${ROOT_CORE}
         ${ROOT_RIO}
         ${ROOT_TREE}
