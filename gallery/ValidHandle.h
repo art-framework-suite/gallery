@@ -1,15 +1,15 @@
-#ifndef art_FWLite_ValidHandle_h
-#define art_FWLite_ValidHandle_h
+#ifndef gallery_ValidHandle_h
+#define gallery_ValidHandle_h
 
 // Should be identical to art::ValidHandle
 // except it is missing functions, data members,
-// typedefs, and dependences not needed in canvas.
+// typedefs, and dependences not needed in gallery.
 
 #include "canvas/Utilities/Exception.h"
 
 #include <utility>
 
-namespace canvas {
+namespace gallery {
 
   template <typename T>
   class ValidHandle
@@ -63,7 +63,7 @@ namespace canvas {
     return prod_;
   }
 }
-#endif /* art_FWLite_ValidHandle_h */
+#endif /* gallery_ValidHandle_h */
 
 // Local Variables:
 // mode: c++

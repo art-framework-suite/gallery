@@ -9,7 +9,7 @@
 #include <ostream>
 #include <vector>
 
-namespace canvas {
+namespace gallery {
 
   InputTag::InputTag() :
     label_(),

@@ -1,5 +1,5 @@
-#ifndef art_FWLite_BranchMapReader_h
-#define art_FWLite_BranchMapReader_h
+#ifndef gallery_BranchMapReader_h
+#define gallery_BranchMapReader_h
 
 // BranchMapReader can find the BranchDescription
 // corresponding to a ProductID. One step in this
@@ -20,7 +20,7 @@
 
 class TFile;
 
-namespace canvas {
+namespace gallery {
 
   class HistoryGetterBase;
 
@@ -42,7 +42,7 @@ namespace canvas {
     std::set<art::BranchID> allSeenBranchIDs_;
   };
 }
-#endif /* art_FWLite_BranchMapReader_h */
+#endif /* gallery_BranchMapReader_h */
 
 // Local Variables:
 // mode: c++

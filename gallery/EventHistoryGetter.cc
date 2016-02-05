@@ -2,7 +2,7 @@
 
 #include "gallery/EventNavigator.h"
 
-namespace canvas {
+namespace gallery {
 
   EventHistoryGetter::EventHistoryGetter(EventNavigator const* eventNavigator) :
     eventNavigator_(eventNavigator) {

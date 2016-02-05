@@ -14,7 +14,7 @@
 
 class TBranch;
 
-namespace canvas {
+namespace gallery {
 
   void BranchMapReader::updateFile(TFile* tFile) {
 

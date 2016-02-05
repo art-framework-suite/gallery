@@ -1,5 +1,5 @@
-#ifndef art_FWLite_Event_h
-#define art_FWLite_Event_h
+#ifndef gallery_Event_h
+#define gallery_Event_h
 
 // Main interface to users. It uses the DataGetterHelper
 // and EventNavigator to iterate over events in a set
@@ -22,7 +22,7 @@
 class TFile;
 class TTree;
 
-namespace canvas {
+namespace gallery {
 
   class DataGetterHelper;
   class EventNavigator;
@@ -37,8 +37,8 @@ namespace canvas {
     ~Event();
 
     template <typename PROD>
-    canvas::ValidHandle<PROD>
-    getValidHandle(canvas::InputTag const&) const;
+    gallery::ValidHandle<PROD>
+    getValidHandle(gallery::InputTag const&) const;
 
     art::EventAuxiliary const& eventAuxiliary() const;
     art::History const& history() const;
@@ -101,7 +101,7 @@ namespace canvas {
   }
 }
 
-#endif /* art_FWLite_Event_h */
+#endif /* gallery_Event_h */
 
 // Local Variables:
 // mode: c++

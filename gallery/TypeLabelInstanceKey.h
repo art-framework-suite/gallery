@@ -1,11 +1,11 @@
-#ifndef art_FWLite_TypeLabelInstanceKey_h
-#define art_FWLite_TypeLabelInstanceKey_h
+#ifndef gallery_TypeLabelInstanceKey_h
+#define gallery_TypeLabelInstanceKey_h
 
 #include "canvas/Utilities/TypeID.h"
 
 #include <cstring>
 
-namespace canvas {
+namespace gallery {
 
   class TypeLabelInstanceKey {
   public:
@@ -49,7 +49,7 @@ namespace canvas {
     char const* instance_;
   };
 }
-#endif /* art_FWLite_TypeLabelInstanceKey_h */
+#endif /* gallery_TypeLabelInstanceKey_h */
 
 // Local Variables:
 // mode: c++

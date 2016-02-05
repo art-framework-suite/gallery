@@ -1,9 +1,9 @@
-#ifndef art_FWLite_EventHistoryGetter_h
-#define art_FWLite_EventHistoryGetter_h
+#ifndef gallery_EventHistoryGetter_h
+#define gallery_EventHistoryGetter_h
 
 #include "gallery/HistoryGetterBase.h"
 
-namespace canvas {
+namespace gallery {
 
   class EventNavigator;
 

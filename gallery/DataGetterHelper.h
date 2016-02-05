@@ -1,5 +1,5 @@
-#ifndef art_FWLite_DataGetterHelper_h
-#define art_FWLite_DataGetterHelper_h
+#ifndef gallery_DataGetterHelper_h
+#define gallery_DataGetterHelper_h
 
 // Allows one to lookup a product given module
 // label, instance name, type and optionally
@@ -65,7 +65,7 @@ class TClass;
 class TFile;
 class TTree;
 
-namespace canvas {
+namespace gallery {
 
   class EventNavigator;
 
@@ -232,7 +232,7 @@ namespace canvas {
     virtual art::EDProductGetter const* getEDProductGetterImpl(art::ProductID const&) const override;
   };
 }
-#endif /* art_FWLite_DataGetterHelper_h */
+#endif /* gallery_DataGetterHelper_h */
 
 // Local Variables:
 // mode: c++

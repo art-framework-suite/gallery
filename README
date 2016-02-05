@@ -1,12 +1,35 @@
-Product: art
+Product: gallery
 
-art is distributed under the terms of the standard BSD open source license.
+gallery is distributed under the terms of the standard BSD open source license.
 
 Author:  The art Team   artists@fnal.gov
 
 Description:
+
+gallery reads data produced using the art framework. It
+is considered "lite" compared to the art framework and
+is not capable of doing many of the things one can do
+with art, the most significant being that it cannot
+produce art formatted output files. It's primary
+use would be a simple way to read over art input files
+and produce histograms or ntuples that could be saved
+in a simple ROOT format file. It could be useful for other
+purposes. It has the advantage that in addition to being
+built as an executable, it can run as a ROOT script or
+via pyROOT. It also does not place the same restrictions
+as art on the input files that can be read in one process.
+In art there are requirements that all the input files
+have to have similar branches and BranchIDLists.
+One does not have to install or setup art to run gallery,
+although both art and gallery depend on canvas.
+One would not want to use gallery for processes like
+fully running reconstruction for an experiment, only
+simpler and less complex tasks.
+
+https://cdcvs.fnal.gov/redmine/projects/gallery/wiki
+
 art is an event-processing framework for particle physics experiments. 
 Experiments use the art framework to build programs that process data 
 in a variety of contexts.
-https://cdcvs.fnal.gov/redmine/projects/art/wiki
 
+https://cdcvs.fnal.gov/redmine/projects/art/wiki

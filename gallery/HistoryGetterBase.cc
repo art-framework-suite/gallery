@@ -1,6 +1,6 @@
 #include "gallery/HistoryGetterBase.h"
 
-namespace canvas {
+namespace gallery {
 
   HistoryGetterBase::~HistoryGetterBase() { }
 }

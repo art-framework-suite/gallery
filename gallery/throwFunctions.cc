@@ -2,7 +2,7 @@
 
 #include "canvas/Utilities/Exception.h"
 
-namespace canvas {
+namespace gallery {
 
   void throwTreeNotFound(std::string const& treeName) {
     throw art::Exception(art::errors::FileReadError)
