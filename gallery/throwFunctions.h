@@ -1,15 +1,15 @@
-#ifndef art_FWLite_throwFunctions_h
-#define art_FWLite_throwFunctions_h
+#ifndef gallery_throwFunctions_h
+#define gallery_throwFunctions_h
 
 #include <string>
 
-namespace canvas {
+namespace gallery {
 
   void throwTreeNotFound(std::string const& treeName);
   void throwBranchNotFound(std::string const& branchName);
 }
 
-#endif /* art_FWLite_throwFunctions_h */
+#endif /* gallery_throwFunctions_h */
 
 // Local Variables:
 // mode: c++

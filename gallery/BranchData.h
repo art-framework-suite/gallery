@@ -1,5 +1,5 @@
-#ifndef art_FWLite_BranchData_h
-#define art_FWLite_BranchData_h
+#ifndef gallery_BranchData_h
+#define gallery_BranchData_h
 
 // BranchData holds a pointer to a single TBranch and
 // the buffer that data is written to from that TBranch.
@@ -19,7 +19,7 @@ namespace art {
   class TypeID;
 }
 
-namespace canvas {
+namespace gallery {
 
   class EventNavigator;
 
@@ -63,7 +63,7 @@ namespace canvas {
     std::string branchName_;
   };
 }
-#endif /* art_FWLite_BranchData_h */
+#endif /* gallery_BranchData_h */
 
 // Local Variables:
 // mode: c++

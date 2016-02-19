@@ -1,5 +1,5 @@
-#ifndef art_FWLite_EventNavigator_h
-#define art_FWLite_EventNavigator_h
+#ifndef gallery_EventNavigator_h
+#define gallery_EventNavigator_h
 
 // Manages iteration over the events in a vector of
 // input files.  It handles the iteration, opening
@@ -20,7 +20,7 @@ class TBranch;
 class TFile;
 class TTree;
 
-namespace canvas {
+namespace gallery {
 
   class EventNavigator {
   public:
@@ -88,7 +88,7 @@ namespace canvas {
   };
 }
 
-#endif /* art_FWLite_EventNavigator_h */
+#endif /* gallery_EventNavigator_h */
 
 // Local Variables:
 // mode: c++

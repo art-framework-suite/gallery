@@ -1,5 +1,5 @@
-#ifndef art_FWLite_InputTag_h
-#define art_FWLite_InputTag_h
+#ifndef gallery_InputTag_h
+#define gallery_InputTag_h
 
 // Holds module label, product instance, and process strings
 // which are passed when requesting a data product.
@@ -7,7 +7,7 @@
 #include <iosfwd>
 #include <string>
 
-namespace canvas {
+namespace gallery {
 
   class InputTag {
   public:
@@ -62,7 +62,7 @@ namespace canvas {
   bool operator != (InputTag const & left, InputTag const & right);
 }
 
-#endif /* art_FWLite_InputTag_h */
+#endif /* gallery_InputTag_h */
 
 // Local Variables:
 // mode: c++

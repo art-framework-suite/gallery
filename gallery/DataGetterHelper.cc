@@ -27,7 +27,7 @@ namespace {
   std::string const emptyString;
 }
 
-namespace canvas {
+namespace gallery {
 
   bool DataGetterHelper::streamersInitialized_ = false;
 

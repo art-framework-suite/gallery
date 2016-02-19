@@ -10,7 +10,7 @@
 
 #include <iostream>
 
-namespace canvas {
+namespace gallery {
 
   EventNavigator::EventNavigator(std::vector<std::string> const& iFileNames) :
     fileNames_(iFileNames),

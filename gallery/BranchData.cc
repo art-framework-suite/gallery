@@ -9,7 +9,7 @@
 #include "TBranch.h"
 #include "TClass.h"
 
-namespace canvas {
+namespace gallery {
 
   BranchData::BranchData() :
     // This is an invalid BranchData object initialized

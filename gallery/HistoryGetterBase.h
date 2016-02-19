@@ -1,5 +1,5 @@
-#ifndef art_FWLite_HistoryGetterBase_h
-#define art_FWLite_HistoryGetterBase_h
+#ifndef gallery_HistoryGetterBase_h
+#define gallery_HistoryGetterBase_h
 
 #include "canvas/Persistency/Provenance/ProcessHistoryID.h"
 
@@ -8,7 +8,7 @@ namespace art {
   class ProcessHistory;
 }
 
-namespace canvas {
+namespace gallery {
 
   class HistoryGetterBase {
   public:

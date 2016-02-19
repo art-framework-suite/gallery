@@ -8,7 +8,7 @@
 
 #include "TFile.h"
 
-namespace canvas {
+namespace gallery {
 
   Event::Event(std::vector<std::string> const& fileNames,
                bool useTTreeCache,
