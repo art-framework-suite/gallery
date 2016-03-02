@@ -39,12 +39,12 @@
 #include "gallery/BranchData.h"
 #include "gallery/BranchMapReader.h"
 #include "gallery/HistoryGetterBase.h"
-#include "gallery/InputTag.h"
 #include "gallery/TypeLabelInstanceKey.h"
 
 #include "canvas/Persistency/Common/EDProductGetterFinder.h"
 #include "canvas/Persistency/Provenance/BranchID.h"
 #include "canvas/Persistency/Provenance/ProcessHistoryID.h"
+#include "canvas/Utilities/InputTag.h"
 #include "canvas/Utilities/TypeID.h"
 
 #include <map>
@@ -78,7 +78,7 @@ namespace gallery {
     ~DataGetterHelper();
 
     void getByLabel(std::type_info const& typeInfoOfWrapper,
-                    InputTag const& inputTag,
+                    art::InputTag const& inputTag,
                     void* ptrToPtrToWrapper) const;
 
     void updateFile(TFile* iFile, TTree* iTree, bool initializeTheCache);

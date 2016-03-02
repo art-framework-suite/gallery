@@ -9,7 +9,6 @@ set(gallery_sources
   EventHistoryGetter.cc
   EventNavigator.cc
   HistoryGetterBase.cc
-  InputTag.cc
   throwFunctions.cc
 )
 

@@ -110,7 +110,7 @@ namespace gallery {
   }
 
   void Event::getByLabel(std::type_info const& typeInfoOfWrapper,
-                         InputTag const& inputTag,
+                         art::InputTag const& inputTag,
                          void* ptrToPtrToWrapper) const {
     dataGetterHelper_->getByLabel(typeInfoOfWrapper,
                                   inputTag,
@@ -118,7 +118,7 @@ namespace gallery {
   }
 
   void Event::throwProductNotFoundException(std::type_info const& typeInfo,
-                                            InputTag const& tag) const {
+                                            art::InputTag const& tag) const {
 
     art::TypeID type(typeInfo);
     throw art::Exception(art::errors::ProductNotFound)

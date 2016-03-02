@@ -5,8 +5,8 @@
 // and EventNavigator to iterate over events in a set
 // of input files and find products in them.
 
-#include "gallery/InputTag.h"
 #include "gallery/ValidHandle.h"
+#include "canvas/Utilities/InputTag.h"
 #include "canvas/Persistency/Common/Wrapper.h"
 
 #include "canvas/Persistency/Provenance/EventAuxiliary.h"
@@ -38,7 +38,7 @@ namespace gallery {
 
     template <typename PROD>
     gallery::ValidHandle<PROD>
-    getValidHandle(gallery::InputTag const&) const;
+    getValidHandle(art::InputTag const&) const;
 
     art::EventAuxiliary const& eventAuxiliary() const;
     art::History const& history() const;
@@ -65,11 +65,11 @@ namespace gallery {
     Event const& operator=(Event const&) = delete;
 
     void getByLabel(std::type_info const& typeInfoOfWrapper,
-                    InputTag const& inputTag,
+                    art::InputTag const& inputTag,
                     void* ptrToPtrToWrapper) const;
 
     void throwProductNotFoundException(std::type_info const& typeInfo,
-                                       InputTag const& tag) const;
+                                       art::InputTag const& tag) const;
     void checkForEnd() const;
     void updateAfterEventChange(long long oldFileEntry);
 
@@ -83,7 +83,7 @@ namespace gallery {
 
   template <typename PROD>
   ValidHandle<PROD>
-  Event::getValidHandle(InputTag const& inputTag) const {
+  Event::getValidHandle(art::InputTag const& inputTag) const {
     checkForEnd();
     std::type_info const& typeInfoOfWrapper = typeid(art::Wrapper<PROD>);
     art::Wrapper<PROD>* ptrToWrapper;

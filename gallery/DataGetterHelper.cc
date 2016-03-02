@@ -49,7 +49,7 @@ namespace gallery {
   }
 
   void DataGetterHelper::getByLabel(std::type_info const& typeInfoOfWrapper,
-                                    InputTag const& inputTag,
+                                    art::InputTag const& inputTag,
                                     void* ptrToPtrToWrapper) const {
 
     void** ptrToPtr = reinterpret_cast<void**>(ptrToPtrToWrapper);
