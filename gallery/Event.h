@@ -5,6 +5,7 @@
 // and EventNavigator to iterate over events in a set
 // of input files and find products in them.
 
+#include "gallery/Handle.h"
 #include "gallery/ValidHandle.h"
 #include "canvas/Utilities/InputTag.h"
 #include "canvas/Persistency/Common/Wrapper.h"
@@ -18,6 +19,10 @@
 #include <string>
 #include <typeinfo>
 #include <vector>
+
+namespace cet {
+  class exception;
+}
 
 class TFile;
 class TTree;
@@ -39,6 +44,9 @@ namespace gallery {
     template <typename PROD>
     gallery::ValidHandle<PROD>
     getValidHandle(art::InputTag const&) const;
+
+    template <typename PROD>
+    bool getByLabel(art::InputTag const&, Handle<PROD>& result) const;
 
     art::EventAuxiliary const& eventAuxiliary() const;
     art::History const& history() const;
@@ -70,6 +78,11 @@ namespace gallery {
 
     void throwProductNotFoundException(std::type_info const& typeInfo,
                                        art::InputTag const& tag) const;
+
+    std::shared_ptr<cet::exception const>
+    makeProductNotFoundException(std::type_info const& typeInfo,
+                                 art::InputTag const& tag) const;
+
     void checkForEnd() const;
     void updateAfterEventChange(long long oldFileEntry);
 
@@ -99,8 +112,28 @@ namespace gallery {
     PROD const* product = ptrToWrapper->product();
     return ValidHandle<PROD>(product);
   }
-}
 
+  template <typename PROD>
+  bool
+  Event::getByLabel(art::InputTag const& inputTag, Handle<PROD>& result) const {
+    checkForEnd();
+    std::type_info const& typeInfoOfWrapper = typeid(art::Wrapper<PROD>);
+    art::Wrapper<PROD>* ptrToWrapper;
+    void* ptrToPtrToWrapper = &ptrToWrapper;
+
+    getByLabel(typeInfoOfWrapper,
+               inputTag,
+               ptrToPtrToWrapper);
+
+    if(ptrToWrapper == nullptr) {
+      result = Handle<PROD>(makeProductNotFoundException(typeid(PROD), inputTag));
+      return false;
+    }
+    PROD const* product = ptrToWrapper->product();
+    result = Handle<PROD>(product);
+    return true;
+  }
+}
 #endif /* gallery_Event_h */
 
 // Local Variables:

@@ -8,8 +8,10 @@ set(gallery_sources
   Event.cc
   EventHistoryGetter.cc
   EventNavigator.cc
+  Handle.cc
   HistoryGetterBase.cc
   throwFunctions.cc
+  ValidHandle.cc
 )
 
 set( gallery_libraries

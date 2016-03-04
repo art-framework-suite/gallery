@@ -5,18 +5,19 @@
 // except it is missing functions, data members,
 // typedefs, and dependences not needed in gallery.
 
-#include "canvas/Utilities/Exception.h"
-
-#include <utility>
-
 namespace gallery {
+
+  void throwValidHandleNullPointer();
 
   template <typename T>
   class ValidHandle
   {
   public:
 
-    ValidHandle() : prod_(nullptr) { }
+    typedef T element_type;
+    class HandleTag { };
+
+    ValidHandle() = delete;
     ValidHandle(T const* prod);
     ValidHandle(ValidHandle const&) = default;
     ValidHandle& operator=(ValidHandle const&) = default;
@@ -34,9 +35,9 @@ namespace gallery {
   ValidHandle<T>::ValidHandle(T const* prod) :
     prod_(prod)
   {
-    if (prod == nullptr)
-      throw art::Exception(art::errors::NullPointerError)
-        << "Attempt to create ValidHandle with null pointer";
+    if (prod == nullptr) {
+      throwValidHandleNullPointer();
+    }
   }
 
   template <class T>

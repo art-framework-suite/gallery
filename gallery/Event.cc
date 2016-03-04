@@ -119,17 +119,24 @@ namespace gallery {
 
   void Event::throwProductNotFoundException(std::type_info const& typeInfo,
                                             art::InputTag const& tag) const {
+    auto e = makeProductNotFoundException(typeInfo, tag);
+    throw *e;
+  }
 
+  std::shared_ptr<cet::exception const>
+  Event::makeProductNotFoundException(std::type_info const& typeInfo,
+                                      art::InputTag const& tag) const {
     art::TypeID type(typeInfo);
-    throw art::Exception(art::errors::ProductNotFound)
-      << "Failed to find product for \n  type = '"
-      << type.className()
-      << "'\n  module = '" << tag.label()
-      << "'\n  productInstance = '"
-      << ((!tag.instance().empty()) ? tag.instance().c_str() : "")
-      << "'\n  process='"
-      << ((!tag.process().empty()) ? tag.process().c_str() : "")
-      << "'\n";
+    std::shared_ptr<art::Exception> e = std::make_shared<art::Exception>(art::errors::ProductNotFound);
+    *e << "Failed to find product for \n  type = '"
+       << type.className()
+       << "'\n  module = '" << tag.label()
+       << "'\n  productInstance = '"
+       << ((!tag.instance().empty()) ? tag.instance().c_str() : "")
+       << "'\n  process='"
+       << ((!tag.process().empty()) ? tag.process().c_str() : "")
+       << "'\n";
+    return e;
   }
 
   void Event::checkForEnd() const {
