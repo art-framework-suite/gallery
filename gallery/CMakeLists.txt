@@ -2,6 +2,7 @@
 include(ArtMake)
 
 set(gallery_sources
+  AssnsBranchData.cc
   BranchData.cc
   BranchMapReader.cc
   DataGetterHelper.cc

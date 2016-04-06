@@ -8,8 +8,8 @@
 #include "gallery/Handle.h"
 #include "gallery/ValidHandle.h"
 #include "canvas/Utilities/InputTag.h"
+#include "canvas/Persistency/Common/EDProduct.h"
 #include "canvas/Persistency/Common/Wrapper.h"
-
 #include "canvas/Persistency/Provenance/EventAuxiliary.h"
 #include "canvas/Persistency/Provenance/History.h"
 #include "canvas/Persistency/Provenance/ProcessHistory.h"
@@ -67,6 +67,9 @@ namespace gallery {
     TFile* getTFile() const;
     TTree* getTTree() const;
 
+    template <typename T>
+    using HandleT = Handle<T>;
+
   private:
 
     Event(Event const&) = delete;
@@ -74,7 +77,7 @@ namespace gallery {
 
     void getByLabel(std::type_info const& typeInfoOfWrapper,
                     art::InputTag const& inputTag,
-                    void* ptrToPtrToWrapper) const;
+                    art::EDProduct const*& edProduct) const;
 
     void throwProductNotFoundException(std::type_info const& typeInfo,
                                        art::InputTag const& tag) const;
@@ -99,12 +102,14 @@ namespace gallery {
   Event::getValidHandle(art::InputTag const& inputTag) const {
     checkForEnd();
     std::type_info const& typeInfoOfWrapper = typeid(art::Wrapper<PROD>);
-    art::Wrapper<PROD>* ptrToWrapper;
-    void* ptrToPtrToWrapper = &ptrToWrapper;
+
+    art::EDProduct const* edProduct = nullptr;
 
     getByLabel(typeInfoOfWrapper,
                inputTag,
-               ptrToPtrToWrapper);
+               edProduct);
+
+    art::Wrapper<PROD> const* ptrToWrapper = dynamic_cast< art::Wrapper<PROD> const *>(edProduct);
 
     if(ptrToWrapper == nullptr) {
       throwProductNotFoundException(typeid(PROD), inputTag);
@@ -118,12 +123,14 @@ namespace gallery {
   Event::getByLabel(art::InputTag const& inputTag, Handle<PROD>& result) const {
     checkForEnd();
     std::type_info const& typeInfoOfWrapper = typeid(art::Wrapper<PROD>);
-    art::Wrapper<PROD>* ptrToWrapper;
-    void* ptrToPtrToWrapper = &ptrToWrapper;
+
+    art::EDProduct const* edProduct = nullptr;
 
     getByLabel(typeInfoOfWrapper,
                inputTag,
-               ptrToPtrToWrapper);
+               edProduct);
+
+    art::Wrapper<PROD> const* ptrToWrapper = dynamic_cast< art::Wrapper<PROD> const *>(edProduct);
 
     if(ptrToWrapper == nullptr) {
       result = Handle<PROD>(makeProductNotFoundException(typeid(PROD), inputTag));

@@ -111,10 +111,10 @@ namespace gallery {
 
   void Event::getByLabel(std::type_info const& typeInfoOfWrapper,
                          art::InputTag const& inputTag,
-                         void* ptrToPtrToWrapper) const {
+                         art::EDProduct const*& edProduct) const {
     dataGetterHelper_->getByLabel(typeInfoOfWrapper,
                                   inputTag,
-                                  ptrToPtrToWrapper);
+                                  edProduct);
   }
 
   void Event::throwProductNotFoundException(std::type_info const& typeInfo,

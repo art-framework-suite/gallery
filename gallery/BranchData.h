@@ -29,18 +29,25 @@ namespace gallery {
     BranchData();
 
     BranchData(art::TypeID const& type,
+               TClass* iTClass,
                TBranch* branch,
                TClass* edProductTClass,
                EventNavigator const* eventNavigator,
                art::EDProductGetterFinder const* finder,
                std::string&& iBranchName);
-    ~BranchData();
 
-    void updateFile(TBranch* iBranch);
+    BranchData(BranchData const&) = delete;
+    BranchData const& operator=(BranchData const&) = delete;
 
+    virtual ~BranchData();
+
+    virtual void updateFile(TBranch* iBranch);
+
+    TClass* tClass() const { return tClass_; }
     void* address() const { return address_; }
     TBranch* branch() const { return branch_; }
     std::string const& branchName() const { return branchName_; }
+    long long lastProduct() const { return lastProduct_; }
 
     virtual bool isReady() const override { return true; }
     virtual art::EDProduct const *getIt() const override;

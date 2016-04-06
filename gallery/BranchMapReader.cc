@@ -85,6 +85,14 @@ namespace gallery {
     return &bdi->second;
   }
 
+  art::BranchDescription const* BranchMapReader::branchIDToBranch(art::BranchID const& bid) const {
+    auto bdi = branchIDToDescriptionMap_.find(bid);
+    if (branchIDToDescriptionMap_.end() == bdi) {
+      return nullptr;
+    }
+    return &bdi->second;
+  }
+
   bool BranchMapReader::branchInRegistryOfAnyOpenedFile(art::BranchID const& branchID) const {
     return allSeenBranchIDs_.find(branchID) != allSeenBranchIDs_.end();
   }
