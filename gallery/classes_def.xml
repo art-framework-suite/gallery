@@ -2,7 +2,4 @@
  <class name="gallery::Event" ClassVersion="0">
   <version ClassVersion="0" checksum="3931426072"/>
  </class>
- <class name="gallery::InputTag" ClassVersion="0">
-  <version ClassVersion="0" checksum="844096822"/>
- </class>
 </lcgdict>

@@ -5,10 +5,11 @@
 // and EventNavigator to iterate over events in a set
 // of input files and find products in them.
 
-#include "gallery/InputTag.h"
+#include "gallery/Handle.h"
 #include "gallery/ValidHandle.h"
+#include "canvas/Utilities/InputTag.h"
+#include "canvas/Persistency/Common/EDProduct.h"
 #include "canvas/Persistency/Common/Wrapper.h"
-
 #include "canvas/Persistency/Provenance/EventAuxiliary.h"
 #include "canvas/Persistency/Provenance/History.h"
 #include "canvas/Persistency/Provenance/ProcessHistory.h"
@@ -18,6 +19,10 @@
 #include <string>
 #include <typeinfo>
 #include <vector>
+
+namespace cet {
+  class exception;
+}
 
 class TFile;
 class TTree;
@@ -38,7 +43,10 @@ namespace gallery {
 
     template <typename PROD>
     gallery::ValidHandle<PROD>
-    getValidHandle(gallery::InputTag const&) const;
+    getValidHandle(art::InputTag const&) const;
+
+    template <typename PROD>
+    bool getByLabel(art::InputTag const&, Handle<PROD>& result) const;
 
     art::EventAuxiliary const& eventAuxiliary() const;
     art::History const& history() const;
@@ -59,17 +67,25 @@ namespace gallery {
     TFile* getTFile() const;
     TTree* getTTree() const;
 
+    template <typename T>
+    using HandleT = Handle<T>;
+
   private:
 
     Event(Event const&) = delete;
     Event const& operator=(Event const&) = delete;
 
     void getByLabel(std::type_info const& typeInfoOfWrapper,
-                    InputTag const& inputTag,
-                    void* ptrToPtrToWrapper) const;
+                    art::InputTag const& inputTag,
+                    art::EDProduct const*& edProduct) const;
 
     void throwProductNotFoundException(std::type_info const& typeInfo,
-                                       InputTag const& tag) const;
+                                       art::InputTag const& tag) const;
+
+    std::shared_ptr<cet::exception const>
+    makeProductNotFoundException(std::type_info const& typeInfo,
+                                 art::InputTag const& tag) const;
+
     void checkForEnd() const;
     void updateAfterEventChange(long long oldFileEntry);
 
@@ -83,15 +99,17 @@ namespace gallery {
 
   template <typename PROD>
   ValidHandle<PROD>
-  Event::getValidHandle(InputTag const& inputTag) const {
+  Event::getValidHandle(art::InputTag const& inputTag) const {
     checkForEnd();
     std::type_info const& typeInfoOfWrapper = typeid(art::Wrapper<PROD>);
-    art::Wrapper<PROD>* ptrToWrapper;
-    void* ptrToPtrToWrapper = &ptrToWrapper;
+
+    art::EDProduct const* edProduct = nullptr;
 
     getByLabel(typeInfoOfWrapper,
                inputTag,
-               ptrToPtrToWrapper);
+               edProduct);
+
+    art::Wrapper<PROD> const* ptrToWrapper = dynamic_cast< art::Wrapper<PROD> const *>(edProduct);
 
     if(ptrToWrapper == nullptr) {
       throwProductNotFoundException(typeid(PROD), inputTag);
@@ -99,8 +117,30 @@ namespace gallery {
     PROD const* product = ptrToWrapper->product();
     return ValidHandle<PROD>(product);
   }
-}
 
+  template <typename PROD>
+  bool
+  Event::getByLabel(art::InputTag const& inputTag, Handle<PROD>& result) const {
+    checkForEnd();
+    std::type_info const& typeInfoOfWrapper = typeid(art::Wrapper<PROD>);
+
+    art::EDProduct const* edProduct = nullptr;
+
+    getByLabel(typeInfoOfWrapper,
+               inputTag,
+               edProduct);
+
+    art::Wrapper<PROD> const* ptrToWrapper = dynamic_cast< art::Wrapper<PROD> const *>(edProduct);
+
+    if(ptrToWrapper == nullptr) {
+      result = Handle<PROD>(makeProductNotFoundException(typeid(PROD), inputTag));
+      return false;
+    }
+    PROD const* product = ptrToWrapper->product();
+    result = Handle<PROD>(product);
+    return true;
+  }
+}
 #endif /* gallery_Event_h */
 
 // Local Variables:

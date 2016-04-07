@@ -87,7 +87,7 @@ namespace gallery {
     if (atEnd()) return;
 
     if (file_) {
-      std::cout << "Reading " << file_->GetBytesRead() << " bytes in " << file_->GetReadCalls() <<  " transactions\n";
+      std::cout << "Closing file, read " << file_->GetBytesRead() << " bytes in " << file_->GetReadCalls() <<  " transactions\n";
     }
 
     ++fileEntry_;

@@ -32,6 +32,7 @@ namespace gallery {
 
     art::BranchID productToBranchID(art::ProductID const& pid) const;
     art::BranchDescription const* productToBranch(art::ProductID const& pid) const;
+    art::BranchDescription const* branchIDToBranch(art::BranchID const& bid) const;
     bool branchInRegistryOfAnyOpenedFile(art::BranchID const&) const;
 
   private:

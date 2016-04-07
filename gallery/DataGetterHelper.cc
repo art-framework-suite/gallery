@@ -1,6 +1,7 @@
 
 #include "gallery/DataGetterHelper.h"
 
+#include "gallery/AssnsBranchData.h"
 #include "gallery/EventNavigator.h"
 
 #include "canvas/Persistency/Provenance/BranchDescription.h"
@@ -8,7 +9,9 @@
 #include "canvas/Persistency/Provenance/History.h"
 #include "canvas/Persistency/Provenance/ProcessHistory.h"
 #include "canvas/Persistency/Provenance/ProductID.h"
+#include "canvas/Persistency/Provenance/TypeTools.h"
 #include "canvas/Utilities/Exception.h"
+#include "canvas/Utilities/WrappedClassName.h"
 
 #include "canvas/Persistency/Common/CacheStreamers.h"
 #include "canvas/Persistency/Provenance/TransientStreamer.h"
@@ -49,25 +52,26 @@ namespace gallery {
   }
 
   void DataGetterHelper::getByLabel(std::type_info const& typeInfoOfWrapper,
-                                    InputTag const& inputTag,
-                                    void* ptrToPtrToWrapper) const {
+                                    art::InputTag const& inputTag,
+                                    art::EDProduct const*& edProduct) const {
 
-    void** ptrToPtr = reinterpret_cast<void**>(ptrToPtrToWrapper);
-    *ptrToPtr = nullptr; // this nullptr indicates product not found yet
+    edProduct = nullptr; // this nullptr indicates product not found yet
 
     if (!initializedForProcessHistory_) initializeForProcessHistory();
 
-    InfoForTypeLabelInstance const& info = getInfoForTypeLabelInstance(typeInfoOfWrapper,
+    art::TypeID type(typeInfoOfWrapper);
+    InfoForTypeLabelInstance const& info = getInfoForTypeLabelInstance(type,
                                                                        inputTag.label(),
                                                                        inputTag.instance());
+
     if (inputTag.process().empty()) {
       // search in reverse order of the ProcessHistory
       for (auto reverseIter = info.branchDataIndexOrderedByHistory().rbegin(),
                        iEnd = info.branchDataIndexOrderedByHistory().rend();
            reverseIter != iEnd; ++reverseIter) {
-        readBranchData(*reverseIter, ptrToPtr);
+        readBranchData(*reverseIter, edProduct, type);
         // If the product was present in the input file and we successfully read it then we are done
-        if (*ptrToPtr) return;
+        if (edProduct) return;
       }
     } else {  // process is not empty
 
@@ -77,7 +81,7 @@ namespace gallery {
 
         unsigned int branchDataIndex = 0;
         if (getBranchDataIndex(info.processIndexToBranchDataIndex(), processIndex, branchDataIndex)) {
-          readBranchData(branchDataIndex, ptrToPtr);
+          readBranchData(branchDataIndex, edProduct, type);
         }
       }
     }
@@ -101,9 +105,26 @@ namespace gallery {
         if (getBranchDataIndex(old, processIndex, branchDataIndex)) {
           BranchData& branchData = *branchDataVector_[branchDataIndex];
           TBranch* branch = tree_->GetBranch(branchData.branchName().c_str());
+
           // This will update the pointer to the TBranch in BranchData.
           // This loop is sufficient to update all BranchData objects in the vector.
           branchData.updateFile(branch);
+
+          // A little paranoia here. What if in one input file Assns<A,B,C> is written into the
+          // file and Assns<B,A,C> is written into another? The following deals properly with
+          // that case by constructing a new AssnsBranchData object, although I imagine it might
+          // never happen in practice.
+          if (info.isAssns() && branch != nullptr) {
+            TClass* tClass = getTClassUsingBranchDescription(processIndex, info);
+            art::TypeID typeIDInDescription(tClass->GetTypeInfo());
+            art::TypeID typeIDInBranchData(branchData.tClass()->GetTypeInfo());
+            std::string branchName = branchData.branchName();
+            if (typeIDInDescription != typeIDInBranchData) {
+              branchDataVector_[branchDataIndex].reset(new AssnsBranchData(typeIDInDescription, tClass, branch,
+                                                                           edProductTClass_, eventNavigator_, this,
+                                                                           std::move(branchName), info.type(), info.partnerType()));
+            }
+          }
           info.processIndexToBranchDataIndex().push_back(uupair(processIndex, branchDataIndex));
           if (initializeTheCache && branch) {
             tree_->AddBranchToCache(branch, kTRUE);
@@ -237,19 +258,49 @@ namespace gallery {
                                        unsigned int processIndex,
                                        InfoForTypeLabelInstance const& info,
                                        bool initializeTheCache) const {
+
     TBranch* branch = tree_->GetBranch(branchName.c_str());
+    if (branch == nullptr) return;
 
     unsigned int branchDataIndex = branchDataVector_.size();
-    branchDataVector_.emplace_back(new BranchData(info.type(), branch, edProductTClass_,
-                                                  eventNavigator_, this, std::move(branchName)));
+
+    if (info.isAssns()) {
+      TClass* tClass = getTClassUsingBranchDescription(processIndex, info);
+      art::TypeID typeIDInDescription(tClass->GetTypeInfo());
+      branchDataVector_.emplace_back(new AssnsBranchData(typeIDInDescription, tClass, branch, edProductTClass_,
+                                                         eventNavigator_, this, std::move(branchName), info.type(), info.partnerType()));
+    } else {
+      branchDataVector_.emplace_back(new BranchData(info.type(), info.tClass(), branch, edProductTClass_,
+                                                    eventNavigator_, this, std::move(branchName)));
+    }
     info.processIndexToBranchDataIndex().push_back(uupair(processIndex, branchDataIndex));
     if (initializeTheCache && branch) {
       tree_->AddBranchToCache(branch,kTRUE);
     }
   }
 
+  TClass*
+  DataGetterHelper::getTClassUsingBranchDescription(unsigned int processIndex,
+                                                    InfoForTypeLabelInstance const& info) const {
+
+    art::BranchDescription const* branchDescription =
+      branchMapReader_.branchIDToBranch(info.branchIDs()[processIndex]);
+    if (branchDescription == nullptr) {
+      throw art::Exception(art::errors::LogicError)
+        << "In DataGetterHelper::getTClassUsingBranchDescription. TBranch exists but no BranchDescription in ProductRegistry.\n"
+        << "This shouldn't be possible. For type " << info.type().className() << "\n";
+    }
+    TClass* tClass = TClass::GetClass(branchDescription->wrappedName().c_str());
+    if (tClass == nullptr) {
+      throw art::Exception(art::errors::DictionaryNotFound)
+        << "In DataGetterHelper::getTClassUsingBranchDescription. Missing dictionary for wrapped Assns class.\n"
+        << branchDescription->wrappedName() << "\n";
+    }
+    return tClass;
+  }
+
   DataGetterHelper::InfoForTypeLabelInstance&
-  DataGetterHelper::getInfoForTypeLabelInstance(std::type_info const& typeInfoOfWrapper,
+  DataGetterHelper::getInfoForTypeLabelInstance(art::TypeID const& type,
                                                 std::string const& label,
                                                 std::string const& instance) const {
     if (label.empty()) {
@@ -257,7 +308,6 @@ namespace gallery {
         << "getValidHandle was passed an empty module label. Not allowed.\n";
     }
 
-    art::TypeID type(typeInfoOfWrapper);
     TypeLabelInstanceKey key(type, label.c_str(), instance.c_str());
 
     auto itFind = infoMap_.find(key);
@@ -271,9 +321,16 @@ namespace gallery {
   void DataGetterHelper::addTypeLabelInstance(art::TypeID const& type,
                                               std::string const& label,
                                               std::string const& instance) const {
+
     unsigned int infoIndex = infoVector_.size();
     infoVector_.emplace_back(type, label, instance);
+    insertIntoInfoMap(type, label, instance, infoIndex);
+
     InfoForTypeLabelInstance const& info = infoVector_[infoIndex];
+
+    if (info.isAssns()) {
+      insertIntoInfoMap(info.partnerType(), label, instance, infoIndex);
+    }
 
     unsigned int processIndex = 0;
     info.branchIDs().reserve(processNames_.size());
@@ -287,8 +344,6 @@ namespace gallery {
       ++processIndex;
     }
     updateBranchDataIndexOrderedByHistory(info);
-
-    insertIntoInfoMap(type, label, instance, infoIndex);
   }
 
   void DataGetterHelper::insertIntoInfoMap(art::TypeID const& type,
@@ -320,12 +375,11 @@ namespace gallery {
   }
 
   void DataGetterHelper::readBranchData(unsigned int branchDataIndex,
-                                        void **ptrToPtr) const {
+                                        art::EDProduct const*& edProduct,
+                                        art::TypeID const& type) const {
 
     BranchData const* branchData =  branchDataVector_[branchDataIndex].get();
-    if (branchData->getIt()) {
-      *ptrToPtr = branchData->address();
-    }
+    edProduct = branchData->uniqueProduct(type);
   }
 
   bool DataGetterHelper::getBranchDataIndex(std::vector<std::pair<unsigned int, unsigned int> > const& processIndexToBranchDataIndex,
@@ -365,8 +419,8 @@ namespace gallery {
 
     TClass* tClass = TClass::GetClass(desc.wrappedName().c_str());
     std::type_info const& typeInfoOfWrapper = *tClass->GetTypeInfo();
-
-    InfoForTypeLabelInstance const& info = getInfoForTypeLabelInstance(typeInfoOfWrapper,
+    art::TypeID type(typeInfoOfWrapper);
+    InfoForTypeLabelInstance const& info = getInfoForTypeLabelInstance(type,
                                                                        desc.moduleLabel(),
                                                                        desc.productInstanceName());
     auto itProcess = processNameToProcessIndex_.find(desc.processName());
@@ -417,6 +471,51 @@ namespace gallery {
                            std::string const& iInstance) :
     type_(iType),
     label_(iLabel),
-    instance_(iInstance) {
+    instance_(iInstance),
+    tClass_(nullptr),
+    isAssns_(false),
+    partnerType_() {
+
+    tClass_ = TClass::GetClass(type_.typeInfo());
+
+    // Note we allow tClass_ to be null at this point. If the branch
+    // is actually in the input file and there is an attempt to construct
+    // a BranchData object with it null, a missing dictionary exception
+    // will be thrown.  This also means we just assume it is not an
+    // Assns. Even if this assumption is wrong, we will get the correct
+    // behavior from getByLabel. A missing dictionary exception will
+    // get thrown if the branch is in the input file and a ProductNotFound
+    // exception will get thrown if it is not.
+
+    if (tClass_) {
+
+      TClass* firstTemplateArgument = art::type_of_template_arg(tClass_, 0);
+      if (!firstTemplateArgument) {
+        throw art::Exception(art::errors::DictionaryNotFound)
+          << "In InfoForTypeLabelInstance constructor.\nMissing dictionary for PROD even though the Wrapper<PROD> dictionary exists.\n"
+          << tClass_->GetName() << "\n";
+      }
+      if (std::string(firstTemplateArgument->GetName()).find("art::Assns<") == 0ul) {
+
+        isAssns_ = true;
+
+        std::string partner = firstTemplateArgument->GetName();
+        partner += "::partner_t";
+        TClass* unwrappedPartnerTClass = TClass::GetClass(partner.c_str());
+        if (!unwrappedPartnerTClass) {
+          throw art::Exception(art::errors::DictionaryNotFound)
+            << "In InfoForTypeLabelInstance constructor.\nMissing dictionary for partner of Assns class.\n"
+            << partner << "\n";
+        }
+        std::string wrappedPartnerName = art::wrappedClassName(unwrappedPartnerTClass->GetName());
+        TClass* partnerTClass = TClass::GetClass(wrappedPartnerName.c_str());
+        if (!partnerTClass) {
+          throw art::Exception(art::errors::DictionaryNotFound)
+            << "In InfoForTypeLabelInstance constructor.\nMissing dictionary for wrapped partner of Assns class.\n"
+            << wrappedPartnerName << "\n";
+        }
+        partnerType_ = art::TypeID(partnerTClass->GetTypeInfo());
+      }
+    }
   }
 }

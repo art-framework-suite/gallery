@@ -24,12 +24,13 @@ namespace gallery {
   }
 
   BranchData::BranchData(art::TypeID const& type,
+                         TClass* iTClass,
                          TBranch* iBranch,
                          TClass* edProductTClass,
                          EventNavigator const* eventNavigator,
                          art::EDProductGetterFinder const* finder,
                          std::string&& iBranchName) :
-    tClass_(TClass::GetClass(type.typeInfo())),
+    tClass_(iTClass),
     address_(tClass_ != nullptr ? tClass_->New() : nullptr),
     edProduct_(nullptr),
     branch_(iBranch),
@@ -99,15 +100,11 @@ namespace gallery {
   }
 
   art::EDProduct const* BranchData::uniqueProduct() const {
-    throw art::Exception(art::errors::LogicError)
-      << "BranchData::uniqueProduct not implemented. Should not be called.";
-    return nullptr;
+    return getIt();
   }
 
   art::EDProduct const* BranchData::uniqueProduct(art::TypeID const&) const {
-    throw art::Exception(art::errors::LogicError)
-      << "BranchData::uniqueProduct not implemented. Should not be called.";
-    return nullptr;
+    return getIt();
   }
 
   bool BranchData::resolveProduct(bool, art::TypeID const&) const {
