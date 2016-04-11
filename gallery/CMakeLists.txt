@@ -1,5 +1,4 @@
-
-include(ArtMake)
+include(CetMake)
 
 set(gallery_sources
   AssnsBranchData.cc
@@ -25,9 +24,14 @@ set( gallery_libraries
         ${ROOT_TREE}
 )
 
-art_make_library( LIBRARY_NAME gallery
-                  SOURCE ${gallery_sources}
-                  LIBRARIES ${gallery_libraries}
+cet_make(LIBRARIES canvas_Persistency_Common
+  canvas_Persistency_Provenance
+  canvas_Utilities
+  cetlib
+  ${ROOT_CORE}
+  ${ROOT_RIO}
+  ${ROOT_TREE}
+  NO_DICTIONARY
 )
 
 art_dictionary(DICTIONARY_LIBRARIES gallery)
