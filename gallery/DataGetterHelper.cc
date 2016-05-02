@@ -488,9 +488,9 @@ namespace gallery {
     // exception will get thrown if it is not.
 
     if (tClass_) {
-
-      TClass* firstTemplateArgument = art::type_of_template_arg(tClass_, 0);
-      if (!firstTemplateArgument) {
+      art::TypeWithDict twd;
+      TClass * firstTemplateArgument = nullptr;
+      if (!art::type_of_template_arg(tClass_, 0, twd) || (firstTemplateArgument = twd.tClass()) == nullptr) {
         throw art::Exception(art::errors::DictionaryNotFound)
           << "In InfoForTypeLabelInstance constructor.\nMissing dictionary for PROD even though the Wrapper<PROD> dictionary exists.\n"
           << tClass_->GetName() << "\n";
