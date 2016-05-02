@@ -4,7 +4,7 @@
 
 namespace gallery {
 
-  void throwHandleWhyFailed(std::shared_ptr<cet::exception const> whyFailed) {
+  void throwHandleWhyFailed(std::shared_ptr<art::Exception const> whyFailed) {
     if (whyFailed) {
       throw *whyFailed;
     }

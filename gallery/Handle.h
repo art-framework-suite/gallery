@@ -5,15 +5,13 @@
 // different and unneeded things have been removed
 // but otherwise the interface is identical.
 
-#include <memory>
+#include "canvas/Utilities/Exception.h"
 
-namespace cet {
-  class exception;
-}
+#include <memory>
 
 namespace gallery {
 
-  void throwHandleWhyFailed(std::shared_ptr<cet::exception const>);
+  void throwHandleWhyFailed(std::shared_ptr<art::Exception const>);
 
   template <typename T>
   class Handle
@@ -25,7 +23,7 @@ namespace gallery {
 
     Handle() : prod_(nullptr) { }
     Handle(T const*);
-    Handle(std::shared_ptr<cet::exception const>);
+    Handle(std::shared_ptr<art::Exception const>);
     Handle(Handle const&) = default;
     Handle& operator=(Handle const&) = default;
 
@@ -36,11 +34,11 @@ namespace gallery {
 
     // inspectors:
     bool isValid() const;
-    std::shared_ptr<cet::exception const> whyFailed() const;
+    std::shared_ptr<art::Exception const> whyFailed() const;
 
   private:
     T const*   prod_;
-    std::shared_ptr<cet::exception const>  whyFailed_;
+    std::shared_ptr<art::Exception const>  whyFailed_;
   };
 
   template <class T>
@@ -50,7 +48,7 @@ namespace gallery {
   }
 
   template <class T>
-  Handle<T>::Handle(std::shared_ptr<cet::exception const> iWhyFailed) :
+  Handle<T>::Handle(std::shared_ptr<art::Exception const> iWhyFailed) :
     prod_(nullptr),
     whyFailed_(iWhyFailed)
   {
@@ -90,7 +88,7 @@ namespace gallery {
 
   template <class T>
   inline
-  std::shared_ptr<cet::exception const>
+  std::shared_ptr<art::Exception const>
   Handle<T>::whyFailed() const
   {
     return whyFailed_;

@@ -123,7 +123,7 @@ namespace gallery {
     throw *e;
   }
 
-  std::shared_ptr<cet::exception const>
+  std::shared_ptr<art::Exception const>
   Event::makeProductNotFoundException(std::type_info const& typeInfo,
                                       art::InputTag const& tag) const {
     art::TypeID type(typeInfo);
