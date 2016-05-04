@@ -25,7 +25,7 @@ namespace gallery {
     EventNavigator const* eventNavigator_;
   };
 }
-#endif
+#endif /* gallery_EventHistoryGetter_h */
 
 // Local Variables:
 // mode: c++
