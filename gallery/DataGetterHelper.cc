@@ -28,6 +28,36 @@ namespace {
   std::string const underscore("_");
   std::string const period(".");
   std::string const emptyString;
+
+  art::TypeID
+  getPartnerTypeID(TClass *tClass)
+  {
+    art::TypeID result;
+    if (tClass) {
+      // Note we allow tClass to be null at this point. If the branch is
+      // actually in the input file and there is an attempt to construct
+      // a BranchData object with it null, a missing dictionary
+      // exception will be thrown. This also means we just assume it is
+      // not an Assns. Even if this assumption is wrong, we will get the
+      // correct behavior from getByLabel. A missing dictionary
+      // exception will get thrown if the branch is in the input file
+      // and a ProductNotFound exception will get thrown if it is not.
+      auto const wrappedClass = art::name_of_template_arg(tClass->GetName(), 0);
+      auto const assnsPartner = art::name_of_assns_partner(wrappedClass);
+      if (assnsPartner.empty()) {
+        return result;
+      }
+      auto const wrappedPartnerClassName = art::wrappedClassName(assnsPartner);
+      art::TypeWithDict const wrappedPartner(wrappedPartnerClassName);
+      if (!wrappedPartner) {
+        throw art::Exception(art::errors::DictionaryNotFound)
+          << "In InfoForTypeLabelInstance constructor.\nMissing dictionary for wrapped partner of Assns class.\n"
+          << wrappedPartnerClassName << "\n";
+      }
+      result = wrappedPartner.id();
+    }
+    return result;
+  }
 }
 
 namespace gallery {
@@ -472,50 +502,8 @@ namespace gallery {
     type_(iType),
     label_(iLabel),
     instance_(iInstance),
-    tClass_(nullptr),
-    isAssns_(false),
-    partnerType_() {
-
-    tClass_ = TClass::GetClass(type_.typeInfo());
-
-    // Note we allow tClass_ to be null at this point. If the branch
-    // is actually in the input file and there is an attempt to construct
-    // a BranchData object with it null, a missing dictionary exception
-    // will be thrown.  This also means we just assume it is not an
-    // Assns. Even if this assumption is wrong, we will get the correct
-    // behavior from getByLabel. A missing dictionary exception will
-    // get thrown if the branch is in the input file and a ProductNotFound
-    // exception will get thrown if it is not.
-
-    if (tClass_) {
-      art::TypeWithDict twd;
-      TClass * firstTemplateArgument = nullptr;
-      if (!art::type_of_template_arg(tClass_, 0, twd) || (firstTemplateArgument = twd.tClass()) == nullptr) {
-        throw art::Exception(art::errors::DictionaryNotFound)
-          << "In InfoForTypeLabelInstance constructor.\nMissing dictionary for PROD even though the Wrapper<PROD> dictionary exists.\n"
-          << tClass_->GetName() << "\n";
-      }
-      if (std::string(firstTemplateArgument->GetName()).find("art::Assns<") == 0ul) {
-
-        isAssns_ = true;
-
-        std::string partner = firstTemplateArgument->GetName();
-        partner += "::partner_t";
-        TClass* unwrappedPartnerTClass = TClass::GetClass(partner.c_str());
-        if (!unwrappedPartnerTClass) {
-          throw art::Exception(art::errors::DictionaryNotFound)
-            << "In InfoForTypeLabelInstance constructor.\nMissing dictionary for partner of Assns class.\n"
-            << partner << "\n";
-        }
-        std::string wrappedPartnerName = art::wrappedClassName(unwrappedPartnerTClass->GetName());
-        TClass* partnerTClass = TClass::GetClass(wrappedPartnerName.c_str());
-        if (!partnerTClass) {
-          throw art::Exception(art::errors::DictionaryNotFound)
-            << "In InfoForTypeLabelInstance constructor.\nMissing dictionary for wrapped partner of Assns class.\n"
-            << wrappedPartnerName << "\n";
-        }
-        partnerType_ = art::TypeID(partnerTClass->GetTypeInfo());
-      }
-    }
+    tClass_(TClass::GetClass(type_.typeInfo())),
+    partnerType_(getPartnerTypeID(tClass_))
+  {
   }
 }

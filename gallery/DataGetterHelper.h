@@ -126,7 +126,7 @@ namespace gallery {
       std::string const& instance() const { return instance_; }
 
       TClass* tClass() const { return tClass_; }
-      bool isAssns() const { return isAssns_; }
+      bool isAssns() const { return bool(partnerType_); }
       art::TypeID const& partnerType() const { return partnerType_; }
 
       std::vector<std::pair<unsigned int, unsigned int> > & processIndexToBranchDataIndex() const
