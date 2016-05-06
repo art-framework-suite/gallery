@@ -10,7 +10,6 @@
 #include "canvas/Utilities/InputTag.h"
 #include "canvas/Persistency/Common/EDProduct.h"
 #include "canvas/Persistency/Common/Wrapper.h"
-#include "canvas/Persistency/Provenance/DictionaryChecker.h"
 #include "canvas/Persistency/Provenance/EventAuxiliary.h"
 #include "canvas/Persistency/Provenance/History.h"
 #include "canvas/Persistency/Provenance/ProcessHistory.h"
@@ -96,8 +95,6 @@ namespace gallery {
     bool useTTreeCache_;
     unsigned int eventsToLearnUsedBranches_;
     unsigned int eventsProcessed_;
-
-    mutable art::DictionaryChecker dictChecker_; //! transient
   };
 
   template <typename PROD>

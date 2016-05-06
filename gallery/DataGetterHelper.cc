@@ -11,6 +11,7 @@
 #include "canvas/Persistency/Provenance/ProductID.h"
 #include "canvas/Persistency/Provenance/TypeTools.h"
 #include "canvas/Utilities/Exception.h"
+#include "canvas/Utilities/uniform_type_name.h"
 #include "canvas/Utilities/WrappedClassName.h"
 
 #include "canvas/Persistency/Common/CacheStreamers.h"
@@ -70,7 +71,8 @@ namespace gallery {
     tree_(nullptr),
     edProductTClass_(TClass::GetClass("art::EDProduct")),
     historyGetter_(historyGetter),
-    initializedForProcessHistory_(false) {
+    initializedForProcessHistory_(false),
+    dictChecker_() {
 
     initializeStreamers();
   }
@@ -351,6 +353,9 @@ namespace gallery {
   void DataGetterHelper::addTypeLabelInstance(art::TypeID const& type,
                                               std::string const& label,
                                               std::string const& instance) const {
+
+    dictChecker_.checkDictionaries(art::uniform_type_name(type.typeInfo()), true);
+    dictChecker_.reportMissingDictionaries();
 
     unsigned int infoIndex = infoVector_.size();
     infoVector_.emplace_back(type, label, instance);

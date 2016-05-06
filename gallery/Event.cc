@@ -5,7 +5,6 @@
 #include "gallery/EventNavigator.h"
 #include "canvas/Utilities/Exception.h"
 #include "canvas/Utilities/TypeID.h"
-#include "canvas/Utilities/uniform_type_name.h"
 
 #include "TFile.h"
 
@@ -19,9 +18,8 @@ namespace gallery {
                                                          std::make_shared<EventHistoryGetter>(eventNavigator_.get()))),
     useTTreeCache_(useTTreeCache),
     eventsToLearnUsedBranches_(eventsToLearnUsedBranches),
-    eventsProcessed_(0),
-    dictChecker_()
-  {
+    eventsProcessed_(0) {
+
     if (eventsToLearnUsedBranches_ < 1) eventsToLearnUsedBranches_ = 1;
     if (!atEnd()) {
       bool initializeTheCache = false;
@@ -114,8 +112,7 @@ namespace gallery {
   void Event::getByLabel(std::type_info const& typeInfoOfWrapper,
                          art::InputTag const& inputTag,
                          art::EDProduct const*& edProduct) const {
-    dictChecker_.checkDictionaries(art::uniform_type_name(typeInfoOfWrapper), true);
-    dictChecker_.reportMissingDictionaries();
+
     dataGetterHelper_->getByLabel(typeInfoOfWrapper,
                                   inputTag,
                                   edProduct);
