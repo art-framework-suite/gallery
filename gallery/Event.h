@@ -82,7 +82,7 @@ namespace gallery {
     void throwProductNotFoundException(std::type_info const& typeInfo,
                                        art::InputTag const& tag) const;
 
-    std::shared_ptr<cet::exception const>
+    std::shared_ptr<art::Exception const>
     makeProductNotFoundException(std::type_info const& typeInfo,
                                  art::InputTag const& tag) const;
 

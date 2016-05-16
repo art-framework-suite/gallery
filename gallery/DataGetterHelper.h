@@ -43,6 +43,7 @@
 
 #include "canvas/Persistency/Common/EDProductGetterFinder.h"
 #include "canvas/Persistency/Provenance/BranchID.h"
+#include "canvas/Persistency/Provenance/DictionaryChecker.h"
 #include "canvas/Persistency/Provenance/ProcessHistoryID.h"
 #include "canvas/Utilities/InputTag.h"
 #include "canvas/Utilities/TypeID.h"
@@ -126,7 +127,7 @@ namespace gallery {
       std::string const& instance() const { return instance_; }
 
       TClass* tClass() const { return tClass_; }
-      bool isAssns() const { return isAssns_; }
+      bool isAssns() const { return bool(partnerType_); }
       art::TypeID const& partnerType() const { return partnerType_; }
 
       std::vector<std::pair<unsigned int, unsigned int> > & processIndexToBranchDataIndex() const
@@ -206,6 +207,8 @@ namespace gallery {
     // Converts ProductIDs to BranchIDs and reads and
     // keeps track of information related to that task.
     BranchMapReader branchMapReader_;
+
+    mutable art::DictionaryChecker dictChecker_;
 
     static bool streamersInitialized_;
 

@@ -18,8 +18,8 @@ namespace gallery {
                                                          std::make_shared<EventHistoryGetter>(eventNavigator_.get()))),
     useTTreeCache_(useTTreeCache),
     eventsToLearnUsedBranches_(eventsToLearnUsedBranches),
-    eventsProcessed_(0)
-  {
+    eventsProcessed_(0) {
+
     if (eventsToLearnUsedBranches_ < 1) eventsToLearnUsedBranches_ = 1;
     if (!atEnd()) {
       bool initializeTheCache = false;
@@ -112,6 +112,7 @@ namespace gallery {
   void Event::getByLabel(std::type_info const& typeInfoOfWrapper,
                          art::InputTag const& inputTag,
                          art::EDProduct const*& edProduct) const {
+
     dataGetterHelper_->getByLabel(typeInfoOfWrapper,
                                   inputTag,
                                   edProduct);
@@ -123,7 +124,7 @@ namespace gallery {
     throw *e;
   }
 
-  std::shared_ptr<cet::exception const>
+  std::shared_ptr<art::Exception const>
   Event::makeProductNotFoundException(std::type_info const& typeInfo,
                                       art::InputTag const& tag) const {
     art::TypeID type(typeInfo);

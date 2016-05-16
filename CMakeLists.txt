@@ -19,13 +19,10 @@ cmake_minimum_required (VERSION 2.8)
 project(gallery)
 
 # cetbuildtools contains our cmake modules
-SET ( CETBUILDTOOLS_VERSION $ENV{CETBUILDTOOLS_VERSION} )
-IF (NOT CETBUILDTOOLS_VERSION)
-    MESSAGE (FATAL_ERROR "ERROR: setup cetbuildtools to get the cmake modules")
-ENDIF()
-set(CMAKE_MODULE_PATH $ENV{CANVAS_DIR}/Modules 
-                      $ENV{CETBUILDTOOLS_DIR}/Modules 
-		      ${CMAKE_MODULE_PATH})
+find_package(cetbuildtools REQUIRED)
+
+list(APPEND CMAKE_MODULE_PATH
+  $ENV{CANVAS_DIR}/Modules)
 
 include(CetCMakeEnv)
 cet_cmake_env()
@@ -51,9 +48,8 @@ find_ups_product (cetbuildtools)
 find_ups_root()
 find_ups_boost()
 
-# macros for art_dictionary and simple_plugin
+# art_dictionary
 include(ArtDictionary)
-include(BuildPlugins)
 
 # source
 add_subdirectory (gallery)

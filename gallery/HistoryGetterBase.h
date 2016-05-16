@@ -24,7 +24,7 @@ namespace gallery {
     virtual art::History const& history() const = 0;
   };
 }
-#endif
+#endif /* gallery_HistoryGetterBase_h */
 
 // Local Variables:
 // mode: c++
