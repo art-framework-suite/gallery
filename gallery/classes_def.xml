@@ -1,8 +1,4 @@
 <lcgdict>
- <class name="gallery::Event" ClassVersion="0">
-  <version ClassVersion="0" checksum="3931426072"/>
- </class>
- <class name="gallery::FindMaker" ClassVersion="0">
-  <version ClassVersion="0" checksum="2611757921"/>
- </class>
+ <class name="gallery::Event" ClassVersion="0"/>
+ <class name="gallery::FindMaker" ClassVersion="0"/>
 </lcgdict>

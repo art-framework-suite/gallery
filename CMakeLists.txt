@@ -45,6 +45,7 @@ find_ups_product(messagefacility)
 find_ups_product(fhiclcpp)
 find_ups_product(cetlib)
 find_ups_product (cetbuildtools)
+find_ups_product(clhep)
 find_ups_root()
 find_ups_boost()
 
