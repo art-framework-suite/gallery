@@ -11,8 +11,6 @@
 
 namespace gallery {
 
-  void throwHandleWhyFailed(std::shared_ptr<art::Exception const>);
-
   template <typename T>
   class Handle
   {
@@ -37,6 +35,8 @@ namespace gallery {
     std::shared_ptr<art::Exception const> whyFailed() const;
 
   private:
+    void throwHandleWhyFailed_() const;
+
     T const*   prod_;
     std::shared_ptr<art::Exception const>  whyFailed_;
   };
@@ -75,7 +75,7 @@ namespace gallery {
   T const*
   Handle<T>::product() const
   {
-    if (!prod_) throwHandleWhyFailed(whyFailed_);
+    if (!prod_) throwHandleWhyFailed_();
     return prod_;
   }
 
@@ -92,6 +92,18 @@ namespace gallery {
   Handle<T>::whyFailed() const
   {
     return whyFailed_;
+  }
+
+  template <class T>
+  void
+  Handle<T>::throwHandleWhyFailed_() const
+  {
+    if (whyFailed_) {
+      throw *whyFailed_;
+    }
+    throw art::Exception(art::errors::LogicError)
+      << "Attempt to dereference invalid Handle with no stored exception\n"
+      << "Maybe you forgot to call getByLabel before dereferencing\n";
   }
 }
 #endif /* gallery_Handle_h */
