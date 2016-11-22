@@ -14,20 +14,23 @@ set(gallery_sources
   ValidHandle.cc
 )
 
-set( gallery_libraries
-        canvas_Persistency_Common
-        canvas_Persistency_Provenance
-        canvas_Utilities
-        cetlib
-        ${ROOT_CORE}
-        ${ROOT_RIO}
-        ${ROOT_TREE}
-)
-
-cet_make(LIBRARIES canvas_Persistency_Common
+set(gallery_libraries
+  canvas_Persistency_Common
   canvas_Persistency_Provenance
   canvas_Utilities
   cetlib
+  cetlib_except
+  ${ROOT_CORE}
+  ${ROOT_RIO}
+  ${ROOT_TREE}
+  )
+
+cet_make(LIBRARIES
+  canvas_Persistency_Common
+  canvas_Persistency_Provenance
+  canvas_Utilities
+  cetlib
+  cetlib_except
   ${ROOT_CORE}
   ${ROOT_RIO}
   ${ROOT_TREE}
