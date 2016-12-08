@@ -140,13 +140,13 @@ namespace gallery {
 
     private:
 
-      art::TypeID type_;
-      std::string label_;
-      std::string instance_;
+      art::TypeID const type_;
+      std::string const label_;
+      std::string const instance_;
 
-      TClass* tClass_;
-      bool isAssns_;
-      art::TypeID partnerType_;
+      TClass* const tClass_;
+      bool const isAssns_;
+      art::TypeID const partnerType_;
 
       // There is an entry here for each process with a branch
       // that is in the ProductRegistry and in the input file for
