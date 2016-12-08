@@ -508,6 +508,7 @@ namespace gallery {
     label_(iLabel),
     instance_(iInstance),
     tClass_(TClass::GetClass(type_.typeInfo())),
+    isAssns_(art::is_assns(art::name_of_template_arg(type_.className(), 0))),
     partnerType_(getPartnerTypeID(tClass_))
   {
   }
