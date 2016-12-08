@@ -69,7 +69,6 @@ namespace gallery {
                                      std::shared_ptr<HistoryGetterBase> historyGetter) :
     eventNavigator_(eventNavigator),
     tree_(nullptr),
-    edProductTClass_(TClass::GetClass("art::EDProduct")),
     historyGetter_(historyGetter),
     initializedForProcessHistory_(false),
     dictChecker_() {
@@ -153,7 +152,7 @@ namespace gallery {
             std::string branchName = branchData.branchName();
             if (typeIDInDescription != typeIDInBranchData) {
               branchDataVector_[branchDataIndex].reset(new AssnsBranchData(typeIDInDescription, tClass, branch,
-                                                                           edProductTClass_, eventNavigator_, this,
+                                                                           eventNavigator_, this,
                                                                            std::move(branchName), info.type(), info.partnerType()));
             }
           }
@@ -299,10 +298,10 @@ namespace gallery {
     if (info.isAssns()) {
       TClass* tClass = getTClassUsingBranchDescription(processIndex, info);
       art::TypeID typeIDInDescription(tClass->GetTypeInfo());
-      branchDataVector_.emplace_back(new AssnsBranchData(typeIDInDescription, tClass, branch, edProductTClass_,
+      branchDataVector_.emplace_back(new AssnsBranchData(typeIDInDescription, tClass, branch,
                                                          eventNavigator_, this, std::move(branchName), info.type(), info.partnerType()));
     } else {
-      branchDataVector_.emplace_back(new BranchData(info.type(), info.tClass(), branch, edProductTClass_,
+      branchDataVector_.emplace_back(new BranchData(info.type(), info.tClass(), branch,
                                                     eventNavigator_, this, std::move(branchName)));
     }
     info.processIndexToBranchDataIndex().push_back(uupair(processIndex, branchDataIndex));

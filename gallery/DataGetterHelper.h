@@ -93,7 +93,6 @@ namespace gallery {
 
     EventNavigator const* eventNavigator_;
     TTree* tree_;
-    TClass* edProductTClass_;
     std::shared_ptr<HistoryGetterBase> historyGetter_;
     mutable std::vector<char const*> labels_;
     mutable bool initializedForProcessHistory_;

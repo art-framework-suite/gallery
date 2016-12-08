@@ -31,7 +31,6 @@ namespace gallery {
     BranchData(art::TypeID const& type,
                TClass* iTClass,
                TBranch* branch,
-               TClass* edProductTClass,
                EventNavigator const* eventNavigator,
                art::EDProductGetterFinder const* finder,
                std::string&& iBranchName);
@@ -62,7 +61,7 @@ namespace gallery {
 
     TClass* tClass_;
     void* address_;
-    art::EDProduct const* edProduct_;
+    art::EDProduct const * edProduct_;
     TBranch* branch_;
     EventNavigator const* eventNavigator_;
     cet::exempt_ptr<art::EDProductGetterFinder const> finder_;

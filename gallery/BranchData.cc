@@ -9,6 +9,24 @@
 #include "TBranch.h"
 #include "TClass.h"
 
+namespace {
+  art::EDProduct *
+  calculateEDProductAddress(TClass * const tClass, void * address)
+  {
+    static TClass * const edProductTClass_s =
+      TClass::GetClass("art::EDProduct");
+
+    union {
+      void* vp;
+      unsigned char* ucp;
+      art::EDProduct* edProduct;
+    } pointerUnion;
+    pointerUnion.vp = address;
+    pointerUnion.ucp += tClass->GetBaseClassOffset(edProductTClass_s);
+    return pointerUnion.edProduct;
+  }
+}
+
 namespace gallery {
 
   BranchData::BranchData() :
@@ -20,24 +38,26 @@ namespace gallery {
     branch_(nullptr),
     eventNavigator_(nullptr),
     finder_(nullptr),
-    lastProduct_(-1) {
+    lastProduct_(-1),
+    branchName_()
+  {
   }
 
   BranchData::BranchData(art::TypeID const& type,
                          TClass* iTClass,
                          TBranch* iBranch,
-                         TClass* edProductTClass,
                          EventNavigator const* eventNavigator,
                          art::EDProductGetterFinder const* finder,
                          std::string&& iBranchName) :
     tClass_(iTClass),
     address_(tClass_ != nullptr ? tClass_->New() : nullptr),
-    edProduct_(nullptr),
+    edProduct_(calculateEDProductAddress(tClass_, address_)),
     branch_(iBranch),
     eventNavigator_(eventNavigator),
     finder_(finder),
-    lastProduct_(-1) {
-
+    lastProduct_(-1),
+    branchName_(std::move(iBranchName))
+  {
     if (tClass_ == nullptr) {
       throw art::Exception(art::errors::LogicError)
         << "In BranchData constructor, no dictionary exists for type " << type.className();
@@ -46,16 +66,6 @@ namespace gallery {
       throw art::Exception(art::errors::LogicError)
         << "In BranchData constructor, failed to construct type " << type.className();
     }
-
-    branchName_.swap(iBranchName);
-    union {
-      void* vp;
-      unsigned char* ucp;
-      art::EDProduct* edProduct;
-    } pointerUnion;
-    pointerUnion.vp = address_;
-    pointerUnion.ucp += tClass_->GetBaseClassOffset(edProductTClass);
-    edProduct_ =  pointerUnion.edProduct;
 
     if (branch_) {
       branch_->SetAddress(&address_);

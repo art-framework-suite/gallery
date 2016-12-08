@@ -25,7 +25,6 @@ namespace gallery {
     AssnsBranchData(art::TypeID const& type,
                     TClass* iTClass,
                     TBranch* branch,
-                    TClass* edProductTClass,
                     EventNavigator const* eventNavigator,
                     art::EDProductGetterFinder const* finder,
                     std::string&& iBranchName,
