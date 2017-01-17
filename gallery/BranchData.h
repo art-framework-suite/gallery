@@ -48,14 +48,14 @@ namespace gallery {
     std::string const& branchName() const { return branchName_; }
     long long lastProduct() const { return lastProduct_; }
 
-    virtual bool isReady() const override { return true; }
-    virtual art::EDProduct const *getIt() const override;
+    bool isReady() const override { return true; }
+    art::EDProduct const *getIt() const override;
 
-    virtual art::EDProduct const *anyProduct() const override;
-    virtual art::EDProduct const *uniqueProduct() const override;
-    virtual art::EDProduct const *uniqueProduct(art::TypeID const&) const override;
-    virtual bool resolveProduct(bool, art::TypeID const&) const override;
-    virtual bool resolveProductIfAvailable(bool, art::TypeID const&) const override;
+    art::EDProduct const *anyProduct() const override;
+    art::EDProduct const *uniqueProduct() const override;
+    art::EDProduct const *uniqueProduct(art::TypeID const&) const override;
+    bool resolveProduct(art::TypeID const&) const override;
+    bool resolveProductIfAvailable(art::TypeID const&) const override;
 
   private:
 

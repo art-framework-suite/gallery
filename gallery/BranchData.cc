@@ -117,13 +117,13 @@ namespace gallery {
     return getIt();
   }
 
-  bool BranchData::resolveProduct(bool, art::TypeID const&) const {
+  bool BranchData::resolveProduct(art::TypeID const&) const {
     throw art::Exception(art::errors::LogicError)
       << "BranchData::resolveProduct not implemented. Should not be called.";
     return false;
   }
 
-  bool BranchData::resolveProductIfAvailable(bool, art::TypeID const&) const {
+  bool BranchData::resolveProductIfAvailable(art::TypeID const&) const {
     throw art::Exception(art::errors::LogicError)
       << "BranchData::resolveProductIfAvailable not implemented. Should not be called.";
     return false;
