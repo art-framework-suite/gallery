@@ -15,9 +15,7 @@ set(gallery_sources
 )
 
 set(gallery_libraries
-  canvas_Persistency_Common
-  canvas_Persistency_Provenance
-  canvas_Utilities
+  canvas
   cetlib
   cetlib_except
   ${ROOT_CORE}
@@ -26,9 +24,7 @@ set(gallery_libraries
   )
 
 cet_make(LIBRARIES
-  canvas_Persistency_Common
-  canvas_Persistency_Provenance
-  canvas_Utilities
+  canvas
   cetlib
   cetlib_except
   ${ROOT_CORE}
