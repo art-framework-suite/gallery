@@ -29,36 +29,6 @@ namespace {
   std::string const underscore("_");
   std::string const period(".");
   std::string const emptyString;
-
-  art::TypeID
-  getPartnerTypeID(TClass *tClass)
-  {
-    art::TypeID result;
-    if (tClass) {
-      // Note we allow tClass to be null at this point. If the branch is
-      // actually in the input file and there is an attempt to construct
-      // a BranchData object with it null, a missing dictionary
-      // exception will be thrown. This also means we just assume it is
-      // not an Assns. Even if this assumption is wrong, we will get the
-      // correct behavior from getByLabel. A missing dictionary
-      // exception will get thrown if the branch is in the input file
-      // and a ProductNotFound exception will get thrown if it is not.
-      auto const wrappedClass = art::name_of_template_arg(tClass->GetName(), 0);
-      auto const assnsPartner = art::name_of_assns_partner(wrappedClass);
-      if (assnsPartner.empty()) {
-        return result;
-      }
-      auto const wrappedPartnerClassName = art::wrappedClassName(assnsPartner);
-      art::TypeWithDict const wrappedPartner(wrappedPartnerClassName);
-      if (!wrappedPartner) {
-        throw art::Exception(art::errors::DictionaryNotFound)
-          << "In InfoForTypeLabelInstance constructor.\nMissing dictionary for wrapped partner of Assns class.\n"
-          << wrappedPartnerClassName << "\n";
-      }
-      result = wrappedPartner.id();
-    }
-    return result;
-  }
 }
 
 namespace gallery {
@@ -151,9 +121,15 @@ namespace gallery {
             art::TypeID typeIDInBranchData(branchData.tClass()->GetTypeInfo());
             std::string branchName = branchData.branchName();
             if (typeIDInDescription != typeIDInBranchData) {
-              branchDataVector_[branchDataIndex].reset(new AssnsBranchData(typeIDInDescription, tClass, branch,
-                                                                           eventNavigator_, this,
-                                                                           std::move(branchName), info.type(), info.partnerType()));
+              branchDataVector_[branchDataIndex].
+                reset(new AssnsBranchData(typeIDInDescription,
+                                          tClass,
+                                          branch,
+                                          eventNavigator_,
+                                          this,
+                                          std::move(branchName),
+                                          info.primaryWrapperType(),
+                                          info.partnerWrapperTypes().front()));
             }
           }
           info.processIndexToBranchDataIndex().push_back(uupair(processIndex, branchDataIndex));
@@ -269,7 +245,7 @@ namespace gallery {
 
   std::string DataGetterHelper::buildBranchName(InfoForTypeLabelInstance const& info,
                                                 std::string const& processName) {
-    std::string branchName(info.type().friendlyClassName());
+    std::string branchName(info.primaryWrapperType().friendlyClassName());
     unsigned int branchNameSize = branchName.size() +
                                   info.label().size() +
                                   info.instance().size() +
@@ -299,9 +275,9 @@ namespace gallery {
       TClass* tClass = getTClassUsingBranchDescription(processIndex, info);
       art::TypeID typeIDInDescription(tClass->GetTypeInfo());
       branchDataVector_.emplace_back(new AssnsBranchData(typeIDInDescription, tClass, branch,
-                                                         eventNavigator_, this, std::move(branchName), info.type(), info.partnerType()));
+                                                         eventNavigator_, this, std::move(branchName), info.primaryWrapperType(), info.partnerWrapperTypes().front()));
     } else {
-      branchDataVector_.emplace_back(new BranchData(info.type(), info.tClass(), branch,
+      branchDataVector_.emplace_back(new BranchData(info.primaryWrapperType(), info.tClass(), branch,
                                                     eventNavigator_, this, std::move(branchName)));
     }
     info.processIndexToBranchDataIndex().push_back(uupair(processIndex, branchDataIndex));
@@ -319,7 +295,7 @@ namespace gallery {
     if (branchDescription == nullptr) {
       throw art::Exception(art::errors::LogicError)
         << "In DataGetterHelper::getTClassUsingBranchDescription. TBranch exists but no BranchDescription in ProductRegistry.\n"
-        << "This shouldn't be possible. For type " << info.type().className() << "\n";
+        << "This shouldn't be possible. For type " << info.primaryWrapperType().className() << "\n";
     }
     TClass* tClass = TClass::GetClass(branchDescription->wrappedName().c_str());
     if (tClass == nullptr) {
@@ -363,7 +339,9 @@ namespace gallery {
     InfoForTypeLabelInstance const& info = infoVector_[infoIndex];
 
     if (info.isAssns()) {
-      insertIntoInfoMap(info.partnerType(), label, instance, infoIndex);
+      for (auto ptype : info.partnerWrapperTypes()) {
+        insertIntoInfoMap(ptype, label, instance, infoIndex);
+      }
     }
 
     unsigned int processIndex = 0;
@@ -500,15 +478,25 @@ namespace gallery {
   }
 
   DataGetterHelper::InfoForTypeLabelInstance::
-  InfoForTypeLabelInstance(art::TypeID const& iType,
-                           std::string const& iLabel,
-                           std::string const& iInstance) :
-    type_(iType),
-    label_(iLabel),
-    instance_(iInstance),
-    tClass_(TClass::GetClass(type_.typeInfo())),
-    isAssns_(art::is_assns(art::name_of_template_arg(type_.className(), 0))),
-    partnerType_(getPartnerTypeID(tClass_))
+  InfoForTypeLabelInstance(std::vector<art::TypeID> const & allWrapperTypes,
+                           std::string const & unwrapped_product_name,
+                           std::string const & moduleLabel,
+                           std::string const & instanceName)
+    : label_(moduleLabel)
+    , instance_(instanceName)
+    , tClass_(TClass::GetClass(allWrapperTypes.front().typeInfo()))
+    , isAssns_(art::is_assns(unwrapped_product_name))
+    , primaryWrapperType_(allWrapperTypes.front())
+// FIXME: restrict for temporary diagnostic purposes.
+    , partnerWrapperTypes_(allWrapperTypes.cbegin() + 1, std::min(allWrapperTypes.cbegin() + 2, allWrapperTypes.cend()))
   {
+    bool const nTypesError = isAssns_ ? partnerWrapperTypes_.empty() : !partnerWrapperTypes_.empty();
+    if (nTypesError) {
+      throw art::Exception(art::errors::LogicError, "Partner Error")
+        << " -- Product " << unwrapped_product_name
+        << " has an unexpected number of partners ("
+        << partnerWrapperTypes_.size()
+        << " for its type.";
+    }
   }
 }

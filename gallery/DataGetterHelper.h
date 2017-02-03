@@ -42,9 +42,11 @@
 #include "gallery/TypeLabelInstanceKey.h"
 
 #include "canvas/Persistency/Common/EDProductGetterFinder.h"
+#include "canvas/Persistency/Common/detail/getWrapperTIDs.h"
 #include "canvas/Persistency/Provenance/BranchID.h"
 #include "canvas/Persistency/Provenance/DictionaryChecker.h"
 #include "canvas/Persistency/Provenance/ProcessHistoryID.h"
+#include "canvas/Persistency/Provenance/TypeTools.h"
 #include "canvas/Utilities/InputTag.h"
 #include "canvas/Utilities/TypeID.h"
 
@@ -117,17 +119,17 @@ namespace gallery {
     class InfoForTypeLabelInstance {
     public:
 
-      InfoForTypeLabelInstance(art::TypeID const& iType,
-                               std::string const& iLabel,
-                               std::string const& iInstance);
+      InfoForTypeLabelInstance(art::TypeID const& primaryWrapperType,
+                               std::string const& moduleLabel,
+                               std::string const& instanceName);
 
-      art::TypeID const& type() const { return type_; }
       std::string const& label() const { return label_; }
       std::string const& instance() const { return instance_; }
 
       TClass* tClass() const { return tClass_; }
       bool isAssns() const { return isAssns_; }
-      art::TypeID const& partnerType() const { return partnerType_; }
+      art::TypeID const & primaryWrapperType() const { return primaryWrapperType_; }
+      std::vector<art::TypeID> const & partnerWrapperTypes() const { return partnerWrapperTypes_; }
 
       std::vector<std::pair<unsigned int, unsigned int> > & processIndexToBranchDataIndex() const
       { return processIndexToBranchDataIndex_; }
@@ -138,14 +140,23 @@ namespace gallery {
       std::vector<art::BranchID> & branchIDs() const { return branchIDs_; }
 
     private:
+      InfoForTypeLabelInstance(art::TypeID const & primaryWrapperType,
+                               std::string const & unwrapped_product_name,
+                               std::string const & moduleLabel,
+                               std::string const & instanceName);
 
-      art::TypeID const type_;
+      InfoForTypeLabelInstance(std::vector<art::TypeID> const & allWrapperTypes,
+                               std::string const & unwrapped_product_name,
+                               std::string const & moduleLabel,
+                               std::string const & instanceName);
+
       std::string const label_;
       std::string const instance_;
 
       TClass* const tClass_;
       bool const isAssns_;
-      art::TypeID const partnerType_;
+      art::TypeID primaryWrapperType_;
+      std::vector<art::TypeID> const partnerWrapperTypes_;
 
       // There is an entry here for each process with a branch
       // that is in the ProductRegistry and in the input file for
@@ -251,6 +262,32 @@ namespace gallery {
     virtual art::EDProductGetter const* getEDProductGetterImpl(art::ProductID const&) const override;
   };
 }
+
+inline
+gallery::DataGetterHelper::InfoForTypeLabelInstance::
+InfoForTypeLabelInstance(art::TypeID const & primaryWrapperType,
+                         std::string const & moduleLabel,
+                         std::string const & instanceName) :
+  InfoForTypeLabelInstance(primaryWrapperType,
+                           art::name_of_unwrapped_product(primaryWrapperType.className()),
+                           moduleLabel,
+                           instanceName)
+{
+}
+
+inline
+gallery::DataGetterHelper::InfoForTypeLabelInstance::
+InfoForTypeLabelInstance(art::TypeID const & primaryWrapperType,
+                         std::string const & unwrapped_product_name,
+                         std::string const & moduleLabel,
+                         std::string const & instanceName) :
+  InfoForTypeLabelInstance(art::detail::getWrapperTIDs(unwrapped_product_name),
+                           art::name_of_unwrapped_product(primaryWrapperType.className()),
+                           moduleLabel,
+                           instanceName)
+{
+}
+
 #endif /* gallery_DataGetterHelper_h */
 
 // Local Variables:
