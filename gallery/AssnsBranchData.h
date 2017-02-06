@@ -33,8 +33,6 @@ namespace gallery {
 
     virtual ~AssnsBranchData();
 
-    virtual void updateFile(TBranch* iBranch) override;
-
     art::EDProduct const*
     getIt() const override;
 
@@ -45,7 +43,7 @@ namespace gallery {
     uniqueProduct(art::TypeID const& wanted_wrapper_type) const override;
 
   private:
-
+    void doResetProducts_() const override;
     art::TypeID secondary_wrapper_type_;
     mutable std::unique_ptr<art::EDProduct> secondaryProduct_;
     mutable long long secondaryLastProduct_;

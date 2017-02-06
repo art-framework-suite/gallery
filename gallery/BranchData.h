@@ -40,7 +40,7 @@ namespace gallery {
 
     virtual ~BranchData();
 
-    virtual void updateFile(TBranch* iBranch);
+    void updateFile(TBranch* iBranch);
 
     TClass* tClass() const { return tClass_; }
     void* address() const { return address_; }
@@ -58,6 +58,8 @@ namespace gallery {
     bool resolveProductIfAvailable(art::TypeID const&) const override;
 
   private:
+    void resetProducts_() { lastProduct_ = -1; doResetProducts_(); }
+    virtual void doResetProducts_() const { };
 
     TClass* tClass_;
     void* address_;

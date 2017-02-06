@@ -30,10 +30,9 @@ namespace gallery {
 
   AssnsBranchData::~AssnsBranchData() { }
 
-  void AssnsBranchData::updateFile(TBranch* iBranch) {
+  void AssnsBranchData::doResetProducts_() const {
     secondaryLastProduct_ = -1;
     secondaryProduct_.reset();
-    BranchData::updateFile(iBranch);
   }
 
   art::EDProduct const*

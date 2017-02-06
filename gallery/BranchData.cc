@@ -83,7 +83,7 @@ namespace gallery {
     if (branch_) {
       branch_->SetAddress(&address_);
     }
-    lastProduct_ = -1;
+    resetProducts_();
   }
 
   art::EDProduct const* BranchData::getIt() const {
