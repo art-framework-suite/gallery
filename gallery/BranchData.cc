@@ -83,13 +83,16 @@ namespace gallery {
     if (branch_) {
       branch_->SetAddress(&address_);
     }
-    lastProduct_ = -1;
+    resetProducts_();
   }
 
   art::EDProduct const* BranchData::getIt() const {
     if (branch_) {
       long long entry = eventNavigator_->eventEntry();
       if (entry != lastProduct_) {
+        if (lastProduct_ > -1) {
+          resetProducts_();
+        }
         //haven't gotten the data for this event
         art::configureRefCoreStreamer(finder_);
         branch_->GetEntry(entry);

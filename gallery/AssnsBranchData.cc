@@ -3,7 +3,37 @@
 #include "canvas/Persistency/Common/EDProduct.h"
 #include "canvas/Utilities/Exception.h"
 
+#include <algorithm>
 #include <utility>
+
+#include "cetlib/container_algorithms.h"
+#include <iostream>
+#include <iterator>
+
+namespace {
+  std::vector<art::TypeID>
+  calcTypes(art::TypeID const& type,
+            art::TypeID infoType,
+            std::vector<art::TypeID> infoPartnerTypes)
+  {
+    using std::swap;
+    std::cerr << type << ", " << infoType << ", ";
+    cet::copy_all(infoPartnerTypes, std::ostream_iterator<art::TypeID>(std::cerr, ", "));
+    if (type != infoType) {
+      auto const it = std::find(infoPartnerTypes.begin(), infoPartnerTypes.end(), type);
+      if (it != infoPartnerTypes.cend()) {
+        swap(infoType, *it);
+      } else {
+        throw art::Exception(art::errors::LogicError, "AssnsBranchData()")
+          << "constructed with an inconsistent sequence of types!";
+      }
+    }
+    std::cerr << "\n  -> ";
+    cet::copy_all(infoPartnerTypes, std::ostream_iterator<art::TypeID>(std::cerr, ", "));
+    std::cerr << "\n";
+    return infoPartnerTypes;
+  }
+}
 
 namespace gallery {
 
@@ -14,27 +44,14 @@ namespace gallery {
                                    art::EDProductGetterFinder const* finder,
                                    std::string&& iBranchName,
                                    art::TypeID const& infoType,
-                                   art::TypeID const& infoPartnerType) :
+                                   std::vector<art::TypeID> const & infoPartnerTypes) :
     BranchData(type, iTClass, iBranch,
                eventNavigator, finder, std::move(iBranchName)),
-    secondary_wrapper_type_(),
-    secondaryProduct_(),
-    secondaryLastProduct_(-1) {
-
-    if (type == infoType) {
-      secondary_wrapper_type_ = infoPartnerType;
-    } else {
-      secondary_wrapper_type_ = infoType;
-    }
-  }
+    secondary_wrapper_types_(calcTypes(type, infoType, infoPartnerTypes)),
+    secondaryProducts_()
+  { }
 
   AssnsBranchData::~AssnsBranchData() { }
-
-  void AssnsBranchData::updateFile(TBranch* iBranch) {
-    secondaryLastProduct_ = -1;
-    secondaryProduct_.reset();
-    BranchData::updateFile(iBranch);
-  }
 
   art::EDProduct const*
   AssnsBranchData::getIt() const
@@ -55,15 +72,26 @@ namespace gallery {
   AssnsBranchData::uniqueProduct(art::TypeID const& wanted_wrapper_type) const
   {
     art::EDProduct const* primaryAssns = BranchData::getIt();
-    if (primaryAssns &&
-        wanted_wrapper_type == secondary_wrapper_type_) {
-
-      if (secondaryLastProduct_ != lastProduct()) {
-        secondaryProduct_ = primaryAssns->makePartner(wanted_wrapper_type.typeInfo());
-        secondaryLastProduct_ = lastProduct();
+    
+    if (primaryAssns) {
+      auto const i = std::find(secondary_wrapper_types_.cbegin(),
+                               secondary_wrapper_types_.cend(),
+                               wanted_wrapper_type);
+      if (i != secondary_wrapper_types_.cend()) {
+        auto sp = secondaryProducts_.begin();
+        std::advance(sp, std::distance(secondary_wrapper_types_.cbegin(), i));
+        if (sp->get() == nullptr) {
+          *sp = (primaryAssns->makePartner(wanted_wrapper_type.typeInfo()));
+        }
+        return sp->get();
       }
-      return secondaryProduct_.get();
     }
     return primaryAssns;
+  }
+
+  void
+  AssnsBranchData::doResetProducts() const
+  {
+    secondaryProducts_.clear();
   }
 }

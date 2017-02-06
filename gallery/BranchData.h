@@ -40,13 +40,12 @@ namespace gallery {
 
     virtual ~BranchData();
 
-    virtual void updateFile(TBranch* iBranch);
+    void updateFile(TBranch* iBranch);
 
     TClass* tClass() const { return tClass_; }
     void* address() const { return address_; }
     TBranch* branch() const { return branch_; }
     std::string const& branchName() const { return branchName_; }
-    long long lastProduct() const { return lastProduct_; }
 
     bool isReady() const override { return true; }
     art::EDProduct const *getIt() const override;
@@ -58,6 +57,10 @@ namespace gallery {
     bool resolveProductIfAvailable(art::TypeID const&) const override;
 
   private:
+
+    void resetProducts_() const { lastProduct_ = -1; doResetProducts(); }
+
+    virtual void doResetProducts() const { };
 
     TClass* tClass_;
     void* address_;

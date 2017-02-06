@@ -129,7 +129,7 @@ namespace gallery {
                                           this,
                                           std::move(branchName),
                                           info.primaryWrapperType(),
-                                          info.partnerWrapperTypes().front()));
+                                          info.partnerWrapperTypes()));
             }
           }
           info.processIndexToBranchDataIndex().push_back(uupair(processIndex, branchDataIndex));
@@ -275,7 +275,7 @@ namespace gallery {
       TClass* tClass = getTClassUsingBranchDescription(processIndex, info);
       art::TypeID typeIDInDescription(tClass->GetTypeInfo());
       branchDataVector_.emplace_back(new AssnsBranchData(typeIDInDescription, tClass, branch,
-                                                         eventNavigator_, this, std::move(branchName), info.primaryWrapperType(), info.partnerWrapperTypes().front()));
+                                                         eventNavigator_, this, std::move(branchName), info.primaryWrapperType(), info.partnerWrapperTypes()));
     } else {
       branchDataVector_.emplace_back(new BranchData(info.primaryWrapperType(), info.tClass(), branch,
                                                     eventNavigator_, this, std::move(branchName)));

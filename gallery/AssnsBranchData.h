@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 class TBranch;
 class TClass;
@@ -29,11 +30,9 @@ namespace gallery {
                     art::EDProductGetterFinder const* finder,
                     std::string&& iBranchName,
                     art::TypeID const& infoType,
-                    art::TypeID const& infoPartnerType);
+                    std::vector<art::TypeID> const & infoPartnerTypes);
 
     virtual ~AssnsBranchData();
-
-    virtual void updateFile(TBranch* iBranch) override;
 
     art::EDProduct const*
     getIt() const override;
@@ -45,10 +44,10 @@ namespace gallery {
     uniqueProduct(art::TypeID const& wanted_wrapper_type) const override;
 
   private:
+    virtual void doResetProducts() const override;
 
-    art::TypeID secondary_wrapper_type_;
-    mutable std::unique_ptr<art::EDProduct> secondaryProduct_;
-    mutable long long secondaryLastProduct_;
+    std::vector<art::TypeID> secondary_wrapper_types_;
+    mutable std::vector<std::unique_ptr<art::EDProduct> > secondaryProducts_;
   };
 }
 #endif /* gallery_AssnsBranchData_h */
