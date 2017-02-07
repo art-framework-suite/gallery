@@ -93,7 +93,6 @@ namespace gallery {
 
     EventNavigator const* eventNavigator_;
     TTree* tree_;
-    TClass* edProductTClass_;
     std::shared_ptr<HistoryGetterBase> historyGetter_;
     mutable std::vector<char const*> labels_;
     mutable bool initializedForProcessHistory_;
@@ -127,7 +126,7 @@ namespace gallery {
       std::string const& instance() const { return instance_; }
 
       TClass* tClass() const { return tClass_; }
-      bool isAssns() const { return bool(partnerType_); }
+      bool isAssns() const { return isAssns_; }
       art::TypeID const& partnerType() const { return partnerType_; }
 
       std::vector<std::pair<unsigned int, unsigned int> > & processIndexToBranchDataIndex() const
@@ -140,13 +139,13 @@ namespace gallery {
 
     private:
 
-      art::TypeID type_;
-      std::string label_;
-      std::string instance_;
+      art::TypeID const type_;
+      std::string const label_;
+      std::string const instance_;
 
-      TClass* tClass_;
-      bool isAssns_;
-      art::TypeID partnerType_;
+      TClass* const tClass_;
+      bool const isAssns_;
+      art::TypeID const partnerType_;
 
       // There is an entry here for each process with a branch
       // that is in the ProductRegistry and in the input file for
