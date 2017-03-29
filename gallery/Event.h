@@ -35,6 +35,9 @@ namespace gallery {
   class Event {
   public:
 
+    Event(Event const&) = delete;
+    Event const& operator=(Event const&) = delete;
+
     Event(std::vector<std::string> const& fileNames,
           bool useTTreeCache = true,
           unsigned int eventsToLearnUsedBranches = 7);
@@ -71,9 +74,6 @@ namespace gallery {
     using HandleT = Handle<T>;
 
   private:
-
-    Event(Event const&) = delete;
-    Event const& operator=(Event const&) = delete;
 
     void getByLabel(std::type_info const& typeInfoOfWrapper,
                     art::InputTag const& inputTag,
