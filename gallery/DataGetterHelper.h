@@ -77,7 +77,7 @@ namespace gallery {
     DataGetterHelper(EventNavigator const* eventNavigator,
                      std::shared_ptr<EventHistoryGetter> historyGetter);
 
-    ~DataGetterHelper();
+    ~DataGetterHelper() noexcept;
 
     void getByLabel(std::type_info const& typeInfoOfWrapper,
                     art::InputTag const& inputTag,

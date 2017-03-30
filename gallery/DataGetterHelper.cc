@@ -76,7 +76,7 @@ namespace gallery {
     initializeStreamers();
   }
 
-  DataGetterHelper::~DataGetterHelper() {
+  DataGetterHelper::~DataGetterHelper() noexcept {
     for (auto label : labels_) {
       delete [] label;
     }
