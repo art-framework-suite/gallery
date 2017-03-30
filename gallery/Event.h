@@ -42,7 +42,7 @@ namespace gallery {
           bool useTTreeCache = true,
           unsigned int eventsToLearnUsedBranches = 7);
 
-    ~Event();
+    ~Event() noexcept;
 
     template <typename PROD>
     gallery::ValidHandle<PROD>

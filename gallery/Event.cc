@@ -27,7 +27,7 @@ namespace gallery {
     }
   }
 
-  Event::~Event() {
+  Event::~Event() noexcept {
   }
 
   art::EventAuxiliary const& Event::eventAuxiliary() const {

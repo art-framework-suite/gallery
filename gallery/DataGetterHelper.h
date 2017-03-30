@@ -38,7 +38,7 @@
 
 #include "gallery/BranchData.h"
 #include "gallery/BranchMapReader.h"
-#include "gallery/HistoryGetterBase.h"
+#include "gallery/EventHistoryGetter.h"
 #include "gallery/TypeLabelInstanceKey.h"
 
 #include "canvas/Persistency/Common/EDProductGetterFinder.h"
@@ -75,7 +75,7 @@ namespace gallery {
   public:
 
     DataGetterHelper(EventNavigator const* eventNavigator,
-                     std::shared_ptr<HistoryGetterBase> historyGetter);
+                     std::shared_ptr<EventHistoryGetter> historyGetter);
 
     ~DataGetterHelper();
 
@@ -93,7 +93,7 @@ namespace gallery {
 
     EventNavigator const* eventNavigator_;
     TTree* tree_;
-    std::shared_ptr<HistoryGetterBase> historyGetter_;
+    std::shared_ptr<EventHistoryGetter> historyGetter_;
     mutable std::vector<char const*> labels_;
     mutable bool initializedForProcessHistory_;
     mutable art::ProcessHistoryID previousProcessHistoryID_;

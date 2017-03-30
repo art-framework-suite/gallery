@@ -66,7 +66,7 @@ namespace gallery {
   bool DataGetterHelper::streamersInitialized_ = false;
 
   DataGetterHelper::DataGetterHelper(EventNavigator const* eventNavigator,
-                                     std::shared_ptr<HistoryGetterBase> historyGetter) :
+                                     std::shared_ptr<EventHistoryGetter> historyGetter) :
     eventNavigator_(eventNavigator),
     tree_(nullptr),
     historyGetter_(historyGetter),

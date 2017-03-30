@@ -22,13 +22,13 @@ class TFile;
 
 namespace gallery {
 
-  class HistoryGetterBase;
+  class EventHistoryGetter;
 
   class BranchMapReader {
   public:
 
     void updateFile(TFile* tFile);
-    void updateEvent(HistoryGetterBase* historyGetter);
+    void updateEvent(EventHistoryGetter*  historyGetter);
 
     art::BranchID productToBranchID(art::ProductID const& pid) const;
     art::BranchDescription const* productToBranch(art::ProductID const& pid) const;
