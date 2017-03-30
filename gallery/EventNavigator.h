@@ -25,7 +25,7 @@ namespace gallery {
   class EventNavigator {
   public:
 
-    EventNavigator(std::vector<std::string> const& iFileNames);
+    explicit EventNavigator(std::vector<std::string> const& iFileNames);
 
     // In a normal iteration using the next function, isValid and
     // atEnd will always return opposite values. If nextFile was
