@@ -34,27 +34,32 @@ namespace gallery {
   class DataGetterHelper;
   class EventNavigator;
 
+  // The gallery::Event provides read-only access to event data
+  // products. It also provides the means to iterate through one or
+  // more art/ROOT files, reading the events in those files; in this
+  // sense, the gallery::Event is a kind of iterator. Only a valid
+  // Event (as defined by Event::isValid()) can be used to access
+  // event data products.
   class Event {
   public:
 
-    // Can not copy or assign.
-    Event(Event const&) = delete;
-    Event& operator=(Event const&) = delete;
+    // gallery::Event objects can be neither copied nor assigned. They
+    // can be move-copied and move-assigned.
 
-    // Can move and move assign. We need to state this, because we
-    // have deleted the copy and assignment.
-    Event(Event &&) = default;
-    Event& operator=(Event &&) = default;
-
+    // Construct an Event that will read events from each of the
+    // named art/ROOT files, in order.
     explicit
     Event(std::vector<std::string> const& fileNames,
           bool useTTreeCache = true,
           unsigned int eventsToLearnUsedBranches = 7);
 
+    // Get access to a data product of type PROD, using a ValidHandle.
     template <typename PROD>
     gallery::ValidHandle<PROD>
     getValidHandle(art::InputTag const&) const;
 
+    // Get access to a data product of type PROD, using a Handle.
+    // Only if the return value is 'true' is the Handle valid.
     template <typename PROD>
     bool getByLabel(art::InputTag const&, Handle<PROD>& result) const;
 
@@ -63,24 +68,42 @@ namespace gallery {
     art::ProcessHistoryID const& processHistoryID() const;
     art::ProcessHistory const& processHistory() const;
 
+    // Return the number of events in the currently-open file.
     long long numberOfEventsInFile() const;
+
+    // Return the current entry number (the entry number of the Events
+    // tree in the current art/ROOT file).
     long long eventEntry() const;
+
+    // Return the index of the current file.
     long long fileEntry() const;
 
+    // Return true if the Event can be used to access data products.
     bool isValid() const;
+
+    // Return true if we are at the end of the sequence of events
+    // through which we are iterating.
     bool atEnd() const;
 
+    // Go to the first event of the sequence we are to traverse.
     void toBegin();
+    void first();
+
+    // Go to the next event in the sequence.
     Event& operator++();
     void next();
+
+    // Throws an exception if the Event was constructed with more than
+    // one filename, or if we are already at the beginning of the
+    // sequence. Otherwise, go to the previous event in the sequence.
+    Event& operator--();
+    void previous();
 
     TFile* getTFile() const;
     TTree* getTTree() const;
 
     template <typename T>
     using HandleT = Handle<T>;
-
-  private:
 
     void getByLabel(std::type_info const& typeInfoOfWrapper,
                     art::InputTag const& inputTag,
@@ -103,39 +126,42 @@ namespace gallery {
     unsigned int eventsToLearnUsedBranches_;
     unsigned int eventsProcessed_;
   };
+} // namespace gallery
 
-  template <typename PROD>
-  ValidHandle<PROD>
-  Event::getValidHandle(art::InputTag const& inputTag) const {
-    checkForEnd();
-    std::type_info const& typeInfoOfWrapper = typeid(art::Wrapper<PROD>);
+template <typename PROD>
+inline
+gallery::ValidHandle<PROD>
+gallery::Event::getValidHandle(art::InputTag const& inputTag) const {
+  checkForEnd();
+  std::type_info const& typeInfoOfWrapper = typeid(art::Wrapper<PROD>);
 
-    art::EDProduct const* edProduct = nullptr;
+  art::EDProduct const* edProduct = nullptr;
 
-    getByLabel(typeInfoOfWrapper,
-               inputTag,
-               edProduct);
+  getByLabel(typeInfoOfWrapper,
+	     inputTag,
+	     edProduct);
 
-    art::Wrapper<PROD> const* ptrToWrapper = dynamic_cast< art::Wrapper<PROD> const *>(edProduct);
+  art::Wrapper<PROD> const* ptrToWrapper = dynamic_cast< art::Wrapper<PROD> const *>(edProduct);
 
-    if(ptrToWrapper == nullptr) {
-      throwProductNotFoundException(typeid(PROD), inputTag);
-    }
-    PROD const* product = ptrToWrapper->product();
-    return ValidHandle<PROD>(product);
+  if (ptrToWrapper == nullptr) {
+    throwProductNotFoundException(typeid(PROD), inputTag);
   }
+  PROD const* product = ptrToWrapper->product();
+  return ValidHandle<PROD>(product);
+}
 
-  template <typename PROD>
-  bool
-  Event::getByLabel(art::InputTag const& inputTag, Handle<PROD>& result) const {
-    checkForEnd();
-    std::type_info const& typeInfoOfWrapper = typeid(art::Wrapper<PROD>);
+template <typename PROD>
+inline
+bool
+gallery::Event::getByLabel(art::InputTag const& inputTag, Handle<PROD>& result) const {
+  checkForEnd();
+  std::type_info const& typeInfoOfWrapper = typeid(art::Wrapper<PROD>);
 
-    art::EDProduct const* edProduct = nullptr;
+  art::EDProduct const* edProduct = nullptr;
 
-    getByLabel(typeInfoOfWrapper,
-               inputTag,
-               edProduct);
+  getByLabel(typeInfoOfWrapper,
+	     inputTag,
+	     edProduct);
 
     art::Wrapper<PROD> const* ptrToWrapper = dynamic_cast< art::Wrapper<PROD> const *>(edProduct);
 
@@ -146,8 +172,8 @@ namespace gallery {
     PROD const* product = ptrToWrapper->product();
     result = Handle<PROD>(product);
     return true;
-  }
 }
+
 #endif /* gallery_Event_h */
 
 // Local Variables:
