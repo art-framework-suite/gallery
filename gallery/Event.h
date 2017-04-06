@@ -7,6 +7,8 @@
 
 #include "gallery/Handle.h"
 #include "gallery/ValidHandle.h"
+#include "gallery/DataGetterHelper.h"
+#include "gallery/EventNavigator.h"
 #include "canvas/Utilities/InputTag.h"
 #include "canvas/Persistency/Common/EDProduct.h"
 #include "canvas/Persistency/Common/Wrapper.h"
@@ -14,6 +16,9 @@
 #include "canvas/Persistency/Provenance/History.h"
 #include "canvas/Persistency/Provenance/ProcessHistory.h"
 #include "canvas/Persistency/Provenance/ProcessHistoryID.h"
+
+#include "TFile.h"
+#include "TTree.h"
 
 #include <memory>
 #include <string>
@@ -24,9 +29,6 @@ namespace cet {
   class exception;
 }
 
-class TFile;
-class TTree;
-
 namespace gallery {
 
   class DataGetterHelper;
@@ -35,14 +37,19 @@ namespace gallery {
   class Event {
   public:
 
+    // Can not copy or assign.
     Event(Event const&) = delete;
-    Event const& operator=(Event const&) = delete;
+    Event& operator=(Event const&) = delete;
 
+    // Can move and move assign. We need to state this, because we
+    // have deleted the copy and assignment.
+    Event(Event &&) = default;
+    Event& operator=(Event &&) = default;
+
+    explicit
     Event(std::vector<std::string> const& fileNames,
           bool useTTreeCache = true,
           unsigned int eventsToLearnUsedBranches = 7);
-
-    ~Event() noexcept;
 
     template <typename PROD>
     gallery::ValidHandle<PROD>

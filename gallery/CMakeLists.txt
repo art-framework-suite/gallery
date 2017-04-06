@@ -34,5 +34,7 @@ cet_make(LIBRARIES
 
 art_dictionary(DICTIONARY_LIBRARIES gallery)
 
+add_subdirectory(test)
+
 install_headers()
 install_source()
