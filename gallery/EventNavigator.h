@@ -42,6 +42,7 @@ namespace gallery {
 
     void toBegin();
     void next();
+    void previous();
     void nextFile();
 
     art::EventAuxiliary const& eventAuxiliary() const;

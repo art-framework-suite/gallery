@@ -3,8 +3,10 @@
 #include "gallery/DataGetterHelper.h"
 #include "gallery/EventHistoryGetter.h"
 #include "gallery/EventNavigator.h"
+#include "gallery/throwFunctions.h"
 #include "canvas/Utilities/Exception.h"
 #include "canvas/Utilities/TypeID.h"
+
 
 #include "TFile.h"
 
@@ -13,6 +15,7 @@ namespace gallery {
   Event::Event(std::vector<std::string> const& fileNames,
                bool useTTreeCache,
                unsigned int eventsToLearnUsedBranches) :
+    randomAccessOK_(fileNames.size()==1),
     eventNavigator_(std::make_unique<EventNavigator>(fileNames)),
     dataGetterHelper_(std::make_unique<DataGetterHelper>(eventNavigator_.get(),
                                                          std::make_shared<EventHistoryGetter>(eventNavigator_.get()))),
@@ -74,8 +77,17 @@ namespace gallery {
   }
 
   Event& Event::operator++() {
-    long long oldFileEntry = fileEntry();
+    auto const oldFileEntry = fileEntry();
     eventNavigator_->next();
+    updateAfterEventChange(oldFileEntry);
+    return *this;
+  }
+
+  Event& Event::operator--() {
+    if (!randomAccessOK_) throwIllegalRandomAccess();
+    if (atEnd()) throwIllegalDecrement();
+    auto const oldFileEntry = fileEntry();
+    eventNavigator_->previous();
     updateAfterEventChange(oldFileEntry);
     return *this;
   }
@@ -96,6 +108,10 @@ namespace gallery {
 
   void Event::next() {
     operator++();
+  }
+
+  void Event::previous() {
+    operator--();
   }
 
   TFile* Event::getTFile() const {

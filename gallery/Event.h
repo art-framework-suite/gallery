@@ -105,6 +105,8 @@ namespace gallery {
     template <typename T>
     using HandleT = Handle<T>;
 
+  private:
+
     void getByLabel(std::type_info const& typeInfoOfWrapper,
                     art::InputTag const& inputTag,
                     art::EDProduct const*& edProduct) const;
@@ -119,6 +121,7 @@ namespace gallery {
     void checkForEnd() const;
     void updateAfterEventChange(long long oldFileEntry);
 
+    bool randomAccessOK_;
     std::unique_ptr<EventNavigator> eventNavigator_;
     std::unique_ptr<DataGetterHelper> dataGetterHelper_;
 
@@ -172,6 +175,12 @@ gallery::Event::getByLabel(art::InputTag const& inputTag, Handle<PROD>& result) 
     PROD const* product = ptrToWrapper->product();
     result = Handle<PROD>(product);
     return true;
+}
+
+inline
+void
+gallery::Event::first() {
+  return toBegin();
 }
 
 #endif /* gallery_Event_h */
