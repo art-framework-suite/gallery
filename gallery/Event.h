@@ -78,6 +78,11 @@ namespace gallery {
     // Return the index of the current file.
     long long fileEntry() const;
 
+    // Go to the entry with the given index. If the index is
+    // out-of-bounds, or negative, or if the Event is not suitable for
+    // random access, an exception will be thrown.
+    void goToEntry(long long entry);
+
     // Return true if the Event can be used to access data products.
     bool isValid() const;
 

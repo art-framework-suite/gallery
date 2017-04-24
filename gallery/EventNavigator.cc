@@ -86,6 +86,13 @@ namespace gallery {
     }
   }
 
+  void EventNavigator::goToEntry(long long entry) {
+    eventEntry_ = entry;
+    if (isValid()) {
+      eventsTree_->LoadTree(eventEntry_);
+    }
+  }
+
   void EventNavigator::nextFile() {
 
     // Be careful with this function. If the next file

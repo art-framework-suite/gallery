@@ -58,6 +58,13 @@ namespace gallery {
     return eventNavigator_->fileEntry();
   }
 
+  void Event::goToEntry(long long entry) {
+    if (!randomAccessOK_) throwIllegalRandomAccess();
+    if (entry < 0) throwIllegalRandomAccess();
+    if (entry >= numberOfEventsInFile()) throwIllegalRandomAccess();
+    eventNavigator_->goToEntry(entry);
+  }
+
   bool Event::isValid() const {
     return eventNavigator_->isValid();
   }
