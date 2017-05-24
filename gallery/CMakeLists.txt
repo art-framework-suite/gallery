@@ -9,7 +9,6 @@ set(gallery_sources
   EventHistoryGetter.cc
   EventNavigator.cc
   FindMaker.cc
-  HistoryGetterBase.cc
   throwFunctions.cc
   ValidHandle.cc
 )
@@ -34,6 +33,8 @@ cet_make(LIBRARIES
 )
 
 art_dictionary(DICTIONARY_LIBRARIES gallery)
+
+add_subdirectory(test)
 
 install_headers()
 install_source()

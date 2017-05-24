@@ -78,16 +78,38 @@ namespace gallery {
     }
   }
 
+  void EventNavigator::previous() {
+    // We will never get here is we're dealing with more than one file.
+    --eventEntry_;
+    if (isValid()) {
+      eventsTree_->LoadTree(eventEntry_);
+    }
+  }
+
+  void EventNavigator::goToEntry(long long entry) {
+    eventEntry_ = entry;
+    if (isValid()) {
+      eventsTree_->LoadTree(eventEntry_);
+    }
+  }
+
   void EventNavigator::nextFile() {
 
     // Be careful with this function. If the next file
     // is empty this will leave it not pointing at a
     // valid event.
 
-    if (atEnd()) return;
+    if (atEnd()) {
+      throw art::Exception(art::errors::LogicError) <<
+	"Illegal call to EventNavigator::nextFile() when atEnd() is true";
+    }
 
     if (file_) {
-      std::cout << "Closing file, read " << file_->GetBytesRead() << " bytes in " << file_->GetReadCalls() <<  " transactions\n";
+      std::cout << "Closing file, read "
+		<< file_->GetBytesRead()
+		<< " bytes in "
+		<< file_->GetReadCalls()
+		<<  " transactions\n";
     }
 
     ++fileEntry_;

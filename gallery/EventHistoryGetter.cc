@@ -2,13 +2,15 @@
 
 #include "gallery/EventNavigator.h"
 
+#include <type_traits>
+
 namespace gallery {
 
   EventHistoryGetter::EventHistoryGetter(EventNavigator const* eventNavigator) :
     eventNavigator_(eventNavigator) {
+    static_assert(std::is_nothrow_destructible<EventHistoryGetter>::value,
+		  "EventHistoryGetter is not nothrow destructible");
   }
-
-  EventHistoryGetter::~EventHistoryGetter() { }
 
   art::ProcessHistoryID const& EventHistoryGetter::processHistoryID() const {
     return eventNavigator_->processHistoryID();

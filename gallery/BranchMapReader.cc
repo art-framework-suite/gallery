@@ -1,6 +1,6 @@
 #include "gallery/BranchMapReader.h"
 
-#include "gallery/HistoryGetterBase.h"
+#include "gallery/EventHistoryGetter.h"
 #include "gallery/throwFunctions.h"
 #include "canvas/Persistency/Provenance/BranchType.h"
 #include "canvas/Persistency/Provenance/History.h"
@@ -54,7 +54,7 @@ namespace gallery {
     }
   }
 
-  void BranchMapReader::updateEvent(HistoryGetterBase* historyGetter) {
+  void BranchMapReader::updateEvent(EventHistoryGetter* historyGetter) {
     branchListIndexes_ = historyGetter->history().branchListIndexes();
   }
 

@@ -7,6 +7,8 @@ namespace gallery {
 
   void throwTreeNotFound(std::string const& treeName);
   void throwBranchNotFound(std::string const& branchName);
+  void throwIllegalRandomAccess();
+  void throwIllegalDecrement();
 }
 
 #endif /* gallery_throwFunctions_h */
