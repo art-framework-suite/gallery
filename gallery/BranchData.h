@@ -5,7 +5,6 @@
 // the buffer that data is written to from that TBranch.
 
 #include "canvas/Persistency/Common/EDProductGetter.h"
-
 #include "cetlib/exempt_ptr.h"
 
 #include <string>
@@ -26,7 +25,9 @@ namespace gallery {
   class BranchData : public art::EDProductGetter {
   public:
 
-    BranchData();
+    // This is an invalid BranchData object initialized
+    // such that getIt always returns a nullptr.
+    BranchData() = default;
 
     BranchData(art::TypeID const& type,
                TClass* iTClass,
@@ -59,14 +60,14 @@ namespace gallery {
 
   private:
 
-    TClass* tClass_;
-    void* address_;
-    art::EDProduct const * edProduct_;
-    TBranch* branch_;
-    EventNavigator const* eventNavigator_;
-    cet::exempt_ptr<art::EDProductGetterFinder const> finder_;
-    mutable long long lastProduct_;
-    std::string branchName_;
+    TClass* tClass_{nullptr};
+    void* address_{nullptr};
+    art::EDProduct const* edProduct_{nullptr};
+    TBranch* branch_{nullptr};
+    EventNavigator const* eventNavigator_{nullptr};
+    cet::exempt_ptr<art::EDProductGetterFinder const> finder_{nullptr};
+    mutable long long lastProduct_{-1};
+    std::string branchName_{};
   };
 }
 #endif /* gallery_BranchData_h */

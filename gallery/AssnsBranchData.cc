@@ -15,22 +15,18 @@ namespace gallery {
                                    std::string&& iBranchName,
                                    art::TypeID const& infoType,
                                    art::TypeID const& infoPartnerType) :
-    BranchData(type, iTClass, iBranch,
-               eventNavigator, finder, std::move(iBranchName)),
-    secondary_wrapper_type_(),
-    secondaryProduct_(),
-    secondaryLastProduct_(-1) {
-
+    BranchData{type, iTClass, iBranch, eventNavigator, finder, std::move(iBranchName)}
+  {
     if (type == infoType) {
       secondary_wrapper_type_ = infoPartnerType;
-    } else {
+    }
+    else {
       secondary_wrapper_type_ = infoType;
     }
   }
 
-  AssnsBranchData::~AssnsBranchData() { }
-
-  void AssnsBranchData::updateFile(TBranch* iBranch) {
+  void AssnsBranchData::updateFile(TBranch* iBranch)
+  {
     secondaryLastProduct_ = -1;
     secondaryProduct_.reset();
     BranchData::updateFile(iBranch);

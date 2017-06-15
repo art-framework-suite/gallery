@@ -1,8 +1,9 @@
 #ifndef gallery_AssnsBranchData_h
 #define gallery_AssnsBranchData_h
 
-#include "gallery/BranchData.h"
 #include "canvas/Utilities/TypeID.h"
+#include "canvas/Persistency/Common/EDProduct.h"
+#include "gallery/BranchData.h"
 
 #include <memory>
 #include <string>
@@ -31,9 +32,9 @@ namespace gallery {
                     art::TypeID const& infoType,
                     art::TypeID const& infoPartnerType);
 
-    virtual ~AssnsBranchData();
+  private:
 
-    virtual void updateFile(TBranch* iBranch) override;
+    void updateFile(TBranch* iBranch) override;
 
     art::EDProduct const*
     getIt() const override;
@@ -44,11 +45,9 @@ namespace gallery {
     art::EDProduct const*
     uniqueProduct(art::TypeID const& wanted_wrapper_type) const override;
 
-  private:
-
-    art::TypeID secondary_wrapper_type_;
-    mutable std::unique_ptr<art::EDProduct> secondaryProduct_;
-    mutable long long secondaryLastProduct_;
+    art::TypeID secondary_wrapper_type_{};
+    mutable std::unique_ptr<art::EDProduct> secondaryProduct_{nullptr};
+    mutable long long secondaryLastProduct_{-1};
   };
 }
 #endif /* gallery_AssnsBranchData_h */

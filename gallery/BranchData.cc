@@ -3,6 +3,7 @@
 #include "gallery/EventNavigator.h"
 #include "canvas/Persistency/Common/EDProduct.h"
 #include "canvas/Persistency/Common/RefCoreStreamer.h"
+#include "canvas/Persistency/Provenance/ProductIDStreamer.h"
 #include "canvas/Utilities/Exception.h"
 #include "canvas/Utilities/TypeID.h"
 
@@ -29,34 +30,19 @@ namespace {
 
 namespace gallery {
 
-  BranchData::BranchData() :
-    // This is an invalid BranchData object initialized
-    // such that getIt always returns a nullptr.
-    tClass_(nullptr),
-    address_(nullptr),
-    edProduct_(nullptr),
-    branch_(nullptr),
-    eventNavigator_(nullptr),
-    finder_(nullptr),
-    lastProduct_(-1),
-    branchName_()
-  {
-  }
-
   BranchData::BranchData(art::TypeID const& type,
                          TClass* iTClass,
                          TBranch* iBranch,
                          EventNavigator const* eventNavigator,
                          art::EDProductGetterFinder const* finder,
                          std::string&& iBranchName) :
-    tClass_(iTClass),
-    address_(tClass_ != nullptr ? tClass_->New() : nullptr),
-    edProduct_(calculateEDProductAddress(tClass_, address_)),
-    branch_(iBranch),
-    eventNavigator_(eventNavigator),
-    finder_(finder),
-    lastProduct_(-1),
-    branchName_(std::move(iBranchName))
+    tClass_{iTClass},
+    address_{tClass_ != nullptr ? tClass_->New() : nullptr},
+    edProduct_{calculateEDProductAddress(tClass_, address_)},
+    branch_{iBranch},
+    eventNavigator_{eventNavigator},
+    finder_{finder},
+    branchName_{std::move(iBranchName)}
   {
     if (tClass_ == nullptr) {
       throw art::Exception(art::errors::LogicError)

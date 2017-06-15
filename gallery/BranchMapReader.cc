@@ -33,67 +33,51 @@ namespace gallery {
     metaDataTree->SetBranchAddress(art::rootNames::metaBranchRootName<art::ProductRegistry>(),
                                    &productRegistryPtr);
 
-    art::BranchIDLists* branchIDListsPtr = &branchIDLists_;
-    TBranch* branchIDListsBranch =
-      metaDataTree->GetBranch(art::rootNames::metaBranchRootName<art::BranchIDLists>());
-    if (branchIDListsBranch == nullptr) {
-      throwBranchNotFound(art::rootNames::metaBranchRootName<art::BranchIDLists>());
+    // To support files that contain BranchIDLists
+    branchIDLists_.reset(nullptr);
+    art::BranchIDLists branchIDLists;
+    bool hasBranchIDLists{false};
+    if (metaDataTree->GetBranch(art::rootNames::metaBranchRootName<art::BranchIDLists>())) {
+      hasBranchIDLists = true;
+      auto branchIDListsPtr = &branchIDLists;
+      metaDataTree->SetBranchAddress(art::rootNames::metaBranchRootName<art::BranchIDLists>(), &branchIDListsPtr);
     }
-    metaDataTree->SetBranchAddress(art::rootNames::metaBranchRootName<art::BranchIDLists>(),
-                                   &branchIDListsPtr);
 
     metaDataTree->GetEntry(0);
 
-    branchIDToDescriptionMap_.clear();
+    // Necessary only for supporting conversion of an old Product ID
+    // schema to the current one
+    if (hasBranchIDLists) {
+      branchIDLists_ = std::make_unique<art::BranchIDLists>(std::move(branchIDLists));
+      metaDataTree->SetBranchAddress(art::rootNames::metaBranchRootName<art::BranchIDLists>(), nullptr);
+    }
+
+    productIDToDescriptionMap_.clear();
     for (auto const& product : productRegistry->productList_) {
       art::BranchDescription const& branchDescription = product.second;
-      if (branchDescription.branchType() == art::InEvent && branchDescription.branchID().isValid()) {
-        branchIDToDescriptionMap_.emplace(std::make_pair(branchDescription.branchID(), branchDescription));
-        allSeenBranchIDs_.insert(branchDescription.branchID());
+      if (branchDescription.branchType() == art::InEvent && branchDescription.productID().isValid()) {
+        productIDToDescriptionMap_.emplace(std::make_pair(branchDescription.productID(), branchDescription));
+        allSeenProductIDs_.insert(branchDescription.productID());
       }
     }
   }
 
-  void BranchMapReader::updateEvent(EventHistoryGetter* historyGetter) {
+  void BranchMapReader::updateEvent(EventHistoryGetter* historyGetter)
+  {
     branchListIndexes_ = historyGetter->history().branchListIndexes();
   }
 
-  art::BranchID BranchMapReader::productToBranchID(art::ProductID const& pid) const {
-    if (pid.isValid()) {
-      size_t procIndex = pid.processIndex() - 1;
-      if (procIndex < branchListIndexes_.size()) {
-        art::BranchListIndex branchListIndex = branchListIndexes_[procIndex];
-        if (branchListIndex < branchIDLists_.size()) {
-          art::BranchIDList const& branchIDList = branchIDLists_[branchListIndex];
-          size_t prodIndex = pid.productIndex() - 1;
-          if (prodIndex < branchIDList.size()) {
-            art::BranchID::value_type bid = branchIDList[prodIndex];
-            return art::BranchID(bid);
-          }
-        }
-      }
-    }
-    return art::BranchID();
-  }
-
-  art::BranchDescription const* BranchMapReader::productToBranch(art::ProductID const& pid) const {
-    art::BranchID bid = productToBranchID(pid);
-    auto bdi = branchIDToDescriptionMap_.find(bid);
-    if (branchIDToDescriptionMap_.end() == bdi) {
+  art::BranchDescription const* BranchMapReader::productToBranch(art::ProductID const& pid) const
+  {
+    auto bdi = productIDToDescriptionMap_.find(pid);
+    if (productIDToDescriptionMap_.end() == bdi) {
       return nullptr;
     }
     return &bdi->second;
   }
 
-  art::BranchDescription const* BranchMapReader::branchIDToBranch(art::BranchID const& bid) const {
-    auto bdi = branchIDToDescriptionMap_.find(bid);
-    if (branchIDToDescriptionMap_.end() == bdi) {
-      return nullptr;
-    }
-    return &bdi->second;
-  }
-
-  bool BranchMapReader::branchInRegistryOfAnyOpenedFile(art::BranchID const& branchID) const {
-    return allSeenBranchIDs_.find(branchID) != allSeenBranchIDs_.end();
+  bool BranchMapReader::branchInRegistryOfAnyOpenedFile(art::ProductID const& productID) const
+  {
+    return allSeenProductIDs_.find(productID) != allSeenProductIDs_.end();
   }
 }
