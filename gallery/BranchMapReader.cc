@@ -23,15 +23,13 @@ namespace gallery {
       throwTreeNotFound(art::rootNames::metaDataTreeName());
     }
 
-    std::unique_ptr<art::ProductRegistry> productRegistry(new art::ProductRegistry);
-    art::ProductRegistry* productRegistryPtr = productRegistry.get();
-    TBranch* productRegistryBranch =
-      metaDataTree->GetBranch(art::rootNames::metaBranchRootName<art::ProductRegistry>());
+    auto productRegistry = std::make_unique<art::ProductRegistry>();
+    auto* productRegistryPtr = productRegistry.get();
+    TBranch* productRegistryBranch = metaDataTree->GetBranch(art::rootNames::metaBranchRootName<art::ProductRegistry>());
     if (productRegistryBranch == nullptr) {
       throwBranchNotFound(art::rootNames::metaBranchRootName<art::ProductRegistry>());
     }
-    metaDataTree->SetBranchAddress(art::rootNames::metaBranchRootName<art::ProductRegistry>(),
-                                   &productRegistryPtr);
+    metaDataTree->SetBranchAddress(art::rootNames::metaBranchRootName<art::ProductRegistry>(), &productRegistryPtr);
 
     // To support files that contain BranchIDLists
     branchIDLists_.reset(nullptr);
@@ -60,11 +58,6 @@ namespace gallery {
         allSeenProductIDs_.insert(branchDescription.productID());
       }
     }
-  }
-
-  void BranchMapReader::updateEvent(EventHistoryGetter* historyGetter)
-  {
-    branchListIndexes_ = historyGetter->history().branchListIndexes();
   }
 
   art::BranchDescription const* BranchMapReader::productToBranch(art::ProductID const& pid) const

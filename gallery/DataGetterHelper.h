@@ -37,7 +37,6 @@
 #include "gallery/TypeLabelInstanceKey.h"
 
 #include "canvas/Persistency/Common/EDProductGetterFinder.h"
-#include "canvas/Persistency/Provenance/BranchID.h"
 #include "canvas/Persistency/Provenance/Compatibility/BranchIDList.h"
 #include "canvas/Persistency/Provenance/DictionaryChecker.h"
 #include "canvas/Persistency/Provenance/ProcessHistoryID.h"
@@ -74,8 +73,6 @@ namespace gallery {
     DataGetterHelper(EventNavigator const* eventNavigator,
                      std::shared_ptr<EventHistoryGetter> historyGetter);
 
-    ~DataGetterHelper() noexcept;
-
     void getByLabel(std::type_info const& typeInfoOfWrapper,
                     art::InputTag const& inputTag,
                     art::EDProduct const*& edProduct) const;
@@ -91,7 +88,6 @@ namespace gallery {
     EventNavigator const* eventNavigator_;
     TTree* tree_{nullptr};
     std::shared_ptr<EventHistoryGetter> historyGetter_;
-    mutable std::vector<char const*> labels_{};
     mutable bool initializedForProcessHistory_{false};
     mutable art::ProcessHistoryID previousProcessHistoryID_{};
     mutable std::vector<std::string> previousProcessHistoryNames_{};
@@ -126,13 +122,13 @@ namespace gallery {
       bool isAssns() const { return isAssns_; }
       art::TypeID const& partnerType() const { return partnerType_; }
 
-      std::vector<std::pair<unsigned int, unsigned int>> & processIndexToBranchDataIndex() const
+      std::vector<std::pair<unsigned int, unsigned int>>& processIndexToBranchDataIndex() const
       { return processIndexToBranchDataIndex_; }
 
-      std::vector<unsigned int> & branchDataIndexOrderedByHistory() const
+      std::vector<unsigned int>& branchDataIndexOrderedByHistory() const
       { return branchDataIndexOrderedByHistory_; }
 
-      std::vector<art::BranchID> & branchIDs() const { return branchIDs_; }
+      std::vector<art::ProductID>& productIDs() const { return productIDs_; }
 
     private:
 
@@ -148,7 +144,7 @@ namespace gallery {
       // in the ProductRegistry and in the input file for any input
       // file that contains events and was opened so far and the
       // product registry entry must be associated with the Event and
-      // have a valid BranchID (the corresponding TBranch does not
+      // have a valid ProductID (the corresponding TBranch does not
       // necessarily need to exist in the current input file).  These
       // are maintained in the order of the processIndex. The second
       // part of the pair is an index into branchDataVector_.
@@ -160,10 +156,10 @@ namespace gallery {
       // each element is an index into the branch data vector.
       mutable std::vector<unsigned int> branchDataIndexOrderedByHistory_;
 
-      // The BranchIDs for the processes in processNames_ This vector
+      // The ProductIDs for the processes in processNames_ This vector
       // is sorted in the same order and has the same size as
       // processNames_.
-      mutable std::vector<art::BranchID> branchIDs_;
+      mutable std::vector<art::ProductID> productIDs_;
     };
 
     // Note we just add to this, the order is never changed
@@ -199,8 +195,7 @@ namespace gallery {
     mutable std::map<art::ProductID, unsigned int> branchDataIndexMap_{};
     mutable std::set<art::ProductID> branchDataMissingSet_{};
 
-    // Converts ProductIDs to BranchIDs and reads and keeps track of
-    // information related to that task.
+    // Keeps track of information related to metadata.
     BranchMapReader branchMapReader_{};
 
     mutable art::DictionaryChecker dictChecker_{};

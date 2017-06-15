@@ -74,19 +74,15 @@ namespace gallery {
     initializeStreamers();
   }
 
-  DataGetterHelper::~DataGetterHelper() noexcept {
-    for (auto label : labels_) {
-      delete [] label;
-    }
-  }
-
   void DataGetterHelper::getByLabel(std::type_info const& typeInfoOfWrapper,
                                     art::InputTag const& inputTag,
-                                    art::EDProduct const*& edProduct) const {
-
+                                    art::EDProduct const*& edProduct) const
+  {
     edProduct = nullptr; // this nullptr indicates product not found yet
 
-    if (!initializedForProcessHistory_) initializeForProcessHistory();
+    if (!initializedForProcessHistory_) {
+      initializeForProcessHistory();
+    }
 
     art::TypeID type(typeInfoOfWrapper);
     InfoForTypeLabelInstance const& info = getInfoForTypeLabelInstance(type,
@@ -102,12 +98,12 @@ namespace gallery {
         // If the product was present in the input file and we successfully read it then we are done
         if (edProduct) return;
       }
-    } else {  // process is not empty
+    }
+    else { // process is not empty
 
       auto itProcess = processNameToProcessIndex_.find(inputTag.process());
       if (itProcess != processNameToProcessIndex_.end()) {
         unsigned int processIndex = itProcess->second;
-
         unsigned int branchDataIndex = 0;
         if (getBranchDataIndex(info.processIndexToBranchDataIndex(), processIndex, branchDataIndex)) {
           readBranchData(branchDataIndex, edProduct, type);
@@ -162,7 +158,7 @@ namespace gallery {
             tree_->AddBranchToCache(branch, kTRUE);
           }
         }
-        else if (branchMapReader_.branchInRegistryOfAnyOpenedFile(art::ProductID{info.branchIDs()[processIndex].id()})) {
+        else if (branchMapReader_.branchInRegistryOfAnyOpenedFile(info.productIDs()[processIndex])) {
           std::string branchName{buildBranchName(info, processNames_[processIndex])};
           addBranchData(std::move(branchName), processIndex, info, initializeTheCache);
         }
@@ -202,7 +198,6 @@ namespace gallery {
 
   void DataGetterHelper::updateEvent()
   {
-    branchMapReader_.updateEvent(historyGetter_.get());
     initializedForProcessHistory_ = false;
   }
 
@@ -245,8 +240,8 @@ namespace gallery {
 
     // update for the new process history
     orderedProcessIndexes_.clear();
-    for (auto i = processHistory.begin(), iEnd = processHistory.end(); i != iEnd; ++i) {
-      std::string const& processName = i->processName();
+    for (auto const& processConfig : processHistory) {
+      std::string const& processName = processConfig.processName();
       previousProcessHistoryNames_.push_back(processName);
       auto itFind = processNameToProcessIndex_.find(processName);
       if (itFind == processNameToProcessIndex_.end()) {
@@ -267,9 +262,9 @@ namespace gallery {
     processNameToProcessIndex_[processName] = processIndex;
     for (auto& info : infoVector_) {
       std::string branchName(buildBranchName(info, processName));
-      art::BranchID branchID(branchName);
-      info.branchIDs().push_back(branchID);
-      if (branchMapReader_.branchInRegistryOfAnyOpenedFile(art::ProductID{branchID.id()})) {
+      art::ProductID const productID{branchName};
+      info.productIDs().push_back(productID);
+      if (branchMapReader_.branchInRegistryOfAnyOpenedFile(productID)) {
         addBranchData(std::move(branchName), processIndex, info);
       }
     }
@@ -331,7 +326,7 @@ namespace gallery {
                                                     InfoForTypeLabelInstance const& info) const
   {
     art::BranchDescription const* branchDescription =
-      branchMapReader_.productToBranch(art::ProductID{info.branchIDs()[processIndex].id()});
+      branchMapReader_.productToBranch(info.productIDs()[processIndex]);
     if (branchDescription == nullptr) {
       throw art::Exception(art::errors::LogicError)
         << "In DataGetterHelper::getTClassUsingBranchDescription. TBranch exists but no BranchDescription in ProductRegistry.\n"
@@ -356,7 +351,7 @@ namespace gallery {
         << "getValidHandle was passed an empty module label. Not allowed.\n";
     }
 
-    TypeLabelInstanceKey key(type, label.c_str(), instance.c_str());
+    TypeLabelInstanceKey const key{type, label, instance};
 
     auto itFind = infoMap_.find(key);
     if (itFind == infoMap_.end()) {
@@ -383,13 +378,13 @@ namespace gallery {
       insertIntoInfoMap(info.partnerType(), label, instance, infoIndex);
     }
 
-    unsigned int processIndex = 0;
-    info.branchIDs().reserve(processNames_.size());
+    unsigned int processIndex{};
+    info.productIDs().reserve(processNames_.size());
     for(auto const& processName : processNames_) {
-      std::string branchName(buildBranchName(info, processName));
-      art::BranchID branchID(branchName);
-      info.branchIDs().push_back(branchID);
-      if (branchMapReader_.branchInRegistryOfAnyOpenedFile(art::ProductID{branchID.id()})) {
+      std::string branchName{buildBranchName(info, processName)};
+      art::ProductID const productID{branchName};
+      info.productIDs().push_back(productID);
+      if (branchMapReader_.branchInRegistryOfAnyOpenedFile(productID)) {
         addBranchData(std::move(branchName), processIndex, info);
       }
       ++processIndex;
@@ -402,27 +397,7 @@ namespace gallery {
                                            std::string const& instance,
                                            unsigned int infoIndex) const
   {
-    char const* pLabel = label.c_str();
-    char const* pInstance = instance.c_str();
-
-    size_t labelLen = strlen(pLabel) + 1;
-    char* newLabel = new char[labelLen];
-    std::strncpy(newLabel, pLabel, labelLen);
-    // The only purpose of the labels_ vector is to save
-    // the pointer so we can delete the allocated memory
-    labels_.push_back(newLabel);
-
-    char const* newInstance = emptyString.c_str();
-    size_t newInstanceLen = strlen(pInstance) + 1;
-    if (newInstanceLen > 1) {
-      char* temp = new char[newInstanceLen];
-      std::strncpy(temp, pInstance, newInstanceLen);
-      labels_.push_back(temp);
-      newInstance = temp;
-    }
-
-    TypeLabelInstanceKey newKey(type, newLabel, newInstance);
-
+    TypeLabelInstanceKey const newKey{type, label, instance};
     infoMap_[newKey] = infoIndex;
   }
 
@@ -457,7 +432,7 @@ namespace gallery {
       info.branchDataIndexOrderedByHistory().reserve(orderedProcessIndexes_.size());
     }
     for (auto processIndex : orderedProcessIndexes_) {
-      unsigned int branchDataIndex = 0;
+      unsigned int branchDataIndex{};
       if (getBranchDataIndex(info.processIndexToBranchDataIndex(), processIndex, branchDataIndex) &&
           branchDataVector_[branchDataIndex]->branch() != nullptr) {
         info.branchDataIndexOrderedByHistory().push_back(branchDataIndex);

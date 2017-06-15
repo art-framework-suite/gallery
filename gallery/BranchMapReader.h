@@ -2,15 +2,13 @@
 #define gallery_BranchMapReader_h
 
 // BranchMapReader can find the BranchDescription corresponding to a
-// ProductID. One step in this is being able to convert a ProductID to
-// a BranchID.
+// ProductID.
 
 // BranchMapReader also maintains a set of all ProductIDs associated
 // with branches in the Event and seen in all input files opened so
 // far.
 
 #include "canvas/Persistency/Provenance/BranchDescription.h"
-#include "canvas/Persistency/Provenance/BranchID.h"
 #include "canvas/Persistency/Provenance/BranchListIndex.h"
 #include "canvas/Persistency/Provenance/Compatibility/BranchIDList.h"
 #include "canvas/Persistency/Provenance/ProductID.h"
@@ -30,7 +28,6 @@ namespace gallery {
   public:
 
     void updateFile(TFile* tFile);
-    void updateEvent(EventHistoryGetter*  historyGetter);
 
     cet::exempt_ptr<art::BranchIDLists const> branchIDLists() const { return branchIDLists_.get(); }
     art::BranchDescription const* productToBranch(art::ProductID const& pid) const;
@@ -40,7 +37,6 @@ namespace gallery {
 
     std::unique_ptr<art::BranchIDLists> branchIDLists_{nullptr}; // Only for backwards compatibility
     std::map<art::ProductID, art::BranchDescription> productIDToDescriptionMap_{};
-    art::BranchListIndexes branchListIndexes_{};
     std::set<art::ProductID> allSeenProductIDs_{};
   };
 }
