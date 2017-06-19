@@ -13,16 +13,13 @@
 # ======================================================================
 
 
-# use cmake 2.8 or later
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required( VERSION 3.2 )
 
-project(gallery)
+project(gallery VERSION 1.04.03 )
 
-# cetbuildtools contains our cmake modules
-find_package(cetbuildtools REQUIRED)
-
-list(APPEND CMAKE_MODULE_PATH
-  $ENV{CANVAS_DIR}/Modules)
+# cetmodules contains our cmake modules
+find_package(cetmodules REQUIRED)
+find_package(canvas REQUIRED)
 
 include(CetCMakeEnv)
 cet_cmake_env()
@@ -33,10 +30,10 @@ cet_set_compiler_flags(DIAGS VIGILANT
   EXTRA_FLAGS -pedantic
   EXTRA_CXX_FLAGS -Wnon-virtual-dtor -Wdelete-non-virtual-dtor
   )
-cet_have_qual(sse2 SSE2)
-if ( SSE2 )
-  cet_add_compiler_flags(CXX -msse2 -ftree-vectorizer-verbose=2)
-endif()
+##cet_have_qual(sse2 SSE2)
+##if ( SSE2 )
+##  cet_add_compiler_flags(CXX -msse2 -ftree-vectorizer-verbose=2)
+##endif()
 
 cet_report_compiler_flags()
 
@@ -46,11 +43,11 @@ find_ups_product(messagefacility)
 find_ups_product(fhiclcpp)
 find_ups_product(cetlib v2_01_00)
 find_ups_product(cetlib_except v1_01_00)
-find_ups_product (cetbuildtools)
 find_ups_product(clhep)
 find_ups_root()
 find_ups_boost()
 
+message(STATUS "MF_MESSAGELOGGER: ${MF_MESSAGELOGGER}")
 # art_dictionary
 include(ArtDictionary)
 
