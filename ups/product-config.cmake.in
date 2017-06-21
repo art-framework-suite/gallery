@@ -1,9 +1,10 @@
-
 @PACKAGE_INIT@
 
 set_and_check(@PROJECT_NAME@_LIBDIR "${PACKAGE_PREFIX_DIR}/lib")
 set_and_check(@PROJECT_NAME@_INCDIR "${PACKAGE_PREFIX_DIR}/include")
-find_library(GALLERY NAMES gallery PATHS "${@PROJECT_NAME@_LIBDIR}" NO_DEFAULT_PATH)
+@CONFIG_FIND_LIBRARY_COMMANDS@
 include_directories( ${@PROJECT_NAME@_INCDIR} )
+
+find_package(canvas)
 
 check_required_components(@PROJECT_NAME@)
