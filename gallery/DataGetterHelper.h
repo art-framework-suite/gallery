@@ -239,7 +239,7 @@ namespace gallery {
     bool getByBranchDescription(art::BranchDescription const&,
                                 unsigned int & branchDataIndex) const;
 
-    art::EDProductGetter const* getEDProductGetterImpl(art::ProductID const&) const override;
+    art::EDProductGetter const* getEDProductGetterImpl(art::ProductID) const override;
   };
 }
 #endif /* gallery_DataGetterHelper_h */

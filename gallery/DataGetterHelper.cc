@@ -465,7 +465,7 @@ namespace gallery {
   }
 
   art::EDProductGetter const*
-  DataGetterHelper::getEDProductGetterImpl(art::ProductID const& productID) const
+  DataGetterHelper::getEDProductGetterImpl(art::ProductID const productID) const
   {
     auto const key = productID;
 
