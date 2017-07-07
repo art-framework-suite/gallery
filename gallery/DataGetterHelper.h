@@ -83,7 +83,7 @@ namespace gallery {
 
   private:
 
-    typedef std::pair<unsigned int, unsigned int> uupair;
+    using uupair = std::pair<unsigned int, unsigned int>;
 
     EventNavigator const* eventNavigator_;
     TTree* tree_{nullptr};

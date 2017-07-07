@@ -3,22 +3,25 @@
 #include "gallery/AssnsBranchData.h"
 #include "gallery/EventNavigator.h"
 
+#include "canvas/Persistency/Common/CacheStreamers.h"
+#include "canvas/Persistency/Common/RefCoreStreamer.h"
+#include "canvas/Persistency/Common/detail/setPtrVectorBaseStreamer.h"
+
 #include "canvas/Persistency/Provenance/BranchDescription.h"
 #include "canvas/Persistency/Provenance/BranchListIndex.h"
 #include "canvas/Persistency/Provenance/Compatibility/type_aliases.h"
 #include "canvas/Persistency/Provenance/History.h"
 #include "canvas/Persistency/Provenance/ProcessHistory.h"
 #include "canvas/Persistency/Provenance/ProductID.h"
+#include "canvas/Persistency/Provenance/ProductIDStreamer.h"
+#include "canvas/Persistency/Provenance/TransientStreamer.h"
 #include "canvas/Persistency/Provenance/TypeTools.h"
+#include "canvas/Persistency/Provenance/canonicalProductName.h"
+
 #include "canvas/Utilities/Exception.h"
 #include "canvas/Utilities/uniform_type_name.h"
 #include "canvas/Utilities/WrappedClassName.h"
 
-#include "canvas/Persistency/Common/CacheStreamers.h"
-#include "canvas/Persistency/Common/RefCoreStreamer.h"
-#include "canvas/Persistency/Common/detail/setPtrVectorBaseStreamer.h"
-#include "canvas/Persistency/Provenance/ProductIDStreamer.h"
-#include "canvas/Persistency/Provenance/TransientStreamer.h"
 
 #include "TClass.h"
 #include "TTree.h"
@@ -273,20 +276,10 @@ namespace gallery {
   std::string DataGetterHelper::buildBranchName(InfoForTypeLabelInstance const& info,
                                                 std::string const& processName)
   {
-    std::string branchName(info.type().friendlyClassName());
-    unsigned int branchNameSize = branchName.size() +
-                                  info.label().size() +
-                                  info.instance().size() +
-                                  processName.size() + 4;
-    branchName.reserve(branchNameSize);
-    branchName += underscore;
-    branchName += info.label();
-    branchName += underscore;
-    branchName += info.instance();
-    branchName += underscore;
-    branchName += processName;
-    branchName += period;
-    return branchName;
+    return art::canonicalProductName(info.type().friendlyClassName(),
+                                     info.label(),
+                                     info.instance(),
+                                     processName);
   }
 
   void DataGetterHelper::addBranchData(std::string&& branchName,

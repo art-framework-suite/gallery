@@ -1,9 +1,8 @@
 #ifndef gallery_Handle_h
 #define gallery_Handle_h
 
-// Similar to art::Handle, constructors are
-// different and unneeded things have been removed
-// but otherwise the interface is identical.
+// Similar to art::Handle, constructors are different and unneeded
+// things have been removed but otherwise the interface is identical.
 
 #include "canvas/Utilities/Exception.h"
 
@@ -16,19 +15,19 @@ namespace gallery {
   {
   public:
 
-    typedef T element_type;
-    class HandleTag { };
+    using element_type = T;
+    class HandleTag {};
 
-    Handle() : prod_(nullptr) { }
+    Handle() = default;
     Handle(T const*);
     Handle(std::shared_ptr<art::Exception const>);
     Handle(Handle const&) = default;
     Handle& operator=(Handle const&) = default;
 
     // pointer behaviors
-    T const & operator*() const;
-    T const * operator->() const; // alias for product()
-    T const * product() const;
+    T const& operator*() const;
+    T const* operator->() const; // alias for product()
+    T const* product() const;
 
     // inspectors:
     bool isValid() const;
@@ -37,26 +36,25 @@ namespace gallery {
   private:
     void throwHandleWhyFailed_() const;
 
-    T const*   prod_;
+    T const* prod_{nullptr};
     std::shared_ptr<art::Exception const>  whyFailed_;
   };
 
   template <class T>
   Handle<T>::Handle(T const* prod) :
-    prod_(prod)
+    prod_{prod}
   {
   }
 
   template <class T>
   Handle<T>::Handle(std::shared_ptr<art::Exception const> iWhyFailed) :
-    prod_(nullptr),
-    whyFailed_(iWhyFailed)
+    whyFailed_{iWhyFailed}
   {
   }
 
   template <class T>
   inline
-  T const &
+  T const&
   Handle<T>::operator*() const
   {
     return *product();
@@ -64,7 +62,7 @@ namespace gallery {
 
   template <class T>
   inline
-  T const *
+  T const*
   Handle<T>::operator->() const
   {
     return product();
