@@ -1,5 +1,6 @@
 #ifndef gallery_DataGetterHelper_h
 #define gallery_DataGetterHelper_h
+// vim: set sw=2 expandtab :
 
 // Allows one to lookup a product given module label, instance name,
 // type and optionally the process name. It contains various data
@@ -31,18 +32,17 @@
 // opened which could be detected by looking for a change in the file
 // entry number using the Event interface.
 
-#include "gallery/BranchData.h"
-#include "gallery/BranchMapReader.h"
-#include "gallery/EventHistoryGetter.h"
-#include "gallery/TypeLabelInstanceKey.h"
-
-#include "canvas/Persistency/Common/EDProductGetterFinder.h"
+#include "canvas/Persistency/Common/PrincipalBase.h"
 #include "canvas/Persistency/Provenance/Compatibility/BranchIDList.h"
 #include "canvas/Persistency/Provenance/DictionaryChecker.h"
 #include "canvas/Persistency/Provenance/ProcessHistoryID.h"
 #include "canvas/Persistency/Provenance/ProductID.h"
 #include "canvas/Utilities/InputTag.h"
 #include "canvas/Utilities/TypeID.h"
+#include "gallery/BranchData.h"
+#include "gallery/BranchMapReader.h"
+#include "gallery/EventHistoryGetter.h"
+#include "gallery/TypeLabelInstanceKey.h"
 
 #include <map>
 #include <memory>
@@ -53,11 +53,15 @@
 #include <vector>
 
 namespace art {
-  class EDProduct;
-  class EDProductGetter;
-  class BranchDescription;
-  class ProductID;
-}
+
+class EDProduct;
+class EDProductGetter;
+class BranchDescription;
+class ProductID;
+
+typedef PrincipalBase EDProductGetterFinder;
+
+} // namespace art
 
 class TClass;
 class TFile;
@@ -65,183 +69,308 @@ class TTree;
 
 namespace gallery {
 
-  class EventNavigator;
+class EventNavigator;
 
-  class DataGetterHelper : art::EDProductGetterFinder {
+class DataGetterHelper : art::EDProductGetterFinder /*Principal*/ {
+
+private: // TYPES
+
+  using uupair = std::pair<unsigned int, unsigned int>;
+
+  // One of these info objects is created the first time each unique
+  // key consisting of the type, module label, and instance is used
+  // in a call to getByLabel, getValidHandle, or a similar function.
+  class InfoForTypeLabelInstance {
+
   public:
 
-    DataGetterHelper(EventNavigator const* eventNavigator,
-                     std::shared_ptr<EventHistoryGetter> historyGetter);
+    InfoForTypeLabelInstance(art::TypeID const& iType, std::string const& iLabel, std::string const& iInstance);
 
-    void getByLabel(std::type_info const& typeInfoOfWrapper,
-                    art::InputTag const& inputTag,
-                    art::EDProduct const*& edProduct) const;
+    art::TypeID const&
+    type() const
+    {
+      return type_;
+    }
 
-    void updateFile(TFile* iFile, TTree* iTree, bool initializeTheCache);
-    void initializeTTreeCache();
-    void updateEvent();
+    std::string const&
+    label() const
+    {
+      return label_;
+    }
+
+    std::string const&
+    instance() const
+    {
+      return instance_;
+    }
+
+    TClass*
+    tClass() const
+    {
+      return tClass_;
+    }
+
+    bool
+    isAssns() const
+    {
+      return isAssns_;
+    }
+
+    art::TypeID const&
+    partnerType() const
+    {
+      return partnerType_;
+    }
+
+    std::vector<std::pair<unsigned int, unsigned int>>&
+    processIndexToBranchDataIndex() const
+    {
+      return processIndexToBranchDataIndex_;
+    }
+
+    std::vector<unsigned int>&
+    branchDataIndexOrderedByHistory() const
+    {
+      return branchDataIndexOrderedByHistory_;
+    }
+
+    std::vector<art::ProductID>&
+    productIDs() const
+    {
+      return productIDs_;
+    }
 
   private:
 
-    using uupair = std::pair<unsigned int, unsigned int>;
+    art::TypeID const
+    type_;
 
-    EventNavigator const* eventNavigator_;
-    TTree* tree_{nullptr};
-    std::shared_ptr<EventHistoryGetter> historyGetter_;
-    mutable bool initializedForProcessHistory_{false};
-    mutable art::ProcessHistoryID previousProcessHistoryID_{};
-    mutable std::vector<std::string> previousProcessHistoryNames_{};
+    std::string const
+    label_;
 
-    // Includes all processNames seen in ProcessHistories.  They are
-    // pushed onto the back of the vector when first seen and then
-    // never modified or moved.
-    mutable std::vector<std::string> processNames_{};
+    std::string const
+    instance_;
 
-    // The key to this map is the process name. The value is the index
-    // into the vector processNames_
-    mutable std::map<std::string, unsigned int> processNameToProcessIndex_{};
+    TClass* const
+    tClass_;
 
-    // These are ordered by the current ProcessHistory
-    mutable std::vector<unsigned int> orderedProcessIndexes_{};
+    bool const
+    isAssns_;
 
-    // One of these info objects is created the first time each unique
-    // key consisting of the type, module label, and instance is used
-    // in a call to getByLabel, getValidHandle, or a similar function.
-    class InfoForTypeLabelInstance {
-    public:
+    art::TypeID const
+    partnerType_;
 
-      InfoForTypeLabelInstance(art::TypeID const& iType,
-                               std::string const& iLabel,
-                               std::string const& iInstance);
+    // There is an entry here for each process with a branch that is
+    // in the ProductRegistry and in the input file for any input
+    // file that contains events and was opened so far and the
+    // product registry entry must be associated with the Event and
+    // have a valid ProductID (the corresponding TBranch does not
+    // necessarily need to exist in the current input file).  These
+    // are maintained in the order of the processIndex. The second
+    // part of the pair is an index into branchDataVector_.
+    mutable
+    std::vector<uupair>
+    processIndexToBranchDataIndex_;
 
-      art::TypeID const& type() const { return type_; }
-      std::string const& label() const { return label_; }
-      std::string const& instance() const { return instance_; }
+    // There is an entry here for each process in the current
+    // process history with a branch in the current input ROOT file.
+    // They are maintained in process history order.  The value of
+    // each element is an index into the branch data vector.
+    mutable
+    std::vector<unsigned int>
+    branchDataIndexOrderedByHistory_;
 
-      TClass* tClass() const { return tClass_; }
-      bool isAssns() const { return isAssns_; }
-      art::TypeID const& partnerType() const { return partnerType_; }
+    // The ProductIDs for the processes in processNames_ This vector
+    // is sorted in the same order and has the same size as
+    // processNames_.
+    mutable
+    std::vector<art::ProductID>
+    productIDs_;
 
-      std::vector<std::pair<unsigned int, unsigned int>>& processIndexToBranchDataIndex() const
-      { return processIndexToBranchDataIndex_; }
-
-      std::vector<unsigned int>& branchDataIndexOrderedByHistory() const
-      { return branchDataIndexOrderedByHistory_; }
-
-      std::vector<art::ProductID>& productIDs() const { return productIDs_; }
-
-    private:
-
-      art::TypeID const type_;
-      std::string const label_;
-      std::string const instance_;
-
-      TClass* const tClass_;
-      bool const isAssns_;
-      art::TypeID const partnerType_;
-
-      // There is an entry here for each process with a branch that is
-      // in the ProductRegistry and in the input file for any input
-      // file that contains events and was opened so far and the
-      // product registry entry must be associated with the Event and
-      // have a valid ProductID (the corresponding TBranch does not
-      // necessarily need to exist in the current input file).  These
-      // are maintained in the order of the processIndex. The second
-      // part of the pair is an index into branchDataVector_.
-      mutable std::vector<uupair> processIndexToBranchDataIndex_;
-
-      // There is an entry here for each process in the current
-      // process history with a branch in the current input ROOT file.
-      // They are maintained in process history order.  The value of
-      // each element is an index into the branch data vector.
-      mutable std::vector<unsigned int> branchDataIndexOrderedByHistory_;
-
-      // The ProductIDs for the processes in processNames_ This vector
-      // is sorted in the same order and has the same size as
-      // processNames_.
-      mutable std::vector<art::ProductID> productIDs_;
-    };
-
-    // Note we just add to this, the order is never changed
-    // so an index into this can be cached. Entries are only
-    // added if and when data is requested via a getValidHandle
-    // function call or another similar function call.
-    mutable std::vector<InfoForTypeLabelInstance> infoVector_{};
-
-    // Use this to find the desired entry in the infoVector_ using a
-    // key with type, label, and instance.
-    mutable std::map<TypeLabelInstanceKey, unsigned int> infoMap_{};
-
-    // The BranchData object contains the object which ROOT fills when
-    // reading the data. It also contains related items.  Note we just
-    // add to this vector, the order is never changed so an index into
-    // this can be cached. The TBranch* in BranchData will be set to
-    // nullptr if the TBranch does not exist in the current
-    // file. There are entries here when the data product is not
-    // "present" because the producer declared it but never put
-    // it. You have to read the data and check the isPresent bit to
-    // determine that. There will be one entry in a
-    // processIndexToBranchDataIndex_ that points at each element in
-    // this vector. These are only created when needed (3 possible
-    // things can cause new BranchData objects to be constructed,
-    // 1. when a new InfoForTypeLabelInstance is constructed 2. when a
-    // new process is encountered in a process history 3. when a new
-    // input file is opened with new entries in its product registry).
-    mutable std::vector<std::unique_ptr<BranchData>> branchDataVector_{};
-    BranchData invalidBranchData_{};
-
-    // Use this for get functions that use the ProductID. These are
-    // mostly used when dereferencing a Ptr.
-    mutable std::map<art::ProductID, unsigned int> branchDataIndexMap_{};
-    mutable std::set<art::ProductID> branchDataMissingSet_{};
-
-    // Keeps track of information related to metadata.
-    BranchMapReader branchMapReader_{};
-
-    mutable art::DictionaryChecker dictChecker_{};
-
-    static bool streamersInitialized_;
-
-    // ----------------- private functions -----------------------
-
-    DataGetterHelper(DataGetterHelper const&) = delete;
-    DataGetterHelper const& operator=(DataGetterHelper const&) = delete;
-
-    static void initializeStreamers();
-    void initializeForProcessHistory() const;
-    void addProcess(std::string const& processName) const;
-    static std::string buildBranchName(InfoForTypeLabelInstance const& info,
-                                       std::string const& processName);
-    void addBranchData(std::string&& branchName,
-                       unsigned int processIndex,
-                       InfoForTypeLabelInstance const& info,
-                       bool initializeTheCache = false) const;
-    TClass* getTClassUsingBranchDescription(unsigned int processIndex,
-                                          InfoForTypeLabelInstance const& info) const;
-    InfoForTypeLabelInstance&
-    getInfoForTypeLabelInstance(art::TypeID const& type,
-                                std::string const& label,
-                                std::string const& instance) const;
-    void addTypeLabelInstance(art::TypeID const& type,
-                              std::string const& label,
-                              std::string const& instance) const;
-    void insertIntoInfoMap(art::TypeID const& type,
-                           std::string const& label,
-                           std::string const& instance,
-                           unsigned int infoIndex) const;
-    void readBranchData(unsigned int branchDataIndex,
-                        art::EDProduct const*& edProduct,
-                        art::TypeID const& type) const;
-    bool getBranchDataIndex(std::vector<std::pair<unsigned int, unsigned int>> const& processIndexToBranchDataIndex,
-                            unsigned int processIndex,
-                            unsigned int & branchDataIndex) const;
-    void updateBranchDataIndexOrderedByHistory(InfoForTypeLabelInstance const& info) const;
-    bool getByBranchDescription(art::BranchDescription const&,
-                                unsigned int & branchDataIndex) const;
-
-    art::EDProductGetter const* getEDProductGetterImpl(art::ProductID) const override;
   };
-}
+
+private: // STATIC MEMBER FUNCTIONS
+
+  static
+  void
+  initializeStreamers();
+
+  static
+  std::string buildBranchName(InfoForTypeLabelInstance const& info, std::string const& processName);
+
+private: // STATIC MEMBER DATA
+
+  static
+  bool
+  streamersInitialized_;
+
+public: // MEMBER FUNCTIONS -- Special Member Functions
+
+  DataGetterHelper(EventNavigator const* eventNavigator, std::shared_ptr<EventHistoryGetter> historyGetter);
+
+  DataGetterHelper(DataGetterHelper const&) = delete;
+
+  DataGetterHelper(DataGetterHelper&&) = delete;
+
+  DataGetterHelper&
+  operator=(DataGetterHelper const&) = delete;
+
+  DataGetterHelper&
+  operator=(DataGetterHelper&&) = delete;
+
+public: // MEMBER FUNCTIONS
+
+  void
+  getByLabel(std::type_info const& typeInfoOfWrapper, art::InputTag const& inputTag, art::EDProduct const*& edProduct) const;
+
+  void
+  updateFile(TFile* iFile, TTree* iTree, bool initializeTheCache);
+
+  void
+  initializeTTreeCache();
+
+  void
+  updateEvent();
+
+private: // MEMBER FUNCTIONS
+
+  void
+  initializeForProcessHistory() const;
+
+  void
+  addProcess(std::string const& processName) const;
+
+  void
+  addBranchData(std::string&& branchName, unsigned int processIndex, InfoForTypeLabelInstance const& info,
+                bool initializeTheCache = false) const;
+
+  TClass*
+  getTClassUsingBranchDescription(unsigned int processIndex, InfoForTypeLabelInstance const& info) const;
+
+  InfoForTypeLabelInstance&
+  getInfoForTypeLabelInstance(art::TypeID const& type, std::string const& label, std::string const& instance) const;
+
+  void
+  addTypeLabelInstance(art::TypeID const& type, std::string const& label, std::string const& instance) const;
+
+  void
+  insertIntoInfoMap(art::TypeID const& type, std::string const& label, std::string const& instance, unsigned int infoIndex) const;
+
+  void
+  readBranchData(unsigned int branchDataIndex, art::EDProduct const*& edProduct, art::TypeID const& type) const;
+
+  bool
+  getBranchDataIndex(std::vector<std::pair<unsigned int, unsigned int>> const& processIndexToBranchDataIndex,
+                     unsigned int processIndex, unsigned int& branchDataIndex) const;
+
+  void
+  updateBranchDataIndexOrderedByHistory(InfoForTypeLabelInstance const& info) const;
+
+  bool
+  getByBranchDescription(art::BranchDescription const&, unsigned int& branchDataIndex) const;
+
+  art::EDProductGetter const*
+  getEDProductGetter_(art::ProductID const&) const override;
+
+private: // MEMBER DATA
+
+  EventNavigator const*
+  eventNavigator_;
+
+  TTree*
+  tree_{nullptr};
+
+  std::shared_ptr<EventHistoryGetter>
+  historyGetter_;
+
+  mutable
+  bool
+  initializedForProcessHistory_{false};
+
+  mutable
+  art::ProcessHistoryID
+  previousProcessHistoryID_{};
+
+  mutable
+  std::vector<std::string>
+  previousProcessHistoryNames_{};
+
+  // Includes all processNames seen in ProcessHistories.  They are
+  // pushed onto the back of the vector when first seen and then
+  // never modified or moved.
+  mutable
+  std::vector<std::string>
+  processNames_{};
+
+  // The key to this map is the process name. The value is the index
+  // into the vector processNames_
+  mutable
+  std::map<std::string, unsigned int>
+  processNameToProcessIndex_{};
+
+  // These are ordered by the current ProcessHistory
+  mutable
+  std::vector<unsigned int>
+  orderedProcessIndexes_{};
+
+  // Note we just add to this, the order is never changed
+  // so an index into this can be cached. Entries are only
+  // added if and when data is requested via a getValidHandle
+  // function call or another similar function call.
+  mutable
+  std::vector<InfoForTypeLabelInstance>
+  infoVector_{};
+
+  // Use this to find the desired entry in the infoVector_ using a
+  // key with type, label, and instance.
+  mutable
+  std::map<TypeLabelInstanceKey, unsigned int>
+  infoMap_{};
+
+  // The BranchData object contains the object which ROOT fills when
+  // reading the data. It also contains related items.  Note we just
+  // add to this vector, the order is never changed so an index into
+  // this can be cached. The TBranch* in BranchData will be set to
+  // nullptr if the TBranch does not exist in the current
+  // file. There are entries here when the data product is not
+  // "present" because the producer declared it but never put
+  // it. You have to read the data and check the isPresent bit to
+  // determine that. There will be one entry in a
+  // processIndexToBranchDataIndex_ that points at each element in
+  // this vector. These are only created when needed (3 possible
+  // things can cause new BranchData objects to be constructed,
+  // 1. when a new InfoForTypeLabelInstance is constructed 2. when a
+  // new process is encountered in a process history 3. when a new
+  // input file is opened with new entries in its product registry).
+  mutable
+  std::vector<std::unique_ptr<BranchData>>
+  branchDataVector_{};
+
+  BranchData
+  invalidBranchData_{};
+
+  // Use this for get functions that use the ProductID. These are
+  // mostly used when dereferencing a Ptr.
+  mutable
+  std::map<art::ProductID, unsigned int>
+  branchDataIndexMap_{};
+
+  mutable
+  std::set<art::ProductID>
+  branchDataMissingSet_{};
+
+  // Keeps track of information related to metadata.
+  BranchMapReader
+  branchMapReader_{};
+
+  mutable
+  art::DictionaryChecker
+  dictChecker_{};
+
+};
+
+} // namespace gallery
+
 #endif /* gallery_DataGetterHelper_h */
 
 // Local Variables:
