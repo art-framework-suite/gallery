@@ -364,7 +364,7 @@ private: // MEMBER DATA
   branchMapReader_{};
 
   mutable
-  art::DictionaryChecker
+  art::root::DictionaryChecker
   dictChecker_{};
 
 };
