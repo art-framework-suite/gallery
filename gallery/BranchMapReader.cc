@@ -6,6 +6,7 @@
 #include "canvas/Persistency/Provenance/History.h"
 #include "canvas/Persistency/Provenance/ProductID.h"
 #include "canvas/Persistency/Provenance/rootNames.h"
+#include "canvas_root_io/Streamers/BranchDescriptionStreamer.h"
 
 #include "TFile.h"
 #include "TTree.h"
@@ -53,10 +54,12 @@ namespace gallery {
     productIDToDescriptionMap_.clear();
     for (auto const& product : productRegistry->productList_) {
       art::BranchDescription const& branchDescription = product.second;
-      if (branchDescription.branchType() == art::InEvent && branchDescription.productID().isValid()) {
-        productIDToDescriptionMap_.emplace(std::make_pair(branchDescription.productID(), branchDescription));
-        allSeenProductIDs_.insert(branchDescription.productID());
-      }
+      if (branchDescription.branchType() != art::InEvent) continue;
+      if (!branchDescription.productID().isValid()) continue;
+
+      art::detail::BranchDescriptionStreamer::fluffRootTransients(branchDescription);
+      productIDToDescriptionMap_.emplace(branchDescription.productID(), branchDescription);
+      allSeenProductIDs_.insert(branchDescription.productID());
     }
   }
 

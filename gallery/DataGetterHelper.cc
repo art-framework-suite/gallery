@@ -3,25 +3,26 @@
 #include "gallery/AssnsBranchData.h"
 #include "gallery/EventNavigator.h"
 
-#include "canvas/Persistency/Common/CacheStreamers.h"
-#include "canvas/Persistency/Common/RefCoreStreamer.h"
-#include "canvas/Persistency/Common/detail/setPtrVectorBaseStreamer.h"
-
 #include "canvas/Persistency/Provenance/BranchDescription.h"
 #include "canvas/Persistency/Provenance/BranchListIndex.h"
 #include "canvas/Persistency/Provenance/Compatibility/type_aliases.h"
 #include "canvas/Persistency/Provenance/History.h"
 #include "canvas/Persistency/Provenance/ProcessHistory.h"
 #include "canvas/Persistency/Provenance/ProductID.h"
-#include "canvas/Persistency/Provenance/ProductIDStreamer.h"
-#include "canvas/Persistency/Provenance/TransientStreamer.h"
-#include "canvas/Persistency/Provenance/TypeTools.h"
 #include "canvas/Persistency/Provenance/canonicalProductName.h"
 
 #include "canvas/Utilities/Exception.h"
 #include "canvas/Utilities/uniform_type_name.h"
 #include "canvas/Utilities/WrappedClassName.h"
 
+#include "canvas_root_io/Streamers/AssnsStreamer.h"
+#include "canvas_root_io/Streamers/BranchDescriptionStreamer.h"
+#include "canvas_root_io/Streamers/CacheStreamers.h"
+#include "canvas_root_io/Streamers/ProductIDStreamer.h"
+#include "canvas_root_io/Streamers/RefCoreStreamer.h"
+#include "canvas_root_io/Streamers/TransientStreamer.h"
+#include "canvas_root_io/Streamers/setPtrVectorBaseStreamer.h"
+#include "canvas_root_io/Utilities/TypeTools.h"
 
 #include "TClass.h"
 #include "TTree.h"
@@ -53,7 +54,7 @@ namespace {
         return result;
       }
       auto const wrappedPartnerClassName = art::wrappedClassName(assnsPartner);
-      art::TypeWithDict const wrappedPartner(wrappedPartnerClassName);
+      art::root::TypeWithDict const wrappedPartner(wrappedPartnerClassName);
       if (!wrappedPartner) {
         throw art::Exception(art::errors::DictionaryNotFound)
           << "In InfoForTypeLabelInstance constructor.\nMissing dictionary for wrapped partner of Assns class.\n"
@@ -146,10 +147,11 @@ namespace gallery {
           // never happen in practice.
           if (info.isAssns() && branch != nullptr) {
             TClass* tClass = getTClassUsingBranchDescription(processIndex, info);
+
             art::TypeID typeIDInDescription(tClass->GetTypeInfo());
             art::TypeID typeIDInBranchData(branchData.tClass()->GetTypeInfo());
-            std::string branchName = branchData.branchName();
             if (typeIDInDescription != typeIDInBranchData) {
+              std::string branchName = branchData.branchName();
               branchDataVector_[branchDataIndex].reset(new AssnsBranchData(typeIDInDescription, tClass, branch,
                                                                            eventNavigator_,
                                                                            this,
@@ -295,6 +297,7 @@ namespace gallery {
 
     if (info.isAssns()) {
       TClass* tClass = getTClassUsingBranchDescription(processIndex, info);
+
       art::TypeID typeIDInDescription(tClass->GetTypeInfo());
       branchDataVector_.emplace_back(new AssnsBranchData(typeIDInDescription, tClass, branch,
                                                          eventNavigator_,
@@ -318,13 +321,14 @@ namespace gallery {
   DataGetterHelper::getTClassUsingBranchDescription(unsigned int processIndex,
                                                     InfoForTypeLabelInstance const& info) const
   {
-    art::BranchDescription const* branchDescription =
-      branchMapReader_.productToBranch(info.productIDs()[processIndex]);
+    art::BranchDescription const* branchDescription = branchMapReader_.productToBranch(info.productIDs()[processIndex]);
     if (branchDescription == nullptr) {
       throw art::Exception(art::errors::LogicError)
         << "In DataGetterHelper::getTClassUsingBranchDescription. TBranch exists but no BranchDescription in ProductRegistry.\n"
         << "This shouldn't be possible. For type " << info.type().className() << "\n";
     }
+
+    art::detail::AssnsStreamer::init_streamer(branchDescription->producedClassName());
     TClass* tClass = TClass::GetClass(branchDescription->wrappedName().c_str());
     if (tClass == nullptr) {
       throw art::Exception(art::errors::DictionaryNotFound)

@@ -15,6 +15,7 @@ set(gallery_sources
 
 set(gallery_libraries
   canvas
+  canvas_root_io
   cetlib
   cetlib_except
   ${ROOT_CORE}
@@ -24,6 +25,7 @@ set(gallery_libraries
 
 cet_make(LIBRARIES
   canvas
+  canvas_root_io
   cetlib
   cetlib_except
   ${ROOT_CORE}

@@ -38,11 +38,11 @@
 
 #include "canvas/Persistency/Common/EDProductGetterFinder.h"
 #include "canvas/Persistency/Provenance/Compatibility/BranchIDList.h"
-#include "canvas/Persistency/Provenance/DictionaryChecker.h"
 #include "canvas/Persistency/Provenance/ProcessHistoryID.h"
 #include "canvas/Persistency/Provenance/ProductID.h"
 #include "canvas/Utilities/InputTag.h"
 #include "canvas/Utilities/TypeID.h"
+#include "canvas_root_io/Utilities/DictionaryChecker.h"
 
 #include <map>
 #include <memory>
@@ -198,7 +198,7 @@ namespace gallery {
     // Keeps track of information related to metadata.
     BranchMapReader branchMapReader_{};
 
-    mutable art::DictionaryChecker dictChecker_{};
+    mutable art::root::DictionaryChecker dictChecker_{};
 
     static bool streamersInitialized_;
 

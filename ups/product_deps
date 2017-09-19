@@ -7,11 +7,11 @@ fcldir -
 perllib  product_dir
 #
 product		version
-canvas		v3_00_02
+canvas_root_io  v0_01_00
 cetbuildtools	v5_13_01	-	only_for_build
 end_product_list
 
-qualifier	canvas		notes
+qualifier	canvas_root_io	notes
 e14:debug	e14:debug
 e14:prof	e14:prof
 nu:e14:debug	e14:nu:debug
