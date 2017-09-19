@@ -34,11 +34,13 @@
 
 #include "canvas/Persistency/Common/PrincipalBase.h"
 #include "canvas/Persistency/Provenance/Compatibility/BranchIDList.h"
-#include "canvas/Persistency/Provenance/DictionaryChecker.h"
 #include "canvas/Persistency/Provenance/ProcessHistoryID.h"
 #include "canvas/Persistency/Provenance/ProductID.h"
 #include "canvas/Utilities/InputTag.h"
 #include "canvas/Utilities/TypeID.h"
+
+#include "canvas_root_io/Utilities/DictionaryChecker.h"
+
 #include "gallery/BranchData.h"
 #include "gallery/BranchMapReader.h"
 #include "gallery/EventHistoryGetter.h"
