@@ -5,11 +5,11 @@
 
 namespace gallery {
 
-  void throwTreeNotFound(std::string const& treeName);
-  void throwBranchNotFound(std::string const& branchName);
-  void throwIllegalRandomAccess();
-  void throwIllegalDecrement();
-}
+void throwTreeNotFound(std::string const &treeName);
+void throwBranchNotFound(std::string const &branchName);
+void throwIllegalRandomAccess();
+void throwIllegalDecrement();
+} // namespace gallery
 
 #endif /* gallery_throwFunctions_h */
 
