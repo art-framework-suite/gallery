@@ -7,44 +7,55 @@
 
 namespace gallery {
 
-void throwValidHandleNullPointer();
+  void throwValidHandleNullPointer();
 
-template <typename T> class ValidHandle {
-public:
-  using element_type = T;
-  class HandleTag {};
+  template <typename T>
+  class ValidHandle {
+  public:
+    using element_type = T;
+    class HandleTag {
+    };
 
-  ValidHandle() = delete;
-  ValidHandle(T const *prod);
-  ValidHandle(ValidHandle const &) = default;
-  ValidHandle &operator=(ValidHandle const &) = default;
+    ValidHandle() = delete;
+    ValidHandle(T const* prod);
+    ValidHandle(ValidHandle const&) = default;
+    ValidHandle& operator=(ValidHandle const&) = default;
 
-  // pointer behaviors
-  T const &operator*() const;
-  T const *operator->() const; // alias for product()
-  T const *product() const;
+    // pointer behaviors
+    T const& operator*() const;
+    T const* operator->() const; // alias for product()
+    T const* product() const;
 
-private:
-  T const *prod_;
-};
+  private:
+    T const* prod_;
+  };
 
-template <class T> ValidHandle<T>::ValidHandle(T const *prod) : prod_{prod} {
-  if (prod == nullptr) {
-    throwValidHandleNullPointer();
+  template <class T>
+  ValidHandle<T>::ValidHandle(T const* prod) : prod_{prod}
+  {
+    if (prod == nullptr) {
+      throwValidHandleNullPointer();
+    }
   }
-}
 
-template <class T> inline T const &ValidHandle<T>::operator*() const {
-  return *prod_;
-}
+  template <class T>
+  inline T const& ValidHandle<T>::operator*() const
+  {
+    return *prod_;
+  }
 
-template <class T> inline T const *ValidHandle<T>::operator->() const {
-  return prod_;
-}
+  template <class T>
+  inline T const* ValidHandle<T>::operator->() const
+  {
+    return prod_;
+  }
 
-template <class T> inline T const *ValidHandle<T>::product() const {
-  return prod_;
-}
+  template <class T>
+  inline T const*
+  ValidHandle<T>::product() const
+  {
+    return prod_;
+  }
 } // namespace gallery
 #endif /* gallery_ValidHandle_h */
 

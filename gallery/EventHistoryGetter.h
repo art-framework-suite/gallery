@@ -4,29 +4,29 @@
 #include "canvas/Persistency/Provenance/ProcessHistoryID.h"
 
 namespace art {
-class History;
-class ProcessHistory;
+  class History;
+  class ProcessHistory;
 } // namespace art
 
 namespace gallery {
 
-class EventNavigator;
+  class EventNavigator;
 
-class EventHistoryGetter {
-public:
-  EventHistoryGetter(EventNavigator const *);
-  virtual ~EventHistoryGetter() = default;
+  class EventHistoryGetter {
+  public:
+    EventHistoryGetter(EventNavigator const*);
+    virtual ~EventHistoryGetter() = default;
 
-  EventHistoryGetter(EventHistoryGetter const &) = delete;
-  EventHistoryGetter const &operator=(EventHistoryGetter const &) = delete;
+    EventHistoryGetter(EventHistoryGetter const&) = delete;
+    EventHistoryGetter const& operator=(EventHistoryGetter const&) = delete;
 
-  virtual art::ProcessHistoryID const &processHistoryID() const;
-  virtual art::ProcessHistory const &processHistory() const;
-  virtual art::History const &history() const;
+    virtual art::ProcessHistoryID const& processHistoryID() const;
+    virtual art::ProcessHistory const& processHistory() const;
+    virtual art::History const& history() const;
 
-private:
-  EventNavigator const *eventNavigator_;
-};
+  private:
+    EventNavigator const* eventNavigator_;
+  };
 } // namespace gallery
 #endif /* gallery_EventHistoryGetter_h */
 

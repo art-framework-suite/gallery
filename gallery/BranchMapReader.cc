@@ -17,77 +17,82 @@ class TBranch;
 
 namespace gallery {
 
-void BranchMapReader::updateFile(TFile *tFile) {
+  void
+  BranchMapReader::updateFile(TFile* tFile)
+  {
 
-  TTree *metaDataTree = dynamic_cast<TTree *>(
+    TTree* metaDataTree = dynamic_cast<TTree*>(
       tFile->Get(art::rootNames::metaDataTreeName().c_str()));
-  if (!metaDataTree) {
-    throwTreeNotFound(art::rootNames::metaDataTreeName());
-  }
+    if (!metaDataTree) {
+      throwTreeNotFound(art::rootNames::metaDataTreeName());
+    }
 
-  auto productRegistry = std::make_unique<art::ProductRegistry>();
-  auto *productRegistryPtr = productRegistry.get();
-  TBranch *productRegistryBranch = metaDataTree->GetBranch(
+    auto productRegistry = std::make_unique<art::ProductRegistry>();
+    auto* productRegistryPtr = productRegistry.get();
+    TBranch* productRegistryBranch = metaDataTree->GetBranch(
       art::rootNames::metaBranchRootName<art::ProductRegistry>());
-  if (productRegistryBranch == nullptr) {
-    throwBranchNotFound(
+    if (productRegistryBranch == nullptr) {
+      throwBranchNotFound(
         art::rootNames::metaBranchRootName<art::ProductRegistry>());
-  }
-  metaDataTree->SetBranchAddress(
+    }
+    metaDataTree->SetBranchAddress(
       art::rootNames::metaBranchRootName<art::ProductRegistry>(),
       &productRegistryPtr);
 
-  // To support files that contain BranchIDLists
-  branchIDLists_.reset(nullptr);
-  art::BranchIDLists branchIDLists;
-  bool hasBranchIDLists{false};
-  if (metaDataTree->GetBranch(
+    // To support files that contain BranchIDLists
+    branchIDLists_.reset(nullptr);
+    art::BranchIDLists branchIDLists;
+    bool hasBranchIDLists{false};
+    if (metaDataTree->GetBranch(
           art::rootNames::metaBranchRootName<art::BranchIDLists>())) {
-    hasBranchIDLists = true;
-    auto branchIDListsPtr = &branchIDLists;
-    metaDataTree->SetBranchAddress(
+      hasBranchIDLists = true;
+      auto branchIDListsPtr = &branchIDLists;
+      metaDataTree->SetBranchAddress(
         art::rootNames::metaBranchRootName<art::BranchIDLists>(),
         &branchIDListsPtr);
-  }
+    }
 
-  metaDataTree->GetEntry(0);
+    metaDataTree->GetEntry(0);
 
-  // Necessary only for supporting conversion of an old Product ID
-  // schema to the current one
-  if (hasBranchIDLists) {
-    branchIDLists_ =
+    // Necessary only for supporting conversion of an old Product ID
+    // schema to the current one
+    if (hasBranchIDLists) {
+      branchIDLists_ =
         std::make_unique<art::BranchIDLists>(std::move(branchIDLists));
-    metaDataTree->SetBranchAddress(
+      metaDataTree->SetBranchAddress(
         art::rootNames::metaBranchRootName<art::BranchIDLists>(), nullptr);
-  }
+    }
 
-  productIDToDescriptionMap_.clear();
-  for (auto const &product : productRegistry->productList_) {
-    art::BranchDescription const &branchDescription = product.second;
-    if (branchDescription.branchType() != art::InEvent)
-      continue;
-    if (!branchDescription.productID().isValid())
-      continue;
+    productIDToDescriptionMap_.clear();
+    for (auto const& product : productRegistry->productList_) {
+      art::BranchDescription const& branchDescription = product.second;
+      if (branchDescription.branchType() != art::InEvent)
+        continue;
+      if (!branchDescription.productID().isValid())
+        continue;
 
-    art::detail::BranchDescriptionStreamer::fluffRootTransients(
+      art::detail::BranchDescriptionStreamer::fluffRootTransients(
         branchDescription);
-    productIDToDescriptionMap_.emplace(branchDescription.productID(),
-                                       branchDescription);
-    allSeenProductIDs_.insert(branchDescription.productID());
+      productIDToDescriptionMap_.emplace(branchDescription.productID(),
+                                         branchDescription);
+      allSeenProductIDs_.insert(branchDescription.productID());
+    }
   }
-}
 
-art::BranchDescription const *
-BranchMapReader::productToBranch(art::ProductID const &pid) const {
-  auto bdi = productIDToDescriptionMap_.find(pid);
-  if (productIDToDescriptionMap_.end() == bdi) {
-    return nullptr;
+  art::BranchDescription const*
+  BranchMapReader::productToBranch(art::ProductID const& pid) const
+  {
+    auto bdi = productIDToDescriptionMap_.find(pid);
+    if (productIDToDescriptionMap_.end() == bdi) {
+      return nullptr;
+    }
+    return &bdi->second;
   }
-  return &bdi->second;
-}
 
-bool BranchMapReader::branchInRegistryOfAnyOpenedFile(
-    art::ProductID const &productID) const {
-  return allSeenProductIDs_.find(productID) != allSeenProductIDs_.end();
-}
+  bool
+  BranchMapReader::branchInRegistryOfAnyOpenedFile(
+    art::ProductID const& productID) const
+  {
+    return allSeenProductIDs_.find(productID) != allSeenProductIDs_.end();
+  }
 } // namespace gallery
