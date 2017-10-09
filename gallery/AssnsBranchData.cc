@@ -16,7 +16,7 @@ namespace gallery {
                                    TClass* iTClass,
                                    TBranch* iBranch,
                                    EventNavigator const* eventNavigator,
-                                   art::EDProductGetterFinder const* finder,
+                                   art::PrincipalBase const* finder,
                                    string&& iBranchName,
                                    art::TypeID const& infoType,
                                    art::TypeID const& infoPartnerType)

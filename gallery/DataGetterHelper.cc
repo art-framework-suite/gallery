@@ -95,6 +95,7 @@ namespace gallery {
     art::TypeID type(typeInfoOfWrapper);
     InfoForTypeLabelInstance const& info =
       getInfoForTypeLabelInstance(type, inputTag.label(), inputTag.instance());
+
     if (inputTag.process().empty()) {
       // search in reverse order of the ProcessHistory
       for (auto reverseIter = info.branchDataIndexOrderedByHistory().rbegin(),
@@ -149,6 +150,7 @@ namespace gallery {
           // This loop is sufficient to update all BranchData objects in the
           // vector.
           branchData.updateFile(branch);
+
           // A little paranoia here. What if in one input file Assns<A,B,C> is
           // written into the file and Assns<B,A,C> is written into another? The
           // following deals properly with that case by constructing a new
@@ -401,8 +403,8 @@ namespace gallery {
 
   void
   DataGetterHelper::addTypeLabelInstance(art::TypeID const& type,
-                                         string const& label,
-                                         string const& instance) const
+                                         std::string const& label,
+                                         std::string const& instance) const
   {
     dictChecker_.checkDictionaries(art::uniform_type_name(type.typeInfo()),
                                    true);

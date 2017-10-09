@@ -40,7 +40,7 @@ namespace gallery {
                          TClass* iTClass,
                          TBranch* iBranch,
                          EventNavigator const* eventNavigator,
-                         art::EDProductGetterFinder const* finder,
+                         art::PrincipalBase const* finder,
                          std::string&& iBranchName)
     : tClass_{iTClass}
     , address_{(tClass_ != nullptr) ? tClass_->New() : nullptr}

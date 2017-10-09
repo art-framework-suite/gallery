@@ -19,8 +19,6 @@ namespace art {
   class PrincipalBase;
   class TypeID;
 
-  typedef PrincipalBase EDProductGetterFinder;
-
 } // namespace art
 
 namespace gallery {
@@ -38,7 +36,7 @@ namespace gallery {
                TClass* iTClass,
                TBranch* branch,
                EventNavigator const* eventNavigator,
-               art::EDProductGetterFinder const* finder,
+               art::PrincipalBase const* finder,
                std::string&& iBranchName);
 
     BranchData(BranchData const&) = delete;
@@ -110,7 +108,7 @@ namespace gallery {
     art::EDProduct const* edProduct_{nullptr};
     TBranch* branch_{nullptr};
     EventNavigator const* eventNavigator_{nullptr};
-    cet::exempt_ptr<art::EDProductGetterFinder const> finder_{nullptr};
+    cet::exempt_ptr<art::PrincipalBase const> finder_{nullptr};
     mutable long long lastProduct_{-1};
     std::string branchName_{};
   };

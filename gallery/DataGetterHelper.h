@@ -61,8 +61,6 @@ namespace art {
   class BranchDescription;
   class ProductID;
 
-  typedef PrincipalBase EDProductGetterFinder;
-
 } // namespace art
 
 class TClass;
@@ -73,7 +71,7 @@ namespace gallery {
 
   class EventNavigator;
 
-  class DataGetterHelper : art::EDProductGetterFinder /*Principal*/ {
+  class DataGetterHelper : art::PrincipalBase {
 
   private: // TYPES
     using uupair = std::pair<unsigned int, unsigned int>;

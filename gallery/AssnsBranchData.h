@@ -17,8 +17,6 @@ namespace art {
   class EDProduct;
   class PrincipalBase;
 
-  typedef PrincipalBase EDProductGetterFinder;
-
 } // namespace art
 
 namespace gallery {
@@ -34,7 +32,7 @@ namespace gallery {
                     TClass* iTClass,
                     TBranch* branch,
                     EventNavigator const* eventNavigator,
-                    art::EDProductGetterFinder const* finder,
+                    art::PrincipalBase const* finder,
                     std::string&& iBranchName,
                     art::TypeID const& infoType,
                     art::TypeID const& infoPartnerType);
