@@ -11,12 +11,11 @@
 namespace gallery {
 
   template <typename T>
-  class Handle
-  {
+  class Handle {
   public:
-
     using element_type = T;
-    class HandleTag {};
+    class HandleTag {
+    };
 
     Handle() = default;
     Handle(T const*);
@@ -37,43 +36,36 @@ namespace gallery {
     void throwHandleWhyFailed_() const;
 
     T const* prod_{nullptr};
-    std::shared_ptr<art::Exception const>  whyFailed_;
+    std::shared_ptr<art::Exception const> whyFailed_;
   };
 
   template <class T>
-  Handle<T>::Handle(T const* prod) :
-    prod_{prod}
-  {
-  }
+  Handle<T>::Handle(T const* prod) : prod_{prod}
+  {}
 
   template <class T>
-  Handle<T>::Handle(std::shared_ptr<art::Exception const> iWhyFailed) :
-    whyFailed_{iWhyFailed}
-  {
-  }
+  Handle<T>::Handle(std::shared_ptr<art::Exception const> iWhyFailed)
+    : whyFailed_{iWhyFailed}
+  {}
 
   template <class T>
-  inline
-  T const&
-  Handle<T>::operator*() const
+  inline T const& Handle<T>::operator*() const
   {
     return *product();
   }
 
   template <class T>
-  inline
-  T const*
-  Handle<T>::operator->() const
+  inline T const* Handle<T>::operator->() const
   {
     return product();
   }
 
   template <class T>
-  inline
-  T const*
+  inline T const*
   Handle<T>::product() const
   {
-    if (!prod_) throwHandleWhyFailed_();
+    if (!prod_)
+      throwHandleWhyFailed_();
     return prod_;
   }
 
@@ -85,8 +77,7 @@ namespace gallery {
   }
 
   template <class T>
-  inline
-  std::shared_ptr<art::Exception const>
+  inline std::shared_ptr<art::Exception const>
   Handle<T>::whyFailed() const
   {
     return whyFailed_;
@@ -103,7 +94,7 @@ namespace gallery {
       << "Attempt to dereference invalid Handle with no stored exception\n"
       << "Maybe you forgot to call getByLabel before dereferencing\n";
   }
-}
+} // namespace gallery
 #endif /* gallery_Handle_h */
 
 // Local Variables:

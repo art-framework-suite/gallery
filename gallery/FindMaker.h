@@ -17,10 +17,10 @@
 // complaining about the complex templates that are used in FindOne.h
 // and the other headers it includes.
 
-#include "canvas/Persistency/Common/FindOne.h"
-#include "canvas/Persistency/Common/FindOneP.h"
 #include "canvas/Persistency/Common/FindMany.h"
 #include "canvas/Persistency/Common/FindManyP.h"
+#include "canvas/Persistency/Common/FindOne.h"
+#include "canvas/Persistency/Common/FindOneP.h"
 
 namespace art {
   class InputTag;
@@ -32,30 +32,45 @@ namespace gallery {
 
   class FindMaker {
   public:
-
     FindMaker();
 
-    template<typename PRODB, typename DATA, typename HANDLE> art::FindOne<PRODB, DATA>
-    makeFindOne(HANDLE const& handle, Event const& event, art::InputTag const& inputTag) {
+    template <typename PRODB, typename DATA, typename HANDLE>
+    art::FindOne<PRODB, DATA>
+    makeFindOne(HANDLE const& handle,
+                Event const& event,
+                art::InputTag const& inputTag)
+    {
       return art::FindOne<PRODB, DATA>(handle, event, inputTag);
     }
 
-    template<typename PRODB, typename DATA, typename HANDLE> art::FindOneP<PRODB, DATA>
-    makeFindOneP(HANDLE const& handle, Event const& event, art::InputTag const& inputTag) {
+    template <typename PRODB, typename DATA, typename HANDLE>
+    art::FindOneP<PRODB, DATA>
+    makeFindOneP(HANDLE const& handle,
+                 Event const& event,
+                 art::InputTag const& inputTag)
+    {
       return art::FindOneP<PRODB, DATA>(handle, event, inputTag);
     }
 
-    template<typename PRODB, typename DATA, typename HANDLE> art::FindMany<PRODB, DATA>
-    makeFindMany(HANDLE const& handle, Event const& event, art::InputTag const& inputTag) {
+    template <typename PRODB, typename DATA, typename HANDLE>
+    art::FindMany<PRODB, DATA>
+    makeFindMany(HANDLE const& handle,
+                 Event const& event,
+                 art::InputTag const& inputTag)
+    {
       return art::FindMany<PRODB, DATA>(handle, event, inputTag);
     }
 
-    template<typename PRODB, typename DATA, typename HANDLE> art::FindManyP<PRODB, DATA>
-    makeFindManyP(HANDLE const& handle, Event const& event, art::InputTag const& inputTag) {
+    template <typename PRODB, typename DATA, typename HANDLE>
+    art::FindManyP<PRODB, DATA>
+    makeFindManyP(HANDLE const& handle,
+                  Event const& event,
+                  art::InputTag const& inputTag)
+    {
       return art::FindManyP<PRODB, DATA>(handle, event, inputTag);
     }
   };
-}
+} // namespace gallery
 #endif /* gallery_FindMaker_h */
 
 // Local Variables:

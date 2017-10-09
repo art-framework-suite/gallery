@@ -4,8 +4,10 @@
 
 namespace gallery {
 
-  void throwValidHandleNullPointer() {
+  void
+  throwValidHandleNullPointer()
+  {
     throw art::Exception(art::errors::NullPointerError)
       << "Attempt to create ValidHandle with null pointer";
   }
-}
+} // namespace gallery

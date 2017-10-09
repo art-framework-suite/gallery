@@ -26,20 +26,25 @@ namespace gallery {
 
   class BranchMapReader {
   public:
-
     void updateFile(TFile* tFile);
 
-    cet::exempt_ptr<art::BranchIDLists const> branchIDLists() const { return branchIDLists_.get(); }
-    art::BranchDescription const* productToBranch(art::ProductID const& pid) const;
+    cet::exempt_ptr<art::BranchIDLists const>
+    branchIDLists() const
+    {
+      return branchIDLists_.get();
+    }
+    art::BranchDescription const* productToBranch(
+      art::ProductID const& pid) const;
     bool branchInRegistryOfAnyOpenedFile(art::ProductID const&) const;
 
   private:
-
-    std::unique_ptr<art::BranchIDLists> branchIDLists_{nullptr}; // Only for backwards compatibility
-    std::map<art::ProductID, art::BranchDescription> productIDToDescriptionMap_{};
+    std::unique_ptr<art::BranchIDLists> branchIDLists_{
+      nullptr}; // Only for backwards compatibility
+    std::map<art::ProductID, art::BranchDescription>
+      productIDToDescriptionMap_{};
     std::set<art::ProductID> allSeenProductIDs_{};
   };
-}
+} // namespace gallery
 #endif /* gallery_BranchMapReader_h */
 
 // Local Variables:

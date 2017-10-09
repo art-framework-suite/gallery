@@ -1,8 +1,8 @@
 #include "gallery/EventNavigator.h"
 
-#include "gallery/throwFunctions.h"
 #include "canvas/Persistency/Provenance/rootNames.h"
 #include "canvas/Utilities/Exception.h"
+#include "gallery/throwFunctions.h"
 
 #include "TBranch.h"
 #include "TFile.h"
@@ -12,30 +12,32 @@
 
 namespace gallery {
 
-  EventNavigator::EventNavigator(std::vector<std::string> const& iFileNames) :
-    fileNames_(iFileNames),
-    numberOfFiles_(fileNames_.size()),
-    fileEntry_(-1),
-    firstFileWithEvent_(0),
-    entriesInCurrentFile_(0),
-    eventEntry_(0),
-    file_(),
-    eventsTree_(nullptr),
-    eventAuxiliaryBranch_(nullptr),
-    eventAuxiliary_(),
-    pEventAuxiliary_(&eventAuxiliary_),
-    previousEventAuxiliaryEntry_(-1),
-    eventHistoryTree_(nullptr),
-    eventHistoryBranch_(nullptr),
-    eventHistory_(),
-    pEventHistory_(&eventHistory_),
-    previousEventHistoryEntry_(-1),
-    historyMap_() {
+  EventNavigator::EventNavigator(std::vector<std::string> const& iFileNames)
+    : fileNames_(iFileNames)
+    , numberOfFiles_(fileNames_.size())
+    , fileEntry_(-1)
+    , firstFileWithEvent_(0)
+    , entriesInCurrentFile_(0)
+    , eventEntry_(0)
+    , file_()
+    , eventsTree_(nullptr)
+    , eventAuxiliaryBranch_(nullptr)
+    , eventAuxiliary_()
+    , pEventAuxiliary_(&eventAuxiliary_)
+    , previousEventAuxiliaryEntry_(-1)
+    , eventHistoryTree_(nullptr)
+    , eventHistoryBranch_(nullptr)
+    , eventHistory_()
+    , pEventHistory_(&eventHistory_)
+    , previousEventHistoryEntry_(-1)
+    , historyMap_()
+  {
 
     if (fileNames_.empty()) {
       fileEntry_ = 0;
     } else {
-      while (eventEntry_ == entriesInCurrentFile_ && fileEntry_ != numberOfFiles_) {
+      while (eventEntry_ == entriesInCurrentFile_ &&
+             fileEntry_ != numberOfFiles_) {
         nextFile();
       }
       firstFileWithEvent_ = fileEntry_;
@@ -45,7 +47,9 @@ namespace gallery {
     }
   }
 
-  void EventNavigator::toBegin() {
+  void
+  EventNavigator::toBegin()
+  {
     if (fileEntry_ == firstFileWithEvent_) {
       eventEntry_ = 0;
       return;
@@ -57,20 +61,23 @@ namespace gallery {
     }
   }
 
-  void EventNavigator::next() {
+  void
+  EventNavigator::next()
+  {
     if (eventEntry_ != entriesInCurrentFile_) {
       // normal case, go to next event in same file
       ++eventEntry_;
     } else {
       // handle odd cases, calling next when already at the end
       // or after a call to nextFile() left us on a file with
-      // no events. (Neither of these cases should occur in a 
+      // no events. (Neither of these cases should occur in a
       // normal loop over events)
       nextFile();
     }
     // if we hit the end of the file go to the next file
     // also skip empty files
-    while (eventEntry_ == entriesInCurrentFile_ && fileEntry_ != numberOfFiles_) {
+    while (eventEntry_ == entriesInCurrentFile_ &&
+           fileEntry_ != numberOfFiles_) {
       nextFile();
     }
     if (isValid()) {
@@ -78,7 +85,9 @@ namespace gallery {
     }
   }
 
-  void EventNavigator::previous() {
+  void
+  EventNavigator::previous()
+  {
     // We will never get here is we're dealing with more than one file.
     --eventEntry_;
     if (isValid()) {
@@ -86,30 +95,31 @@ namespace gallery {
     }
   }
 
-  void EventNavigator::goToEntry(long long entry) {
+  void
+  EventNavigator::goToEntry(long long entry)
+  {
     eventEntry_ = entry;
     if (isValid()) {
       eventsTree_->LoadTree(eventEntry_);
     }
   }
 
-  void EventNavigator::nextFile() {
+  void
+  EventNavigator::nextFile()
+  {
 
     // Be careful with this function. If the next file
     // is empty this will leave it not pointing at a
     // valid event.
 
     if (atEnd()) {
-      throw art::Exception(art::errors::LogicError) <<
-	"Illegal call to EventNavigator::nextFile() when atEnd() is true";
+      throw art::Exception(art::errors::LogicError)
+        << "Illegal call to EventNavigator::nextFile() when atEnd() is true";
     }
 
     if (file_) {
-      std::cout << "Closing file, read "
-		<< file_->GetBytesRead()
-		<< " bytes in "
-		<< file_->GetReadCalls()
-		<<  " transactions\n";
+      std::cout << "Closing file, read " << file_->GetBytesRead()
+                << " bytes in " << file_->GetReadCalls() << " transactions\n";
     }
 
     ++fileEntry_;
@@ -131,7 +141,8 @@ namespace gallery {
       throw art::Exception(art::errors::FileOpenError)
         << "Failed opening file \'" << fileNames_[fileEntry_] << "\'";
     }
-    std::cout << "Successfully opened file " << fileNames_[fileEntry_] << std::endl;
+    std::cout << "Successfully opened file " << fileNames_[fileEntry_]
+              << std::endl;
     initializeTTreePointers();
     initializeTBranchPointers();
     entriesInCurrentFile_ = eventsTree_->GetEntries();
@@ -142,7 +153,9 @@ namespace gallery {
     return;
   }
 
-  art::EventAuxiliary const& EventNavigator::eventAuxiliary() const {
+  art::EventAuxiliary const&
+  EventNavigator::eventAuxiliary() const
+  {
     if (previousEventAuxiliaryEntry_ != eventEntry_) {
       eventAuxiliaryBranch_->GetEntry(eventEntry_);
       previousEventAuxiliaryEntry_ = eventEntry_;
@@ -150,39 +163,46 @@ namespace gallery {
     return eventAuxiliary_;
   }
 
-  art::History const& EventNavigator::history() const {
-    if(previousEventHistoryEntry_ != eventEntry_) {
+  art::History const&
+  EventNavigator::history() const
+  {
+    if (previousEventHistoryEntry_ != eventEntry_) {
       eventHistoryBranch_->GetEntry(eventEntry_);
       previousEventHistoryEntry_ = eventEntry_;
     }
     return eventHistory_;
   }
 
-  art::ProcessHistoryID const& EventNavigator::processHistoryID() const {
-    if(previousEventHistoryEntry_ != eventEntry_) {
+  art::ProcessHistoryID const&
+  EventNavigator::processHistoryID() const
+  {
+    if (previousEventHistoryEntry_ != eventEntry_) {
       eventHistoryBranch_->GetEntry(eventEntry_);
       previousEventHistoryEntry_ = eventEntry_;
     }
     return eventHistory_.processHistoryID();
   }
 
-  art::ProcessHistory const& EventNavigator::processHistory() const {
+  art::ProcessHistory const&
+  EventNavigator::processHistory() const
+  {
 
     if (historyMap_.empty()) {
 
-      auto metaDataTree =
-        dynamic_cast<TTree*>(file_->Get(art::rootNames::metaDataTreeName().c_str()));
+      auto metaDataTree = dynamic_cast<TTree*>(
+        file_->Get(art::rootNames::metaDataTreeName().c_str()));
 
       if (!metaDataTree) {
         throwTreeNotFound(art::rootNames::metaDataTreeName());
       }
 
       auto pHistMapPtr = &historyMap_;
-      TBranch* processHistoryBranch =
-        metaDataTree->GetBranch(art::rootNames::metaBranchRootName<art::ProcessHistoryMap>());
+      TBranch* processHistoryBranch = metaDataTree->GetBranch(
+        art::rootNames::metaBranchRootName<art::ProcessHistoryMap>());
 
       if (!processHistoryBranch) {
-        throwBranchNotFound(art::rootNames::metaBranchRootName<art::ProcessHistoryMap>());
+        throwBranchNotFound(
+          art::rootNames::metaBranchRootName<art::ProcessHistoryMap>());
       }
       processHistoryBranch->SetAddress(&pHistMapPtr);
       processHistoryBranch->GetEntry(0);
@@ -190,16 +210,23 @@ namespace gallery {
     return historyMap_[processHistoryID()];
   }
 
-  TFile* EventNavigator::getTFile() const {
+  TFile*
+  EventNavigator::getTFile() const
+  {
     return file_.get();
   }
 
-  TTree* EventNavigator::getTTree() const {
+  TTree*
+  EventNavigator::getTTree() const
+  {
     return eventsTree_;
   }
 
-  void EventNavigator::initializeTTreePointers() {
-    eventsTree_ = dynamic_cast<TTree*>(file_->Get(art::rootNames::eventTreeName().c_str()));
+  void
+  EventNavigator::initializeTTreePointers()
+  {
+    eventsTree_ =
+      dynamic_cast<TTree*>(file_->Get(art::rootNames::eventTreeName().c_str()));
     if (eventsTree_ == nullptr) {
       throwTreeNotFound(art::rootNames::eventTreeName());
     }
@@ -208,27 +235,30 @@ namespace gallery {
         << "Unable to get the number of entries in events TTree.\n"
            "This might be a corrupted file.\n";
     }
-    eventHistoryTree_ = dynamic_cast<TTree*>(file_->Get(art::rootNames::eventHistoryTreeName().c_str()));
+    eventHistoryTree_ = dynamic_cast<TTree*>(
+      file_->Get(art::rootNames::eventHistoryTreeName().c_str()));
     if (eventHistoryTree_ == nullptr) {
       throwTreeNotFound(art::rootNames::eventHistoryTreeName());
     }
   }
 
-  void EventNavigator::initializeTBranchPointers() {
-    eventAuxiliaryBranch_ =
-      eventsTree_->GetBranch(art::BranchTypeToAuxiliaryBranchName(art::InEvent).c_str());
+  void
+  EventNavigator::initializeTBranchPointers()
+  {
+    eventAuxiliaryBranch_ = eventsTree_->GetBranch(
+      art::BranchTypeToAuxiliaryBranchName(art::InEvent).c_str());
 
     if (eventAuxiliaryBranch_ == nullptr) {
       throwBranchNotFound(art::BranchTypeToAuxiliaryBranchName(art::InEvent));
     }
     eventAuxiliaryBranch_->SetAddress(&pEventAuxiliary_);
 
-    eventHistoryBranch_ =
-      eventHistoryTree_->GetBranch(art::rootNames::eventHistoryBranchName().c_str());
+    eventHistoryBranch_ = eventHistoryTree_->GetBranch(
+      art::rootNames::eventHistoryBranchName().c_str());
 
-    if(eventHistoryBranch_ == nullptr) {
+    if (eventHistoryBranch_ == nullptr) {
       throwBranchNotFound(art::rootNames::eventHistoryBranchName());
     }
     eventHistoryBranch_->SetAddress(&pEventHistory_);
   }
-}
+} // namespace gallery

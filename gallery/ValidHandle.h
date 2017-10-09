@@ -10,12 +10,11 @@ namespace gallery {
   void throwValidHandleNullPointer();
 
   template <typename T>
-  class ValidHandle
-  {
+  class ValidHandle {
   public:
-
     using element_type = T;
-    class HandleTag {};
+    class HandleTag {
+    };
 
     ValidHandle() = delete;
     ValidHandle(T const* prod);
@@ -32,8 +31,7 @@ namespace gallery {
   };
 
   template <class T>
-  ValidHandle<T>::ValidHandle(T const* prod) :
-    prod_{prod}
+  ValidHandle<T>::ValidHandle(T const* prod) : prod_{prod}
   {
     if (prod == nullptr) {
       throwValidHandleNullPointer();
@@ -41,29 +39,24 @@ namespace gallery {
   }
 
   template <class T>
-  inline
-  T const&
-  ValidHandle<T>::operator*() const
+  inline T const& ValidHandle<T>::operator*() const
   {
     return *prod_;
   }
 
   template <class T>
-  inline
-  T const*
-  ValidHandle<T>::operator->() const
+  inline T const* ValidHandle<T>::operator->() const
   {
     return prod_;
   }
 
   template <class T>
-  inline
-  T const*
+  inline T const*
   ValidHandle<T>::product() const
   {
     return prod_;
   }
-}
+} // namespace gallery
 #endif /* gallery_ValidHandle_h */
 
 // Local Variables:

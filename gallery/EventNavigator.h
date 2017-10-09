@@ -24,7 +24,6 @@ namespace gallery {
 
   class EventNavigator {
   public:
-
     explicit EventNavigator(std::vector<std::string> const& iFileNames);
 
     // In a normal iteration using the next function, isValid and
@@ -32,11 +31,16 @@ namespace gallery {
     // called directly and there was an empty file, they might
     // return different values.
 
-    bool isValid() const {
-      return fileEntry_ != numberOfFiles_ && eventEntry_ != entriesInCurrentFile_;
+    bool
+    isValid() const
+    {
+      return fileEntry_ != numberOfFiles_ &&
+             eventEntry_ != entriesInCurrentFile_;
     }
 
-    bool atEnd() const {
+    bool
+    atEnd() const
+    {
       return fileEntry_ == numberOfFiles_;
     }
 
@@ -53,14 +57,29 @@ namespace gallery {
 
     TFile* getTFile() const;
     TTree* getTTree() const;
-    TBranch* eventAuxiliaryBranch() const { return eventAuxiliaryBranch_; }
+    TBranch*
+    eventAuxiliaryBranch() const
+    {
+      return eventAuxiliaryBranch_;
+    }
 
-    long long fileEntry() const { return fileEntry_; }
-    long long entriesInCurrentFile() const { return entriesInCurrentFile_; }
-    long long eventEntry() const { return eventEntry_; }
+    long long
+    fileEntry() const
+    {
+      return fileEntry_;
+    }
+    long long
+    entriesInCurrentFile() const
+    {
+      return entriesInCurrentFile_;
+    }
+    long long
+    eventEntry() const
+    {
+      return eventEntry_;
+    }
 
   private:
-
     void initializeTTreePointers();
     void initializeTBranchPointers();
 
@@ -88,7 +107,7 @@ namespace gallery {
 
     mutable art::ProcessHistoryMap historyMap_;
   };
-}
+} // namespace gallery
 
 #endif /* gallery_EventNavigator_h */
 
