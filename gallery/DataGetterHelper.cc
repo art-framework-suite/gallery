@@ -364,9 +364,10 @@ namespace gallery {
     art::BranchDescription const* branchDescription =
       branchMapReader_.productToBranch(info.productIDs()[processIndex]);
     if (branchDescription == nullptr) {
-      throw art::Exception(art::errors::LogicError)
-        << "In DataGetterHelper::getTClassUsingBranchDescription. TBranch "
-           "exists but no BranchDescription in ProductRegistry.\n"
+      throw art::Exception(
+        art::errors::LogicError,
+        "DataGetterHelper::getTClassUsingBranchDescription: ")
+        << "TBranch exists but no BranchDescription in ProductRegistry.\n"
         << "This shouldn't be possible. For type " << info.type().className()
         << "\n";
     }
@@ -375,9 +376,10 @@ namespace gallery {
       branchDescription->producedClassName());
     TClass* tClass = TClass::GetClass(branchDescription->wrappedName().c_str());
     if (tClass == nullptr) {
-      throw art::Exception(art::errors::DictionaryNotFound)
-        << "In DataGetterHelper::getTClassUsingBranchDescription. Missing "
-           "dictionary for wrapped Assns class.\n"
+      throw art::Exception(
+        art::errors::DictionaryNotFound,
+        "DataGetterHelper::getTClassUsingBranchDescription: ")
+        << "Missing dictionary for wrapped Assns class.\n"
         << branchDescription->wrappedName() << "\n";
     }
     return tClass;
@@ -498,6 +500,13 @@ namespace gallery {
       initializeForProcessHistory();
     }
     TClass* tClass = TClass::GetClass(desc.wrappedName().c_str());
+    if (tClass == nullptr) {
+      throw art::Exception(art::errors::DictionaryNotFound,
+                           "DataGetterHelper::getByBranchDescription: ")
+        << "Missing dictionary for wrapped class.\n"
+        << desc.wrappedName() << "\n";
+    }
+
     type_info const& typeInfoOfWrapper = *tClass->GetTypeInfo();
     art::TypeID const type{typeInfoOfWrapper};
     InfoForTypeLabelInstance const& info = getInfoForTypeLabelInstance(
