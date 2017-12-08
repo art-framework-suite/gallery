@@ -31,9 +31,6 @@
 #include <cstring>
 
 namespace {
-  std::string const underscore("_");
-  std::string const period(".");
-  std::string const emptyString;
 
   art::TypeID
   getPartnerTypeID(TClass* tClass)

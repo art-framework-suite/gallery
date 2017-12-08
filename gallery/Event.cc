@@ -12,22 +12,21 @@
 namespace gallery {
 
   Event::Event(std::vector<std::string> const& fileNames,
-               bool useTTreeCache,
-               unsigned int eventsToLearnUsedBranches)
-    : randomAccessOK_(fileNames.size() == 1)
-    , eventNavigator_(std::make_unique<EventNavigator>(fileNames))
-    , dataGetterHelper_(std::make_unique<DataGetterHelper>(
+               bool const useTTreeCache,
+               unsigned int const eventsToLearnUsedBranches)
+    : randomAccessOK_{fileNames.size() == 1}
+    , eventNavigator_{std::make_unique<EventNavigator>(fileNames)}
+    , dataGetterHelper_{std::make_unique<DataGetterHelper>(
         eventNavigator_.get(),
-        std::make_shared<EventHistoryGetter>(eventNavigator_.get())))
-    , useTTreeCache_(useTTreeCache)
-    , eventsToLearnUsedBranches_(eventsToLearnUsedBranches)
-    , eventsProcessed_(0)
+        std::make_shared<EventHistoryGetter>(eventNavigator_.get()))}
+    , useTTreeCache_{useTTreeCache}
+    , eventsToLearnUsedBranches_{eventsToLearnUsedBranches}
   {
 
     if (eventsToLearnUsedBranches_ < 1)
       eventsToLearnUsedBranches_ = 1;
     if (!atEnd()) {
-      bool initializeTheCache = false;
+      bool constexpr initializeTheCache{false};
       dataGetterHelper_->updateFile(eventNavigator_->getTFile(),
                                     eventNavigator_->getTTree(),
                                     initializeTheCache);
@@ -77,7 +76,7 @@ namespace gallery {
   }
 
   void
-  Event::goToEntry(long long entry)
+  Event::goToEntry(long long const entry)
   {
     if (!randomAccessOK_)
       throwIllegalRandomAccess();
@@ -103,8 +102,8 @@ namespace gallery {
   void
   Event::toBegin()
   {
-    long long oldEventEntry = eventEntry();
-    long long oldFileEntry = fileEntry();
+    long long const oldEventEntry = eventEntry();
+    long long const oldFileEntry = fileEntry();
     eventNavigator_->toBegin();
     if (oldEventEntry == eventEntry() && oldFileEntry == fileEntry()) {
       return;
@@ -133,7 +132,7 @@ namespace gallery {
   }
 
   void
-  Event::updateAfterEventChange(long long oldFileEntry)
+  Event::updateAfterEventChange(long long const oldFileEntry)
   {
     ++eventsProcessed_;
     if (atEnd())
@@ -197,10 +196,8 @@ namespace gallery {
   Event::makeProductNotFoundException(std::type_info const& typeInfo,
                                       art::InputTag const& tag) const
   {
-    art::TypeID type(typeInfo);
-    std::shared_ptr<art::Exception> e =
-      std::make_shared<art::Exception>(art::errors::ProductNotFound);
-    *e << "Failed to find product for \n  type = '" << type.className()
+    auto e = std::make_shared<art::Exception>(art::errors::ProductNotFound);
+    *e << "Failed to find product for \n  type = '" << art::TypeID{typeInfo}.className()
        << "'\n  module = '" << tag.label() << "'\n  productInstance = '"
        << ((!tag.instance().empty()) ? tag.instance().c_str() : "")
        << "'\n  process='"

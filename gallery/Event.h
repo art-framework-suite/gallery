@@ -128,7 +128,7 @@ namespace gallery {
 
     bool useTTreeCache_;
     unsigned int eventsToLearnUsedBranches_;
-    unsigned int eventsProcessed_;
+    unsigned int eventsProcessed_{};
   };
 } // namespace gallery
 
@@ -137,19 +137,17 @@ inline gallery::ValidHandle<PROD>
 gallery::Event::getValidHandle(art::InputTag const& inputTag) const
 {
   checkForEnd();
-  std::type_info const& typeInfoOfWrapper = typeid(art::Wrapper<PROD>);
-
-  art::EDProduct const* edProduct = nullptr;
+  std::type_info const& typeInfoOfWrapper{typeid(art::Wrapper<PROD>)};
+  art::EDProduct const* edProduct{nullptr};
 
   getByLabel(typeInfoOfWrapper, inputTag, edProduct);
 
-  art::Wrapper<PROD> const* ptrToWrapper =
-    dynamic_cast<art::Wrapper<PROD> const*>(edProduct);
-
+  auto ptrToWrapper = dynamic_cast<art::Wrapper<PROD> const*>(edProduct);
   if (ptrToWrapper == nullptr) {
     throwProductNotFoundException(typeid(PROD), inputTag);
   }
-  PROD const* product = ptrToWrapper->product();
+
+  auto product = ptrToWrapper->product();
   return ValidHandle<PROD>(product);
 }
 
@@ -159,20 +157,18 @@ gallery::Event::getByLabel(art::InputTag const& inputTag,
                            Handle<PROD>& result) const
 {
   checkForEnd();
-  std::type_info const& typeInfoOfWrapper = typeid(art::Wrapper<PROD>);
-
-  art::EDProduct const* edProduct = nullptr;
+  std::type_info const& typeInfoOfWrapper{typeid(art::Wrapper<PROD>)};
+  art::EDProduct const* edProduct{nullptr};
 
   getByLabel(typeInfoOfWrapper, inputTag, edProduct);
 
-  art::Wrapper<PROD> const* ptrToWrapper =
-    dynamic_cast<art::Wrapper<PROD> const*>(edProduct);
+  auto ptrToWrapper = dynamic_cast<art::Wrapper<PROD> const*>(edProduct);
 
   if (ptrToWrapper == nullptr) {
     result = Handle<PROD>(makeProductNotFoundException(typeid(PROD), inputTag));
     return false;
   }
-  PROD const* product = ptrToWrapper->product();
+  auto product = ptrToWrapper->product();
   result = Handle<PROD>(product);
   return true;
 }
