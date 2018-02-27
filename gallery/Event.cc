@@ -197,8 +197,9 @@ namespace gallery {
                                       art::InputTag const& tag) const
   {
     auto e = std::make_shared<art::Exception>(art::errors::ProductNotFound);
-    *e << "Failed to find product for \n  type = '" << art::TypeID{typeInfo}.className()
-       << "'\n  module = '" << tag.label() << "'\n  productInstance = '"
+    *e << "Failed to find product for \n  type = '"
+       << art::TypeID{typeInfo}.className() << "'\n  module = '" << tag.label()
+       << "'\n  productInstance = '"
        << ((!tag.instance().empty()) ? tag.instance().c_str() : "")
        << "'\n  process='"
        << ((!tag.process().empty()) ? tag.process().c_str() : "") << "'\n";
