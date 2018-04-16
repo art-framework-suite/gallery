@@ -85,7 +85,7 @@ namespace gallery {
     long long entry = eventNavigator_->eventEntry();
     if (entry != lastProduct_) {
       // haven't gotten the data for this event
-      art::configureRefCoreStreamer(finder_);
+      art::configureRefCoreStreamer(finder_.get());
       branch_->GetEntry(entry);
       art::configureRefCoreStreamer();
       lastProduct_ = entry;
@@ -115,12 +115,6 @@ namespace gallery {
   {
     return getIt_();
   }
-
-  // bool BranchData::resolveProduct(art::TypeID const&) const {
-  //  throw art::Exception(art::errors::LogicError)
-  //    << "BranchData::resolveProduct not implemented. Should not be called.";
-  //  return false;
-  //}
 
   bool
   BranchData::resolveProductIfAvailable_(art::TypeID const&) const
