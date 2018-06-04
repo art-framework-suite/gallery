@@ -2,5 +2,5 @@
 
 namespace gallery {
 
-  FindMaker::FindMaker() { }
-}
+  FindMaker::FindMaker() {}
+} // namespace gallery

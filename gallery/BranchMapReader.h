@@ -1,21 +1,21 @@
 #ifndef gallery_BranchMapReader_h
 #define gallery_BranchMapReader_h
 
-// BranchMapReader can find the BranchDescription
-// corresponding to a ProductID. One step in this
-// is being able to convert a ProductID to a
-// BranchID.
+// BranchMapReader can find the BranchDescription corresponding to a
+// ProductID.
 
-// BranchMapReader also maintains a set of all
-// BranchIDs associated with branches in the Event
-// and seen in all input files opened so far.
+// BranchMapReader also maintains a set of all ProductIDs associated
+// with branches in the Event and seen in all input files opened so
+// far.
 
 #include "canvas/Persistency/Provenance/BranchDescription.h"
-#include "canvas/Persistency/Provenance/BranchID.h"
-#include "canvas/Persistency/Provenance/BranchIDList.h"
 #include "canvas/Persistency/Provenance/BranchListIndex.h"
+#include "canvas/Persistency/Provenance/Compatibility/BranchIDList.h"
+#include "canvas/Persistency/Provenance/ProductID.h"
+#include "cetlib/exempt_ptr.h"
 
 #include <map>
+#include <memory>
 #include <set>
 
 class TFile;
@@ -26,23 +26,25 @@ namespace gallery {
 
   class BranchMapReader {
   public:
-
     void updateFile(TFile* tFile);
-    void updateEvent(EventHistoryGetter*  historyGetter);
 
-    art::BranchID productToBranchID(art::ProductID const& pid) const;
-    art::BranchDescription const* productToBranch(art::ProductID const& pid) const;
-    art::BranchDescription const* branchIDToBranch(art::BranchID const& bid) const;
-    bool branchInRegistryOfAnyOpenedFile(art::BranchID const&) const;
+    cet::exempt_ptr<art::BranchIDLists const>
+    branchIDLists() const
+    {
+      return branchIDLists_.get();
+    }
+    art::BranchDescription const* productToBranch(
+      art::ProductID const& pid) const;
+    bool branchInRegistryOfAnyOpenedFile(art::ProductID const&) const;
 
   private:
-
-    art::BranchIDLists branchIDLists_;
-    std::map<art::BranchID, art::BranchDescription> branchIDToDescriptionMap_;
-    art::BranchListIndexes branchListIndexes_;
-    std::set<art::BranchID> allSeenBranchIDs_;
+    std::unique_ptr<art::BranchIDLists> branchIDLists_{
+      nullptr}; // Only for backwards compatibility
+    std::map<art::ProductID, art::BranchDescription>
+      productIDToDescriptionMap_{};
+    std::set<art::ProductID> allSeenProductIDs_{};
   };
-}
+} // namespace gallery
 #endif /* gallery_BranchMapReader_h */
 
 // Local Variables:

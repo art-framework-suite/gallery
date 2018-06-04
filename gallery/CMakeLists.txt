@@ -15,6 +15,8 @@ set(gallery_sources
 
 set(gallery_libraries
   canvas
+  canvas_root_io
+  fhiclcpp
   cetlib
   cetlib_except
   ${ROOT_CORE}
@@ -23,14 +25,9 @@ set(gallery_libraries
   )
 
 cet_make(LIBRARIES
-  canvas
-  cetlib
-  cetlib_except
-  ${ROOT_CORE}
-  ${ROOT_RIO}
-  ${ROOT_TREE}
+  ${gallery_libraries}
   NO_DICTIONARY
-)
+  )
 
 art_dictionary(DICTIONARY_LIBRARIES gallery)
 

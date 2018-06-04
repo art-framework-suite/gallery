@@ -1,29 +1,23 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent gallery	v1_04_03
-defaultqual	e14
+parent gallery	v1_08_02
+defaultqual	e15
 #
 fcldir -
 perllib  product_dir
 #
 product		version
-canvas		v2_00_02
-cetbuildtools	v5_08_02	-	only_for_build
+canvas_root_io  v1_01_06
+cetbuildtools	v7_04_00	-	only_for_build
 end_product_list
 
-qualifier	canvas		notes
-e14:debug	e14:debug
-e14:prof	e14:prof
-nu:e14:debug	e14:nu:debug
-nu:e14:prof	e14:nu:prof
-e12:debug	e12:debug
-e12:prof	e12:prof	
-nu:e12:debug	e12:nu:debug
-nu:e12:prof	e12:nu:prof
-e10:debug	e10:debug
-e10:prof	e10:prof	
-nu:e10:debug	e10:nu:debug
-nu:e10:prof	e10:nu:prof
+qualifier	canvas_root_io	notes
+e15:debug	e15:debug
+e15:prof	e15:prof
+e17:debug	e17:debug
+e17:prof	e17:prof
+c2:debug	c2:debug
+c2:prof		c2:prof
 end_qualifier_list
 
 # Local Variables:

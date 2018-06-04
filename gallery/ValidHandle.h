@@ -10,12 +10,11 @@ namespace gallery {
   void throwValidHandleNullPointer();
 
   template <typename T>
-  class ValidHandle
-  {
+  class ValidHandle {
   public:
-
-    typedef T element_type;
-    class HandleTag { };
+    using element_type = T;
+    class HandleTag {
+    };
 
     ValidHandle() = delete;
     ValidHandle(T const* prod);
@@ -23,17 +22,16 @@ namespace gallery {
     ValidHandle& operator=(ValidHandle const&) = default;
 
     // pointer behaviors
-    T const & operator*() const;
-    T const * operator->() const; // alias for product()
-    T const * product() const;
+    T const& operator*() const;
+    T const* operator->() const; // alias for product()
+    T const* product() const;
 
   private:
-    T const*   prod_;
+    T const* prod_;
   };
 
   template <class T>
-  ValidHandle<T>::ValidHandle(T const* prod) :
-    prod_(prod)
+  ValidHandle<T>::ValidHandle(T const* prod) : prod_{prod}
   {
     if (prod == nullptr) {
       throwValidHandleNullPointer();
@@ -41,29 +39,24 @@ namespace gallery {
   }
 
   template <class T>
-  inline
-  T const &
-  ValidHandle<T>::operator*() const
+  inline T const& ValidHandle<T>::operator*() const
   {
     return *prod_;
   }
 
   template <class T>
-  inline
-  T const *
-  ValidHandle<T>::operator->() const
+  inline T const* ValidHandle<T>::operator->() const
   {
     return prod_;
   }
 
   template <class T>
-  inline
-  T const*
+  inline T const*
   ValidHandle<T>::product() const
   {
     return prod_;
   }
-}
+} // namespace gallery
 #endif /* gallery_ValidHandle_h */
 
 // Local Variables:
