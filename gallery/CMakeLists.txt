@@ -16,6 +16,7 @@ set(gallery_sources
 set(gallery_libraries
   canvas
   canvas_root_io
+  hep_concurrency
   fhiclcpp
   cetlib
   cetlib_except
