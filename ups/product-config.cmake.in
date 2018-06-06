@@ -5,6 +5,6 @@ set_and_check(@PROJECT_NAME@_INCDIR "${PACKAGE_PREFIX_DIR}/include")
 @CONFIG_FIND_LIBRARY_COMMANDS@
 include_directories( ${@PROJECT_NAME@_INCDIR} )
 
-find_package(canvas)
+find_package(canvas_root_io)
 
 check_required_components(@PROJECT_NAME@)

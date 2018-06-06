@@ -12,16 +12,16 @@
 #  make package (builds distribution tarfile)
 # ======================================================================
 
+# Required to keep CMake happy.
+cmake_minimum_required(VERSION ${CMAKE_VERSION} FATAL_ERROR)
+# Actual version requirement.
+cmake_policy(VERSION 3.4)
 
-cmake_minimum_required( VERSION 3.2 )
-
-project(gallery VERSION 1.04.03 )
+# Project information.
+project(gallery VERSION 1.08.02 LANGUAGES CXX)
 
 # cetmodules contains our cmake modules
 find_package(cetmodules REQUIRED)
-find_package(canvas REQUIRED)
-
-list(APPEND CMAKE_MODULE_PATH $ENV{CANVAS_ROOT_IO_DIR}/Modules)
 
 include(CetCMakeEnv)
 cet_cmake_env()
@@ -36,17 +36,14 @@ cet_set_compiler_flags(DIAGS VIGILANT
 cet_report_compiler_flags()
 
 # these are minimum required versions, not the actual product versions
-find_ups_product(canvas_root_io)
-find_ups_product(canvas)
-find_ups_product(messagefacility)
-find_ups_product(fhiclcpp)
-find_ups_product(cetlib v2_01_00)
-find_ups_product(cetlib_except v1_01_00)
-find_ups_root()
-find_ups_boost()
-find_ups_root()
+find_package(canvas_root_io REQUIRED)
+find_package(canvas REQUIRED)
+find_package(messagefacility REQUIRED)
+find_package(fhiclcpp REQUIRED)
+find_package(cetlib REQUIRED)
+find_package(cetlib_except REQUIRED)
+find_package(ROOT REQUIRED COMPONENTS Core RIO Tree)
 
-message(STATUS "MF_MESSAGELOGGER: ${MF_MESSAGELOGGER}")
 # art_dictionary
 include(ArtDictionary)
 
@@ -55,6 +52,3 @@ add_subdirectory(gallery)
 
 # ups - table and config files
 add_subdirectory(ups)
-
-# packaging utility
-include(UseCPack)
