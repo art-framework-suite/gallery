@@ -523,6 +523,12 @@ namespace gallery {
     return false;
   }
 
+  art::BranchDescription const*
+  DataGetterHelper::getProductDescription(art::ProductID const productID) const
+  {
+    return branchMapReader_.productToBranch(productID);
+  }
+
   art::EDProductGetter const*
   DataGetterHelper::getEDProductGetter_(art::ProductID const& productID) const
   {

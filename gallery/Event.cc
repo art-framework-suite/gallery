@@ -57,6 +57,12 @@ namespace gallery {
     return eventNavigator_->processHistory();
   }
 
+  art::BranchDescription const*
+  Event::getProductDescription(art::ProductID const pid) const
+  {
+    return dataGetterHelper_->getProductDescription(pid);
+  }
+
   long long
   Event::numberOfEventsInFile() const
   {

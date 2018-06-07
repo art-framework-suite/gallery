@@ -11,6 +11,7 @@
 #include "canvas/Persistency/Provenance/History.h"
 #include "canvas/Persistency/Provenance/ProcessHistory.h"
 #include "canvas/Persistency/Provenance/ProcessHistoryID.h"
+#include "canvas/Persistency/Provenance/ProductID.h"
 #include "canvas/Utilities/InputTag.h"
 #include "gallery/DataGetterHelper.h"
 #include "gallery/EventNavigator.h"
@@ -64,6 +65,9 @@ namespace gallery {
     art::History const& history() const;
     art::ProcessHistoryID const& processHistoryID() const;
     art::ProcessHistory const& processHistory() const;
+
+    // Return the product description if it is present.
+    art::BranchDescription const* getProductDescription(art::ProductID) const;
 
     // Return the number of events in the currently-open file.
     long long numberOfEventsInFile() const;
