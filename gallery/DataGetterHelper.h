@@ -201,7 +201,7 @@ namespace gallery {
                     art::InputTag const& inputTag,
                     art::EDProduct const*& edProduct) const;
 
-    art::BranchDescription const* getProductDescription(art::ProductID) const;
+    art::BranchDescription const& getProductDescription(art::ProductID) const;
 
     void updateFile(TFile* iFile, TTree* iTree, bool initializeTheCache);
 

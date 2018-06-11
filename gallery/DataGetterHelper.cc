@@ -523,10 +523,17 @@ namespace gallery {
     return false;
   }
 
-  art::BranchDescription const*
+  art::BranchDescription const&
   DataGetterHelper::getProductDescription(art::ProductID const productID) const
   {
-    return branchMapReader_.productToBranch(productID);
+    auto pd = branchMapReader_.productToBranch(productID);
+    if (pd == nullptr) {
+      throw art::Exception(art::errors::ProductNotFound,
+                           "DataGetterHelper::getProductDescription: ")
+        << "Do product description could be found for ProductID " << productID
+        << ".\n";
+    }
+    return *pd;
   }
 
   art::EDProductGetter const*

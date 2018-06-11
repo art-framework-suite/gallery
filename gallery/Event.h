@@ -67,7 +67,7 @@ namespace gallery {
     art::ProcessHistory const& processHistory() const;
 
     // Return the product description if it is present.
-    art::BranchDescription const* getProductDescription(art::ProductID) const;
+    art::BranchDescription const& getProductDescription(art::ProductID) const;
 
     // Return the number of events in the currently-open file.
     long long numberOfEventsInFile() const;
