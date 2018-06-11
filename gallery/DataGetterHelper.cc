@@ -530,7 +530,7 @@ namespace gallery {
     if (pd == nullptr) {
       throw art::Exception(art::errors::ProductNotFound,
                            "DataGetterHelper::getProductDescription: ")
-        << "Do product description could be found for ProductID " << productID
+        << "No product description could be found for ProductID " << productID
         << ".\n";
     }
     return *pd;
