@@ -49,7 +49,7 @@ namespace gallery {
     , eventNavigator_{eventNavigator}
     , finder_{finder}
     , lastProduct_{-1}
-    , branchName_{std::move(iBranchName)}
+    , branchName_{move(iBranchName)}
   {
     if (tClass_ == nullptr) {
       throw art::Exception(art::errors::LogicError)
@@ -97,14 +97,6 @@ namespace gallery {
   }
 
   art::EDProduct const*
-  BranchData::anyProduct_() const
-  {
-    throw art::Exception(art::errors::LogicError)
-      << "BranchData::anyProduct not implemented. Should not be called.";
-    return nullptr;
-  }
-
-  art::EDProduct const*
   BranchData::uniqueProduct_() const
   {
     return getIt_();
@@ -114,15 +106,6 @@ namespace gallery {
   BranchData::uniqueProduct_(art::TypeID const&) const
   {
     return getIt_();
-  }
-
-  bool
-  BranchData::resolveProductIfAvailable_(art::TypeID const&) const
-  {
-    throw art::Exception(art::errors::LogicError)
-      << "BranchData::resolveProductIfAvailable not implemented. Should not be "
-         "called.";
-    return false;
   }
 
 } // namespace gallery

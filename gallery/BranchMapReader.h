@@ -28,6 +28,12 @@ namespace gallery {
   public:
     void updateFile(TFile* tFile);
 
+    auto const&
+    productDescriptions() const
+    {
+      return productIDToDescriptionMap_;
+    }
+
     cet::exempt_ptr<art::BranchIDLists const>
     branchIDLists() const
     {

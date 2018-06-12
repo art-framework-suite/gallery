@@ -1,8 +1,10 @@
 #ifndef gallery_Handle_h
 #define gallery_Handle_h
 
+// ==================================================================
 // Similar to art::Handle, constructors are different and unneeded
 // things have been removed but otherwise the interface is identical.
+// ==================================================================
 
 #include "canvas/Utilities/Exception.h"
 
@@ -18,22 +20,22 @@ namespace gallery {
     };
 
     Handle() = default;
-    Handle(T const*);
-    Handle(std::shared_ptr<art::Exception const>);
+    explicit Handle(T const*);
+    explicit Handle(std::shared_ptr<art::Exception const>);
     Handle(Handle const&) = default;
     Handle& operator=(Handle const&) = default;
 
     // pointer behaviors
-    T const& operator*() const;
-    T const* operator->() const; // alias for product()
-    T const* product() const;
+    T const& operator*() const noexcept(false);
+    T const* operator->() const noexcept(false); // alias for product()
+    T const* product() const noexcept(false);
 
     // inspectors:
-    bool isValid() const;
-    std::shared_ptr<art::Exception const> whyFailed() const;
+    bool isValid() const noexcept;
+    std::shared_ptr<art::Exception const> whyFailed() const noexcept;
 
   private:
-    void throwHandleWhyFailed_() const;
+    [[noreturn]] void throwHandleWhyFailed_() const noexcept(false);
 
     T const* prod_{nullptr};
     std::shared_ptr<art::Exception const> whyFailed_;
@@ -49,20 +51,20 @@ namespace gallery {
   {}
 
   template <class T>
-  inline T const& Handle<T>::operator*() const
+  inline T const& Handle<T>::operator*() const noexcept(false)
   {
     return *product();
   }
 
   template <class T>
-  inline T const* Handle<T>::operator->() const
+  inline T const* Handle<T>::operator->() const noexcept(false)
   {
     return product();
   }
 
   template <class T>
   inline T const*
-  Handle<T>::product() const
+  Handle<T>::product() const noexcept(false)
   {
     if (!prod_)
       throwHandleWhyFailed_();
@@ -71,21 +73,21 @@ namespace gallery {
 
   template <class T>
   bool
-  Handle<T>::isValid() const
+  Handle<T>::isValid() const noexcept
   {
     return prod_ != nullptr;
   }
 
   template <class T>
   inline std::shared_ptr<art::Exception const>
-  Handle<T>::whyFailed() const
+  Handle<T>::whyFailed() const noexcept
   {
     return whyFailed_;
   }
 
   template <class T>
   void
-  Handle<T>::throwHandleWhyFailed_() const
+  Handle<T>::throwHandleWhyFailed_() const noexcept(false)
   {
     if (whyFailed_) {
       throw *whyFailed_;

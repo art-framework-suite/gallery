@@ -10,7 +10,7 @@ using namespace std;
 
 namespace gallery {
 
-  AssnsBranchData::~AssnsBranchData() {}
+  AssnsBranchData::~AssnsBranchData() = default;
 
   AssnsBranchData::AssnsBranchData(art::TypeID const& type,
                                    TClass* iTClass,

@@ -13,6 +13,7 @@
 #include "canvas/Persistency/Provenance/ProcessHistoryID.h"
 #include "canvas/Persistency/Provenance/ProductID.h"
 #include "canvas/Utilities/InputTag.h"
+#include "cetlib/container_algorithms.h"
 #include "gallery/DataGetterHelper.h"
 #include "gallery/EventNavigator.h"
 #include "gallery/Handle.h"
@@ -60,6 +61,11 @@ namespace gallery {
     // Only if the return value is 'true' is the Handle valid.
     template <typename PROD>
     bool getByLabel(art::InputTag const&, Handle<PROD>& result) const;
+
+    // Get access to all data products of type PROD, using a
+    // std::vector<Handle>.
+    template <typename PROD>
+    void getManyByType(std::vector<Handle<PROD>>& result) const;
 
     art::EventAuxiliary const& eventAuxiliary() const;
     art::History const& history() const;
@@ -116,8 +122,12 @@ namespace gallery {
                     art::InputTag const& inputTag,
                     art::EDProduct const*& edProduct) const;
 
-    void throwProductNotFoundException(std::type_info const& typeInfo,
-                                       art::InputTag const& tag) const;
+    void getManyByType(std::type_info const& typeInfoOfWrapper,
+                       std::vector<art::EDProduct const*>& products) const;
+
+    [[noreturn]] void throwProductNotFoundException(
+      std::type_info const& typeInfo,
+      art::InputTag const& tag) const;
 
     std::shared_ptr<art::Exception const> makeProductNotFoundException(
       std::type_info const& typeInfo,
@@ -152,7 +162,7 @@ gallery::Event::getValidHandle(art::InputTag const& inputTag) const
   }
 
   auto product = ptrToWrapper->product();
-  return ValidHandle<PROD>(product);
+  return ValidHandle<PROD>{product};
 }
 
 template <typename PROD>
@@ -169,12 +179,30 @@ gallery::Event::getByLabel(art::InputTag const& inputTag,
   auto ptrToWrapper = dynamic_cast<art::Wrapper<PROD> const*>(edProduct);
 
   if (ptrToWrapper == nullptr) {
-    result = Handle<PROD>(makeProductNotFoundException(typeid(PROD), inputTag));
+    result = Handle<PROD>{makeProductNotFoundException(typeid(PROD), inputTag)};
     return false;
   }
   auto product = ptrToWrapper->product();
-  result = Handle<PROD>(product);
+  result = Handle<PROD>{product};
   return true;
+}
+
+template <typename PROD>
+inline void
+gallery::Event::getManyByType(std::vector<Handle<PROD>>& result) const
+{
+  std::type_info const& typeInfoOfWrapper{typeid(art::Wrapper<PROD>)};
+  std::vector<art::EDProduct const*> products;
+  getManyByType(typeInfoOfWrapper, products);
+  std::vector<Handle<PROD>> tmp;
+  cet::transform_all(products, back_inserter(tmp), [](auto const& product) {
+    auto wrapped_product = dynamic_cast<art::Wrapper<PROD> const*>(product);
+    assert(wrapped_product != nullptr);
+    auto user_product = wrapped_product->product();
+    assert(user_product != nullptr);
+    return Handle<PROD>{user_product};
+  });
+  swap(tmp, result);
 }
 
 inline void

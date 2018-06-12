@@ -191,6 +191,13 @@ namespace gallery {
   }
 
   void
+  Event::getManyByType(std::type_info const& typeInfoOfWrapper,
+                       std::vector<art::EDProduct const*>& result) const
+  {
+    dataGetterHelper_->getManyByType(typeInfoOfWrapper, result);
+  }
+
+  void
   Event::throwProductNotFoundException(std::type_info const& typeInfo,
                                        art::InputTag const& tag) const
   {

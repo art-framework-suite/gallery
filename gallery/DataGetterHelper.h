@@ -72,7 +72,6 @@ namespace gallery {
   class EventNavigator;
 
   class DataGetterHelper : art::PrincipalBase {
-
   private: // TYPES
     using uupair = std::pair<unsigned int, unsigned int>;
 
@@ -80,11 +79,10 @@ namespace gallery {
     // key consisting of the type, module label, and instance is used
     // in a call to getByLabel, getValidHandle, or a similar function.
     class InfoForTypeLabelInstance {
-
     public:
-      InfoForTypeLabelInstance(art::TypeID const& iType,
-                               std::string const& iLabel,
-                               std::string const& iInstance);
+      explicit InfoForTypeLabelInstance(art::TypeID const& iType,
+                                        std::string const& iLabel,
+                                        std::string const& iInstance);
 
       art::TypeID const&
       type() const
@@ -122,7 +120,7 @@ namespace gallery {
         return partnerType_;
       }
 
-      std::vector<std::pair<unsigned int, unsigned int>>&
+      std::vector<uupair>&
       processIndexToBranchDataIndex() const
       {
         return processIndexToBranchDataIndex_;
@@ -142,15 +140,10 @@ namespace gallery {
 
     private:
       art::TypeID const type_;
-
       std::string const label_;
-
       std::string const instance_;
-
       TClass* const tClass_;
-
       bool const isAssns_;
-
       art::TypeID const partnerType_;
 
       // There is an entry here for each process with a branch that is
@@ -201,6 +194,9 @@ namespace gallery {
                     art::InputTag const& inputTag,
                     art::EDProduct const*& edProduct) const;
 
+    void getManyByType(std::type_info const& typeInfoOfWrapper,
+                       std::vector<art::EDProduct const*>& products) const;
+
     art::BranchDescription const& getProductDescription(art::ProductID) const;
 
     void updateFile(TFile* iFile, TTree* iTree, bool initializeTheCache);
@@ -237,9 +233,8 @@ namespace gallery {
                            std::string const& instance,
                            unsigned int infoIndex) const;
 
-    void readBranchData(unsigned int branchDataIndex,
-                        art::EDProduct const*& edProduct,
-                        art::TypeID const& type) const;
+    art::EDProduct const* readProduct(unsigned int branchDataIndex,
+                                      art::TypeID const& type) const;
 
     bool getBranchDataIndex(
       std::vector<std::pair<unsigned int, unsigned int>> const&

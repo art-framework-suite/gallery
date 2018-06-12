@@ -38,20 +38,14 @@ namespace gallery {
                     art::TypeID const& infoPartnerType);
 
   private:
-    virtual void updateFile(TBranch* iBranch) override;
-
-    virtual art::EDProduct const* getIt_() const override;
-
-    virtual art::EDProduct const* uniqueProduct_() const override;
-
-    virtual art::EDProduct const* uniqueProduct_(
+    void updateFile(TBranch* iBranch) override;
+    art::EDProduct const* getIt_() const override;
+    art::EDProduct const* uniqueProduct_() const override;
+    art::EDProduct const* uniqueProduct_(
       art::TypeID const& wanted_wrapper_type) const override;
 
-  private:
     art::TypeID secondary_wrapper_type_{};
-
     mutable std::unique_ptr<art::EDProduct> secondaryProduct_{nullptr};
-
     mutable long long secondaryLastProduct_{-1};
   };
 

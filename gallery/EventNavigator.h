@@ -12,12 +12,13 @@
 #include "canvas/Persistency/Provenance/ProcessHistory.h"
 #include "canvas/Persistency/Provenance/ProcessHistoryID.h"
 
+#include "TFile.h"
+
 #include <memory>
 #include <string>
 #include <vector>
 
 class TBranch;
-class TFile;
 class TTree;
 
 namespace gallery {
@@ -85,27 +86,27 @@ namespace gallery {
 
     std::vector<std::string> fileNames_;
     long long numberOfFiles_;
-    long long fileEntry_;
-    long long firstFileWithEvent_;
+    long long fileEntry_{-1};
+    long long firstFileWithEvent_{};
 
-    long long entriesInCurrentFile_;
-    long long eventEntry_;
+    long long entriesInCurrentFile_{};
+    long long eventEntry_{};
 
-    std::unique_ptr<TFile> file_;
+    std::unique_ptr<TFile> file_{nullptr};
 
-    TTree* eventsTree_;
-    TBranch* eventAuxiliaryBranch_;
-    mutable art::EventAuxiliary eventAuxiliary_;
-    art::EventAuxiliary* pEventAuxiliary_;
-    mutable long long previousEventAuxiliaryEntry_;
+    TTree* eventsTree_{nullptr};
+    TBranch* eventAuxiliaryBranch_{nullptr};
+    mutable art::EventAuxiliary eventAuxiliary_{};
+    art::EventAuxiliary* pEventAuxiliary_{&eventAuxiliary_};
+    mutable long long previousEventAuxiliaryEntry_{-1};
 
-    TTree* eventHistoryTree_;
-    TBranch* eventHistoryBranch_;
-    mutable art::History eventHistory_;
-    art::History* pEventHistory_;
-    mutable long long previousEventHistoryEntry_;
+    TTree* eventHistoryTree_{nullptr};
+    TBranch* eventHistoryBranch_{nullptr};
+    mutable art::History eventHistory_{};
+    art::History* pEventHistory_{&eventHistory_};
+    mutable long long previousEventHistoryEntry_{-1};
 
-    mutable art::ProcessHistoryMap historyMap_;
+    mutable art::ProcessHistoryMap historyMap_{};
   };
 } // namespace gallery
 

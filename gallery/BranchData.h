@@ -14,11 +14,9 @@ class TBranch;
 class TClass;
 
 namespace art {
-
   class EDProduct;
   class PrincipalBase;
   class TypeID;
-
 } // namespace art
 
 namespace gallery {
@@ -26,81 +24,59 @@ namespace gallery {
   class EventNavigator;
 
   class BranchData : public art::EDProductGetter {
-
   public:
     virtual ~BranchData();
 
     BranchData() = default;
 
-    BranchData(art::TypeID const& type,
-               TClass* iTClass,
-               TBranch* branch,
-               EventNavigator const* eventNavigator,
-               art::PrincipalBase const* finder,
-               std::string&& iBranchName);
+    explicit BranchData(art::TypeID const& type,
+                        TClass* iTClass,
+                        TBranch* branch,
+                        EventNavigator const* eventNavigator,
+                        art::PrincipalBase const* finder,
+                        std::string&& iBranchName);
 
     BranchData(BranchData const&) = delete;
-
     BranchData(BranchData&&) = delete;
-
     BranchData& operator=(BranchData const&) = delete;
-
     BranchData& operator=(BranchData&&) = delete;
 
   public:
     virtual void updateFile(TBranch* iBranch);
 
     TClass*
-    tClass() const
+    tClass() const noexcept
     {
       return tClass_;
     }
 
     void*
-    address() const
+    address() const noexcept
     {
       return address_;
     }
 
     TBranch*
-    branch() const
+    branch() const noexcept
     {
       return branch_;
     }
 
     std::string const&
-    branchName() const
+    branchName() const noexcept
     {
       return branchName_;
     }
 
     long long
-    lastProduct() const
+    lastProduct() const noexcept
     {
       return lastProduct_;
     }
 
-    // bool isReady() const override { return true; }
-
-    virtual art::EDProduct const* getIt_() const override;
-
-    virtual art::EDProduct const*
-    // anyProduct_() const override;
-    anyProduct_() const;
-
-    virtual art::EDProduct const*
-    // uniqueProduct_() const override;
-    uniqueProduct_() const;
-
-    virtual art::EDProduct const*
-    // uniqueProduct_(art::TypeID const&) const override;
-    uniqueProduct_(art::TypeID const&) const;
-
-    // bool resolveProduct_(art::TypeID const&) const override;
-
-    virtual bool
-    // resolveProductIfAvailable_(art::TypeID const&) const override;
-    resolveProductIfAvailable_(art::TypeID const&) const;
+    virtual art::EDProduct const* getIt_() const;
+    virtual art::EDProduct const* uniqueProduct_() const;
+    virtual art::EDProduct const* uniqueProduct_(art::TypeID const&) const;
 
   private:
     TClass* tClass_{nullptr};
