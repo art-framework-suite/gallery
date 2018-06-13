@@ -56,12 +56,9 @@
 #include <vector>
 
 namespace art {
-
   class EDProduct;
   class EDProductGetter;
   class BranchDescription;
-  class ProductID;
-
 } // namespace art
 
 class TClass;
@@ -103,14 +100,13 @@ namespace gallery {
 
     void addProcess(std::string const& processName) const;
 
-    void addBranchData(std::string&& branchName,
+    void addBranchData(std::string branchName,
                        unsigned int processIndex,
                        InfoForTypeLabelInstance const& info,
                        bool initializeTheCache = false) const;
 
-    TClass* getTClassUsingBranchDescription(
-      unsigned int processIndex,
-      InfoForTypeLabelInstance const& info) const;
+    TClass* getTClass(InfoForTypeLabelInstance const& info,
+                      std::string const& processName) const;
 
     InfoForTypeLabelInstance& getInfoForTypeLabelInstance(
       art::TypeID const& type,
@@ -126,7 +122,7 @@ namespace gallery {
                            std::string const& instance,
                            unsigned int infoIndex) const;
 
-    art::EDProduct const* readProduct(unsigned int branchDataIndex,
+    art::EDProduct const* readProduct(art::ProductID const productID,
                                       art::TypeID const& type) const;
 
     std::pair<unsigned int, bool> getBranchDataIndex(
@@ -136,8 +132,11 @@ namespace gallery {
     void updateBranchDataIndexOrderedByHistory(
       InfoForTypeLabelInstance const& info) const;
 
-    std::pair<unsigned int, bool> getByBranchDescription(
-      art::BranchDescription const&) const;
+    BranchData const* getBranchData(
+      std::vector<uupair> const& processIndexToBranchDataIndex,
+      unsigned int processIndex) const;
+
+    BranchData const* getBranchData(art::BranchDescription const&) const;
 
     art::EDProductGetter const* getEDProductGetter_(
       art::ProductID const&) const override;
@@ -198,7 +197,7 @@ namespace gallery {
 
     // Use this for get functions that use the ProductID. These are
     // mostly used when dereferencing a Ptr.
-    mutable std::map<art::ProductID, unsigned int> branchDataIndexMap_{};
+    mutable std::map<art::ProductID, BranchData const*> branchDataMap_{};
 
     mutable std::set<art::ProductID> branchDataMissingSet_{};
 

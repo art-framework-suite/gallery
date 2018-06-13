@@ -13,6 +13,7 @@
 #include "canvas/Persistency/Provenance/Compatibility/BranchIDList.h"
 #include "canvas/Persistency/Provenance/ProductID.h"
 #include "cetlib/exempt_ptr.h"
+#include "gallery/InfoForTypeLabelInstance.h"
 
 #include <map>
 #include <memory>
@@ -28,6 +29,19 @@ namespace gallery {
   public:
     void updateFile(TFile* tFile);
 
+    art::BranchDescription const* productDescription(
+      InfoForTypeLabelInstance const& info,
+      std::string const& process) const;
+
+    art::BranchDescription const* productDescription(
+      art::TypeID const& type,
+      std::string const& label,
+      std::string const& instance,
+      std::string const& process) const;
+
+    art::BranchDescription const* productDescription(
+      art::ProductID const& pid) const;
+
     auto const&
     productDescriptions() const
     {
@@ -39,8 +53,6 @@ namespace gallery {
     {
       return branchIDLists_.get();
     }
-    art::BranchDescription const* productToBranch(
-      art::ProductID const& pid) const;
     bool branchInRegistryOfAnyOpenedFile(art::ProductID const&) const;
 
   private:

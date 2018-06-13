@@ -35,7 +35,7 @@ namespace gallery {
     art::TypeID const& partnerType() const noexcept;
 
     std::vector<uupair>& processIndexToBranchDataIndex() const noexcept;
-    std::vector<unsigned int>& branchDataIndexOrderedByHistory() const noexcept;
+    std::vector<art::ProductID>& productIDsOrderedByHistory() const noexcept;
     std::vector<art::ProductID>& productIDs() const noexcept;
 
   private:
@@ -58,9 +58,8 @@ namespace gallery {
 
     // There is an entry here for each process in the current process
     // history with a branch in the current input ROOT file.  They are
-    // maintained in process history order.  The value of each element
-    // is an index into the branch data vector.
-    mutable std::vector<unsigned int> branchDataIndexOrderedByHistory_;
+    // maintained in process history order.
+    mutable std::vector<art::ProductID> productIDsOrderedByHistory_;
 
     // The ProductIDs for the processes in processNames_ This vector
     // is sorted in the same order and has the same size as

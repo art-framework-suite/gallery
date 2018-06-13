@@ -80,7 +80,40 @@ namespace gallery {
   }
 
   art::BranchDescription const*
-  BranchMapReader::productToBranch(art::ProductID const& pid) const
+  BranchMapReader::productDescription(InfoForTypeLabelInstance const& info,
+                                      std::string const& process) const
+  {
+    return productDescription(
+      info.type(), info.label(), info.instance(), process);
+  }
+
+  art::BranchDescription const*
+  BranchMapReader::productDescription(art::TypeID const& type,
+                                      std::string const& label,
+                                      std::string const& instance,
+                                      std::string const& process) const
+  {
+    for (auto const& pr : productIDToDescriptionMap_) {
+      auto const& pd = pr.second;
+      if (pd.friendlyClassName() != type.friendlyClassName()) {
+        continue;
+      }
+      if (pd.moduleLabel() != label) {
+        continue;
+      }
+      if (pd.productInstanceName() != instance) {
+        continue;
+      }
+      if (pd.processName() != process) {
+        continue;
+      }
+      return &pd;
+    }
+    return nullptr;
+  }
+
+  art::BranchDescription const*
+  BranchMapReader::productDescription(art::ProductID const& pid) const
   {
     auto bdi = productIDToDescriptionMap_.find(pid);
     if (productIDToDescriptionMap_.end() == bdi) {

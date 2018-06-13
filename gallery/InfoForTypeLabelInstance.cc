@@ -93,10 +93,10 @@ namespace gallery {
     return processIndexToBranchDataIndex_;
   }
 
-  std::vector<unsigned int>&
-  InfoForTypeLabelInstance::branchDataIndexOrderedByHistory() const noexcept
+  std::vector<art::ProductID>&
+  InfoForTypeLabelInstance::productIDsOrderedByHistory() const noexcept
   {
-    return branchDataIndexOrderedByHistory_;
+    return productIDsOrderedByHistory_;
   }
 
   std::vector<art::ProductID>&
