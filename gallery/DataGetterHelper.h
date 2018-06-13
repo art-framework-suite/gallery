@@ -44,6 +44,7 @@
 #include "gallery/BranchData.h"
 #include "gallery/BranchMapReader.h"
 #include "gallery/EventHistoryGetter.h"
+#include "gallery/InfoForTypeLabelInstance.h"
 #include "gallery/TypeLabelInstanceKey.h"
 
 #include <map>
@@ -72,124 +73,16 @@ namespace gallery {
   class EventNavigator;
 
   class DataGetterHelper : art::PrincipalBase {
-  private: // TYPES
-    using uupair = std::pair<unsigned int, unsigned int>;
-
-    // One of these info objects is created the first time each unique
-    // key consisting of the type, module label, and instance is used
-    // in a call to getByLabel, getValidHandle, or a similar function.
-    class InfoForTypeLabelInstance {
-    public:
-      explicit InfoForTypeLabelInstance(art::TypeID const& iType,
-                                        std::string const& iLabel,
-                                        std::string const& iInstance);
-
-      art::TypeID const&
-      type() const
-      {
-        return type_;
-      }
-
-      std::string const&
-      label() const
-      {
-        return label_;
-      }
-
-      std::string const&
-      instance() const
-      {
-        return instance_;
-      }
-
-      TClass*
-      tClass() const
-      {
-        return tClass_;
-      }
-
-      bool
-      isAssns() const
-      {
-        return isAssns_;
-      }
-
-      art::TypeID const&
-      partnerType() const
-      {
-        return partnerType_;
-      }
-
-      std::vector<uupair>&
-      processIndexToBranchDataIndex() const
-      {
-        return processIndexToBranchDataIndex_;
-      }
-
-      std::vector<unsigned int>&
-      branchDataIndexOrderedByHistory() const
-      {
-        return branchDataIndexOrderedByHistory_;
-      }
-
-      std::vector<art::ProductID>&
-      productIDs() const
-      {
-        return productIDs_;
-      }
-
-    private:
-      art::TypeID const type_;
-      std::string const label_;
-      std::string const instance_;
-      TClass* const tClass_;
-      bool const isAssns_;
-      art::TypeID const partnerType_;
-
-      // There is an entry here for each process with a branch that is
-      // in the ProductRegistry and in the input file for any input
-      // file that contains events and was opened so far and the
-      // product registry entry must be associated with the Event and
-      // have a valid ProductID (the corresponding TBranch does not
-      // necessarily need to exist in the current input file).  These
-      // are maintained in the order of the processIndex. The second
-      // part of the pair is an index into branchDataVector_.
-      mutable std::vector<uupair> processIndexToBranchDataIndex_;
-
-      // There is an entry here for each process in the current
-      // process history with a branch in the current input ROOT file.
-      // They are maintained in process history order.  The value of
-      // each element is an index into the branch data vector.
-      mutable std::vector<unsigned int> branchDataIndexOrderedByHistory_;
-
-      // The ProductIDs for the processes in processNames_ This vector
-      // is sorted in the same order and has the same size as
-      // processNames_.
-      mutable std::vector<art::ProductID> productIDs_;
-    };
-
-  private: // STATIC MEMBER FUNCTIONS
-    static void initializeStreamers();
-
-    static std::string buildBranchName(InfoForTypeLabelInstance const& info,
-                                       std::string const& processName);
-
-  private: // STATIC MEMBER DATA
-    static bool streamersInitialized_;
-
-  public: // MEMBER FUNCTIONS -- Special Member Functions
-    DataGetterHelper(EventNavigator const* eventNavigator,
-                     std::shared_ptr<EventHistoryGetter> historyGetter);
+  public:
+    explicit DataGetterHelper(
+      EventNavigator const* eventNavigator,
+      std::shared_ptr<EventHistoryGetter> historyGetter);
 
     DataGetterHelper(DataGetterHelper const&) = delete;
-
     DataGetterHelper(DataGetterHelper&&) = delete;
-
     DataGetterHelper& operator=(DataGetterHelper const&) = delete;
-
     DataGetterHelper& operator=(DataGetterHelper&&) = delete;
 
-  public: // MEMBER FUNCTIONS
     void getByLabel(std::type_info const& typeInfoOfWrapper,
                     art::InputTag const& inputTag,
                     art::EDProduct const*& edProduct) const;
@@ -236,17 +129,15 @@ namespace gallery {
     art::EDProduct const* readProduct(unsigned int branchDataIndex,
                                       art::TypeID const& type) const;
 
-    bool getBranchDataIndex(
-      std::vector<std::pair<unsigned int, unsigned int>> const&
-        processIndexToBranchDataIndex,
-      unsigned int processIndex,
-      unsigned int& branchDataIndex) const;
+    std::pair<unsigned int, bool> getBranchDataIndex(
+      std::vector<uupair> const& processIndexToBranchDataIndex,
+      unsigned int processIndex) const;
 
     void updateBranchDataIndexOrderedByHistory(
       InfoForTypeLabelInstance const& info) const;
 
-    bool getByBranchDescription(art::BranchDescription const&,
-                                unsigned int& branchDataIndex) const;
+    std::pair<unsigned int, bool> getByBranchDescription(
+      art::BranchDescription const&) const;
 
     art::EDProductGetter const* getEDProductGetter_(
       art::ProductID const&) const override;

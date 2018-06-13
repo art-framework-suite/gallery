@@ -5,6 +5,7 @@ set(gallery_sources
   BranchData.cc
   BranchMapReader.cc
   DataGetterHelper.cc
+  InfoForTypeLabelInstance.cc
   Event.cc
   EventHistoryGetter.cc
   EventNavigator.cc

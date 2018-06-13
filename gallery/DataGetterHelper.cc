@@ -37,42 +37,39 @@ namespace {
   constexpr char underscore{'_'};
   constexpr char period{'.'};
 
-  art::TypeID
-  getPartnerTypeID(TClass* tClass)
+  void
+  initializeStreamers()
   {
-    art::TypeID result;
-    if (tClass) {
-      // Note we allow tClass to be null at this point. If the branch is
-      // actually in the input file and there is an attempt to construct
-      // a BranchData object with it null, a missing dictionary
-      // exception will be thrown. This also means we just assume it is
-      // not an Assns. Even if this assumption is wrong, we will get the
-      // correct behavior from getByLabel. A missing dictionary
-      // exception will get thrown if the branch is in the input file
-      // and a ProductNotFound exception will get thrown if it is not.
-      auto const wrappedClass = art::name_of_template_arg(tClass->GetName(), 0);
-      auto const assnsPartner = art::name_of_assns_partner(wrappedClass);
-      if (assnsPartner.empty()) {
-        return result;
-      }
-      auto const wrappedPartnerClassName = art::wrappedClassName(assnsPartner);
-      art::root::TypeWithDict const wrappedPartner(wrappedPartnerClassName);
-      if (!wrappedPartner) {
-        throw art::Exception(art::errors::DictionaryNotFound)
-          << "In InfoForTypeLabelInstance constructor.\nMissing dictionary for "
-             "wrapped partner of Assns class.\n"
-          << wrappedPartnerClassName << "\n";
-      }
-      result = wrappedPartner.id();
-    }
-    return result;
+    art::setCacheStreamers();
+    art::setProvenanceTransientStreamers();
+    art::detail::setBranchDescriptionStreamer();
+    art::detail::setPtrVectorBaseStreamer();
+    art::configureProductIDStreamer();
+    art::configureRefCoreStreamer();
+  }
+
+  string
+  buildBranchName(gallery::InfoForTypeLabelInstance const& info,
+                  string const& processName)
+  {
+    string branchName{info.type().friendlyClassName()};
+    unsigned int const branchNameSize =
+      branchName.size() + info.label().size() + info.instance().size() +
+      processName.size() + 4;
+    branchName.reserve(branchNameSize);
+    branchName += underscore;
+    branchName += info.label();
+    branchName += underscore;
+    branchName += info.instance();
+    branchName += underscore;
+    branchName += processName;
+    branchName += period;
+    return branchName;
   }
 
 } // unnamed namespace
 
 namespace gallery {
-
-  bool DataGetterHelper::streamersInitialized_ = false;
 
   DataGetterHelper::DataGetterHelper(
     EventNavigator const* eventNavigator,
@@ -112,12 +109,10 @@ namespace gallery {
       auto itProcess = processNameToProcessIndex_.find(inputTag.process());
       if (itProcess != processNameToProcessIndex_.end()) {
         unsigned int const processIndex = itProcess->second;
-        unsigned int branchDataIndex = 0;
-        if (getBranchDataIndex(info.processIndexToBranchDataIndex(),
-                               processIndex,
-                               branchDataIndex)) {
-          edProduct = readProduct(branchDataIndex, type);
-          return;
+        auto const result = getBranchDataIndex(
+          info.processIndexToBranchDataIndex(), processIndex);
+        if (result.second) {
+          edProduct = readProduct(result.first, type);
         }
       }
     }
@@ -147,14 +142,13 @@ namespace gallery {
         type, pd.moduleLabel(), pd.productInstanceName());
 
       unsigned int const processIndex = itProcess->second;
-      unsigned int branchDataIndex = 0;
-      if (!getBranchDataIndex(info.processIndexToBranchDataIndex(),
-                              processIndex,
-                              branchDataIndex)) {
+      auto const result =
+        getBranchDataIndex(info.processIndexToBranchDataIndex(), processIndex);
+      if (!result.second) {
         continue;
       }
 
-      auto product = readProduct(branchDataIndex, type);
+      auto product = readProduct(result.first, type);
       // If the product was not present in the input file or we did
       // not successfully read it then we skip it.
       if (product == nullptr) {
@@ -183,8 +177,9 @@ namespace gallery {
       info.processIndexToBranchDataIndex().reserve(processNames_.size());
       for (unsigned int processIndex{}; processIndex < processNames_.size();
            ++processIndex) {
-        unsigned int branchDataIndex{};
-        if (getBranchDataIndex(old, processIndex, branchDataIndex)) {
+        auto const result = getBranchDataIndex(old, processIndex);
+        if (result.second) {
+          auto const branchDataIndex = result.first;
           BranchData& branchData = *branchDataVector_[branchDataIndex];
           auto branch = tree_->GetBranch(branchData.branchName().c_str());
           // This will update the pointer to the TBranch in
@@ -217,8 +212,8 @@ namespace gallery {
                                     info.partnerType()});
             }
           }
-          info.processIndexToBranchDataIndex().push_back(
-            uupair(processIndex, branchDataIndex));
+          info.processIndexToBranchDataIndex().emplace_back(processIndex,
+                                                            branchDataIndex);
           if (initializeTheCache && branch) {
             tree_->AddBranchToCache(branch, kTRUE);
           }
@@ -262,21 +257,6 @@ namespace gallery {
   DataGetterHelper::updateEvent()
   {
     initializedForProcessHistory_ = false;
-  }
-
-  void
-  DataGetterHelper::initializeStreamers()
-  {
-    if (streamersInitialized_) {
-      return;
-    }
-    streamersInitialized_ = true;
-    art::setCacheStreamers();
-    art::setProvenanceTransientStreamers();
-    art::detail::setBranchDescriptionStreamer();
-    art::detail::setPtrVectorBaseStreamer();
-    art::configureProductIDStreamer();
-    art::configureRefCoreStreamer();
   }
 
   void
@@ -338,25 +318,6 @@ namespace gallery {
         addBranchData(move(branchName), processIndex, info);
       }
     }
-  }
-
-  string
-  DataGetterHelper::buildBranchName(InfoForTypeLabelInstance const& info,
-                                    string const& processName)
-  {
-    string branchName{info.type().friendlyClassName()};
-    unsigned int const branchNameSize =
-      branchName.size() + info.label().size() + info.instance().size() +
-      processName.size() + 4;
-    branchName.reserve(branchNameSize);
-    branchName += underscore;
-    branchName += info.label();
-    branchName += underscore;
-    branchName += info.instance();
-    branchName += underscore;
-    branchName += processName;
-    branchName += period;
-    return branchName;
   }
 
   void
@@ -426,7 +387,7 @@ namespace gallery {
     return tClass;
   }
 
-  DataGetterHelper::InfoForTypeLabelInstance&
+  InfoForTypeLabelInstance&
   DataGetterHelper::getInfoForTypeLabelInstance(art::TypeID const& type,
                                                 string const& label,
                                                 string const& instance) const
@@ -491,12 +452,10 @@ namespace gallery {
     return branchData->uniqueProduct_(type);
   }
 
-  bool
+  std::pair<unsigned int, bool>
   DataGetterHelper::getBranchDataIndex(
-    vector<pair<unsigned int, unsigned int>> const&
-      processIndexToBranchDataIndex,
-    unsigned int const processIndex,
-    unsigned int& branchDataIndex) const
+    vector<uupair> const& processIndexToBranchDataIndex,
+    unsigned int const processIndex) const
   {
     auto itBranchDataIndex = lower_bound(
       processIndexToBranchDataIndex.cbegin(),
@@ -505,10 +464,9 @@ namespace gallery {
       [](uupair const& l, uupair const& r) { return l.first < r.first; });
     if (itBranchDataIndex != processIndexToBranchDataIndex.cend() &&
         itBranchDataIndex->first == processIndex) {
-      branchDataIndex = itBranchDataIndex->second;
-      return true;
+      return make_pair(itBranchDataIndex->second, true);
     }
-    return false;
+    return make_pair(-1u, false);
   }
 
   void
@@ -522,19 +480,21 @@ namespace gallery {
         orderedProcessIndexes_.size());
     }
     for (auto processIndex : orderedProcessIndexes_) {
-      unsigned int branchDataIndex{};
-      if (getBranchDataIndex(info.processIndexToBranchDataIndex(),
-                             processIndex,
-                             branchDataIndex) &&
-          branchDataVector_[branchDataIndex]->branch() != nullptr) {
+      auto const result =
+        getBranchDataIndex(info.processIndexToBranchDataIndex(), processIndex);
+      if (!result.second) {
+        continue;
+      }
+      auto const branchDataIndex = result.first;
+      if (branchDataVector_[branchDataIndex]->branch() != nullptr) {
         info.branchDataIndexOrderedByHistory().emplace_back(branchDataIndex);
       }
     }
   }
 
-  bool
-  DataGetterHelper::getByBranchDescription(art::BranchDescription const& desc,
-                                           unsigned int& branchDataIndex) const
+  std::pair<unsigned int, bool>
+  DataGetterHelper::getByBranchDescription(
+    art::BranchDescription const& desc) const
   {
     if (!initializedForProcessHistory_) {
       initializeForProcessHistory();
@@ -554,13 +514,14 @@ namespace gallery {
     auto itProcess = processNameToProcessIndex_.find(desc.processName());
     if (itProcess != processNameToProcessIndex_.end()) {
       unsigned int const processIndex = itProcess->second;
-      if (getBranchDataIndex(info.processIndexToBranchDataIndex(),
-                             processIndex,
-                             branchDataIndex)) {
-        return branchDataVector_[branchDataIndex]->branch() != nullptr;
+      auto const result =
+        getBranchDataIndex(info.processIndexToBranchDataIndex(), processIndex);
+      if (result.second) {
+        return std::make_pair(
+          result.first, branchDataVector_[result.first]->branch() != nullptr);
       }
     }
-    return false;
+    return std::make_pair(0, false);
   }
 
   art::BranchDescription const&
@@ -579,39 +540,28 @@ namespace gallery {
   art::EDProductGetter const*
   DataGetterHelper::getEDProductGetter_(art::ProductID const& productID) const
   {
-    auto const key = productID;
-    unsigned int branchDataIndex{};
-    auto itFind = branchDataIndexMap_.find(key);
-    if (itFind == branchDataIndexMap_.end()) {
-      if (branchDataMissingSet_.find(key) != branchDataMissingSet_.end()) {
-        return &invalidBranchData_;
-      }
-      if (auto const branchDescription =
-            branchMapReader_.productToBranch(productID)) {
-        if (!getByBranchDescription(*branchDescription, branchDataIndex)) {
-          branchDataMissingSet_.insert(key);
-          return &invalidBranchData_;
-        }
-      } else {
-        return &invalidBranchData_;
-      }
-      branchDataIndexMap_.emplace(key, branchDataIndex);
-    } else {
-      branchDataIndex = itFind->second;
+    auto itFind = branchDataIndexMap_.find(productID);
+    if (itFind != cend(branchDataIndexMap_)) {
+      return branchDataVector_[itFind->second].get();
     }
+
+    if (branchDataMissingSet_.find(productID) != branchDataMissingSet_.end()) {
+      return &invalidBranchData_;
+    }
+
+    auto const pd = branchMapReader_.productToBranch(productID);
+    if (pd == nullptr) {
+      return &invalidBranchData_;
+    }
+
+    auto result = getByBranchDescription(*pd);
+    if (!result.second) {
+      branchDataMissingSet_.insert(productID);
+      return &invalidBranchData_;
+    }
+    auto const branchDataIndex = result.first;
+    branchDataIndexMap_.emplace(productID, branchDataIndex);
     return branchDataVector_[branchDataIndex].get();
   }
-
-  DataGetterHelper::InfoForTypeLabelInstance::InfoForTypeLabelInstance(
-    art::TypeID const& iType,
-    string const& iLabel,
-    string const& iInstance)
-    : type_{iType}
-    , label_{iLabel}
-    , instance_{iInstance}
-    , tClass_{TClass::GetClass(type_.typeInfo())}
-    , isAssns_{art::is_assns(art::name_of_template_arg(type_.className(), 0))}
-    , partnerType_{getPartnerTypeID(tClass_)}
-  {}
 
 } // namespace gallery

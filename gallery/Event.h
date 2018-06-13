@@ -1,9 +1,11 @@
 #ifndef gallery_Event_h
 #define gallery_Event_h
 
-// Main interface to users. It uses the DataGetterHelper
-// and EventNavigator to iterate over events in a set
-// of input files and find products in them.
+// ====================================================================
+// Main interface to users. It uses the DataGetterHelper and
+// EventNavigator to iterate over events in a set of input files and
+// find products in them.
+// ====================================================================
 
 #include "canvas/Persistency/Common/EDProduct.h"
 #include "canvas/Persistency/Common/Wrapper.h"
