@@ -12,19 +12,19 @@
 #include "canvas/Persistency/Provenance/ProcessHistory.h"
 #include "canvas/Persistency/Provenance/ProcessHistoryID.h"
 
+#include "TFile.h"
+
 #include <memory>
 #include <string>
 #include <vector>
 
 class TBranch;
-class TFile;
 class TTree;
 
 namespace gallery {
 
   class EventNavigator {
   public:
-
     explicit EventNavigator(std::vector<std::string> const& iFileNames);
 
     // In a normal iteration using the next function, isValid and
@@ -32,11 +32,16 @@ namespace gallery {
     // called directly and there was an empty file, they might
     // return different values.
 
-    bool isValid() const {
-      return fileEntry_ != numberOfFiles_ && eventEntry_ != entriesInCurrentFile_;
+    bool
+    isValid() const
+    {
+      return fileEntry_ != numberOfFiles_ &&
+             eventEntry_ != entriesInCurrentFile_;
     }
 
-    bool atEnd() const {
+    bool
+    atEnd() const
+    {
       return fileEntry_ == numberOfFiles_;
     }
 
@@ -53,42 +58,57 @@ namespace gallery {
 
     TFile* getTFile() const;
     TTree* getTTree() const;
-    TBranch* eventAuxiliaryBranch() const { return eventAuxiliaryBranch_; }
+    TBranch*
+    eventAuxiliaryBranch() const
+    {
+      return eventAuxiliaryBranch_;
+    }
 
-    long long fileEntry() const { return fileEntry_; }
-    long long entriesInCurrentFile() const { return entriesInCurrentFile_; }
-    long long eventEntry() const { return eventEntry_; }
+    long long
+    fileEntry() const
+    {
+      return fileEntry_;
+    }
+    long long
+    entriesInCurrentFile() const
+    {
+      return entriesInCurrentFile_;
+    }
+    long long
+    eventEntry() const
+    {
+      return eventEntry_;
+    }
 
   private:
-
     void initializeTTreePointers();
     void initializeTBranchPointers();
 
     std::vector<std::string> fileNames_;
     long long numberOfFiles_;
-    long long fileEntry_;
-    long long firstFileWithEvent_;
+    long long fileEntry_{-1};
+    long long firstFileWithEvent_{};
 
-    long long entriesInCurrentFile_;
-    long long eventEntry_;
+    long long entriesInCurrentFile_{};
+    long long eventEntry_{};
 
-    std::unique_ptr<TFile> file_;
+    std::unique_ptr<TFile> file_{nullptr};
 
-    TTree* eventsTree_;
-    TBranch* eventAuxiliaryBranch_;
-    mutable art::EventAuxiliary eventAuxiliary_;
-    art::EventAuxiliary* pEventAuxiliary_;
-    mutable long long previousEventAuxiliaryEntry_;
+    TTree* eventsTree_{nullptr};
+    TBranch* eventAuxiliaryBranch_{nullptr};
+    mutable art::EventAuxiliary eventAuxiliary_{};
+    art::EventAuxiliary* pEventAuxiliary_{&eventAuxiliary_};
+    mutable long long previousEventAuxiliaryEntry_{-1};
 
-    TTree* eventHistoryTree_;
-    TBranch* eventHistoryBranch_;
-    mutable art::History eventHistory_;
-    art::History* pEventHistory_;
-    mutable long long previousEventHistoryEntry_;
+    TTree* eventHistoryTree_{nullptr};
+    TBranch* eventHistoryBranch_{nullptr};
+    mutable art::History eventHistory_{};
+    art::History* pEventHistory_{&eventHistory_};
+    mutable long long previousEventHistoryEntry_{-1};
 
-    mutable art::ProcessHistoryMap historyMap_;
+    mutable art::ProcessHistoryMap historyMap_{};
   };
-}
+} // namespace gallery
 
 #endif /* gallery_EventNavigator_h */
 

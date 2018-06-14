@@ -6,7 +6,7 @@
 namespace art {
   class History;
   class ProcessHistory;
-}
+} // namespace art
 
 namespace gallery {
 
@@ -14,7 +14,6 @@ namespace gallery {
 
   class EventHistoryGetter {
   public:
-
     EventHistoryGetter(EventNavigator const*);
     virtual ~EventHistoryGetter() = default;
 
@@ -26,10 +25,9 @@ namespace gallery {
     virtual art::History const& history() const;
 
   private:
-
     EventNavigator const* eventNavigator_;
   };
-}
+} // namespace gallery
 #endif /* gallery_EventHistoryGetter_h */
 
 // Local Variables:

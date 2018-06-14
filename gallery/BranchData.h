@@ -1,11 +1,11 @@
 #ifndef gallery_BranchData_h
 #define gallery_BranchData_h
+// vim: set sw=2 expandtab :
 
 // BranchData holds a pointer to a single TBranch and
 // the buffer that data is written to from that TBranch.
 
 #include "canvas/Persistency/Common/EDProductGetter.h"
-
 #include "cetlib/exempt_ptr.h"
 
 #include <string>
@@ -15,9 +15,9 @@ class TClass;
 
 namespace art {
   class EDProduct;
-  class EDProductGetterFinder;
+  class PrincipalBase;
   class TypeID;
-}
+} // namespace art
 
 namespace gallery {
 
@@ -25,50 +25,72 @@ namespace gallery {
 
   class BranchData : public art::EDProductGetter {
   public:
-
-    BranchData();
-
-    BranchData(art::TypeID const& type,
-               TClass* iTClass,
-               TBranch* branch,
-               EventNavigator const* eventNavigator,
-               art::EDProductGetterFinder const* finder,
-               std::string&& iBranchName);
-
-    BranchData(BranchData const&) = delete;
-    BranchData const& operator=(BranchData const&) = delete;
-
     virtual ~BranchData();
 
+    BranchData() = default;
+
+    explicit BranchData(art::TypeID const& type,
+                        TClass* iTClass,
+                        TBranch* branch,
+                        EventNavigator const* eventNavigator,
+                        art::PrincipalBase const* finder,
+                        std::string&& iBranchName);
+
+    BranchData(BranchData const&) = delete;
+    BranchData(BranchData&&) = delete;
+    BranchData& operator=(BranchData const&) = delete;
+    BranchData& operator=(BranchData&&) = delete;
+
+  public:
     virtual void updateFile(TBranch* iBranch);
 
-    TClass* tClass() const { return tClass_; }
-    void* address() const { return address_; }
-    TBranch* branch() const { return branch_; }
-    std::string const& branchName() const { return branchName_; }
-    long long lastProduct() const { return lastProduct_; }
+    TClass*
+    tClass() const noexcept
+    {
+      return tClass_;
+    }
 
-    bool isReady() const override { return true; }
-    art::EDProduct const *getIt() const override;
+    void*
+    address() const noexcept
+    {
+      return address_;
+    }
 
-    art::EDProduct const *anyProduct() const override;
-    art::EDProduct const *uniqueProduct() const override;
-    art::EDProduct const *uniqueProduct(art::TypeID const&) const override;
-    bool resolveProduct(art::TypeID const&) const override;
-    bool resolveProductIfAvailable(art::TypeID const&) const override;
+    TBranch*
+    branch() const noexcept
+    {
+      return branch_;
+    }
+
+    std::string const&
+    branchName() const noexcept
+    {
+      return branchName_;
+    }
+
+    long long
+    lastProduct() const noexcept
+    {
+      return lastProduct_;
+    }
+
+    virtual art::EDProduct const* getIt_() const;
+    virtual art::EDProduct const* uniqueProduct_() const;
+    virtual art::EDProduct const* uniqueProduct_(art::TypeID const&) const;
 
   private:
-
-    TClass* tClass_;
-    void* address_;
-    art::EDProduct const * edProduct_;
-    TBranch* branch_;
-    EventNavigator const* eventNavigator_;
-    cet::exempt_ptr<art::EDProductGetterFinder const> finder_;
-    mutable long long lastProduct_;
-    std::string branchName_;
+    TClass* tClass_{nullptr};
+    void* address_{nullptr};
+    art::EDProduct const* edProduct_{nullptr};
+    TBranch* branch_{nullptr};
+    EventNavigator const* eventNavigator_{nullptr};
+    cet::exempt_ptr<art::PrincipalBase const> finder_{nullptr};
+    mutable long long lastProduct_{-1};
+    std::string branchName_{};
   };
-}
+
+} // namespace gallery
+
 #endif /* gallery_BranchData_h */
 
 // Local Variables:

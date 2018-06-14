@@ -45,7 +45,7 @@
  rename {art => canvas}/Persistency/Common/EDProduct.cc (88%)
  rename {art => canvas}/Persistency/Common/EDProduct.h (98%)
  rename {art => canvas}/Persistency/Common/EDProductGetter.h (93%)
- create mode 100644 canvas/Persistency/Common/EDProductGetterFinder.h
+ create mode 100644 canvas/Persistency/Common/PrincipalBase.h
  rename {art => canvas}/Persistency/Common/GetProduct.h (100%)
  rename {art => canvas}/Persistency/Common/GroupQueryResult.cc (93%)
  rename {art => canvas}/Persistency/Common/GroupQueryResult.h (100%)

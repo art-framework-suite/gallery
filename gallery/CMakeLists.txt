@@ -5,6 +5,7 @@ set(gallery_sources
   BranchData.cc
   BranchMapReader.cc
   DataGetterHelper.cc
+  InfoForTypeLabelInstance.cc
   Event.cc
   EventHistoryGetter.cc
   EventNavigator.cc
@@ -15,6 +16,9 @@ set(gallery_sources
 
 set(gallery_libraries
   canvas
+  canvas_root_io
+  hep_concurrency
+  fhiclcpp
   cetlib
   cetlib_except
   ${ROOT_CORE}
@@ -23,14 +27,9 @@ set(gallery_libraries
   )
 
 cet_make(LIBRARIES
-  canvas
-  cetlib
-  cetlib_except
-  ${ROOT_CORE}
-  ${ROOT_RIO}
-  ${ROOT_TREE}
+  ${gallery_libraries}
   NO_DICTIONARY
-)
+  )
 
 art_dictionary(DICTIONARY_LIBRARIES gallery)
 

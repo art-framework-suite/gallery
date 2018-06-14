@@ -21,8 +21,7 @@ project(gallery)
 # cetbuildtools contains our cmake modules
 find_package(cetbuildtools REQUIRED)
 
-list(APPEND CMAKE_MODULE_PATH
-  $ENV{CANVAS_DIR}/Modules)
+list(APPEND CMAKE_MODULE_PATH $ENV{CANVAS_ROOT_IO_DIR}/Modules)
 
 include(CetCMakeEnv)
 cet_cmake_env()
@@ -31,31 +30,69 @@ cet_set_compiler_flags(DIAGS VIGILANT
   WERROR
   NO_UNDEFINED
   EXTRA_FLAGS -pedantic
-  EXTRA_CXX_FLAGS -Wnon-virtual-dtor -Wdelete-non-virtual-dtor
-  )
+  EXTRA_CXX_FLAGS -Wnon-virtual-dtor -Wdelete-non-virtual-dtor)
 cet_have_qual(sse2 SSE2)
-if ( SSE2 )
+if (SSE2)
   cet_add_compiler_flags(CXX -msse2 -ftree-vectorizer-verbose=2)
+endif()
+
+if($ENV{CET_SANITIZE_ADDRESS})
+  #message(STATUS "CET_SANITIZE_ADDRESS=$ENV{CET_SANITIZE_ADDRESS}")
+  if(NOT "$ENV{GCC_FQ_DIR}" STREQUAL "")
+    #message(STATUS "GCC_FQ_DIR=$ENV{GCC_FQ_DIR}")
+    find_file(ASAN_LIB libasan.so NO_DEFAULT_PATH PATHS $ENV{GCC_FQ_DIR}/lib64)
+    if(NOT ASAN_LIB STREQUAL "ASAN_LIB-NOTFOUND")
+      #message(STATUS "ASAN_LIB=${ASAN_LIB}")
+    endif()
+  endif()
+endif()
+
+if($ENV{CET_SANITIZE_THREAD})
+  #message(STATUS "CET_SANITIZE_THREAD=$ENV{CET_SANITIZE_THREAD}")
+  if(NOT "$ENV{GCC_FQ_DIR}" STREQUAL "")
+    #message(STATUS "GCC_FQ_DIR=$ENV{GCC_FQ_DIR}")
+    find_file(TSAN_LIB libtsan.so NO_DEFAULT_PATH PATHS $ENV{GCC_FQ_DIR}/lib64)
+    if(NOT TSAN_LIB STREQUAL "TSAN_LIB-NOTFOUND")
+      #message(STATUS "TSAN_LIB=${TSAN_LIB}")
+    endif()
+  endif()
+endif()
+
+if ($ENV{CET_SANITIZE_ADDRESS})
+cet_add_compiler_flags(CXX -fsanitize=address)
+cet_add_compiler_flags(C -fsanitize=address)
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address")
+set(CMAKE_MODULE_LINKER_FLAGS_DEBUG "${CMAKE_MODULE_LINKER_FLAGS_DEBUG} -fsanitize=address")
+set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=address")
+endif()
+
+if ($ENV{CET_SANITIZE_THREAD})
+cet_add_compiler_flags(CXX -fsanitize=thread -D__SANITIZE_THREAD__)
+cet_add_compiler_flags(C -fsanitize=thread -D__SANITIZE_THREAD__)
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=thread -D__SANITIZE_THREAD__")
+set(CMAKE_MODULE_LINKER_FLAGS_DEBUG "${CMAKE_MODULE_LINKER_FLAGS_DEBUG} -fsanitize=thread -D__SANITIZE_THREAD__")
+set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=thread -D__SANITIZE_THREAD__")
 endif()
 
 cet_report_compiler_flags()
 
 # these are minimum required versions, not the actual product versions
+find_ups_product(canvas_root_io)
 find_ups_product(canvas)
 find_ups_product(messagefacility)
 find_ups_product(fhiclcpp)
 find_ups_product(cetlib v2_01_00)
 find_ups_product(cetlib_except v1_01_00)
-find_ups_product (cetbuildtools)
+find_ups_product(cetbuildtools)
 find_ups_product(clhep)
-find_ups_root()
 find_ups_boost()
+find_ups_root()
 
 # art_dictionary
 include(ArtDictionary)
 
 # source
-add_subdirectory (gallery)
+add_subdirectory(gallery)
 
 # ups - table and config files
 add_subdirectory(ups)
