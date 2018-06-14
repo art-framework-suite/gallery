@@ -87,21 +87,15 @@ namespace gallery {
     return partnerType_;
   }
 
-  std::vector<uupair>&
-  InfoForTypeLabelInstance::processIndexToBranchDataIndex() const noexcept
+  std::vector<IndexProductIDPair>&
+  InfoForTypeLabelInstance::processIndexToProductID() const noexcept
   {
-    return processIndexToBranchDataIndex_;
+    return processIndexToProductID_;
   }
 
   std::vector<art::ProductID>&
   InfoForTypeLabelInstance::productIDsOrderedByHistory() const noexcept
   {
     return productIDsOrderedByHistory_;
-  }
-
-  std::vector<art::ProductID>&
-  InfoForTypeLabelInstance::productIDs() const noexcept
-  {
-    return productIDs_;
   }
 }

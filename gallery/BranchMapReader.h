@@ -40,19 +40,13 @@ namespace gallery {
       std::string const& process) const;
 
     art::BranchDescription const* productDescription(
-      art::ProductID const& pid) const;
+      art::ProductID const pid) const;
 
-    auto const&
-    productDescriptions() const
-    {
-      return productIDToDescriptionMap_;
-    }
+    std::map<art::ProductID, art::BranchDescription> const&
+    productDescriptions() const;
 
-    cet::exempt_ptr<art::BranchIDLists const>
-    branchIDLists() const
-    {
-      return branchIDLists_.get();
-    }
+    cet::exempt_ptr<art::BranchIDLists const> branchIDLists() const;
+
     bool branchInRegistryOfAnyOpenedFile(art::ProductID const&) const;
 
   private:

@@ -93,33 +93,38 @@ namespace gallery {
                                       std::string const& instance,
                                       std::string const& process) const
   {
-    for (auto const& pr : productIDToDescriptionMap_) {
+    auto const fcn = type.friendlyClassName();
+    auto match = [&fcn, &label, &instance, &process](auto const& pr) {
       auto const& pd = pr.second;
-      if (pd.friendlyClassName() != type.friendlyClassName()) {
-        continue;
-      }
-      if (pd.moduleLabel() != label) {
-        continue;
-      }
-      if (pd.productInstanceName() != instance) {
-        continue;
-      }
-      if (pd.processName() != process) {
-        continue;
-      }
-      return &pd;
-    }
-    return nullptr;
+      return pd.friendlyClassName() == fcn && pd.moduleLabel() == label &&
+             pd.productInstanceName() == instance &&
+             pd.processName() == process;
+    };
+    auto const end = cend(productIDToDescriptionMap_);
+    auto it = std::find_if(cbegin(productIDToDescriptionMap_), end, match);
+    return it == end ? nullptr : &it->second;
   }
 
   art::BranchDescription const*
-  BranchMapReader::productDescription(art::ProductID const& pid) const
+  BranchMapReader::productDescription(art::ProductID const pid) const
   {
     auto bdi = productIDToDescriptionMap_.find(pid);
-    if (productIDToDescriptionMap_.end() == bdi) {
+    if (bdi == cend(productIDToDescriptionMap_)) {
       return nullptr;
     }
     return &bdi->second;
+  }
+
+  std::map<art::ProductID, art::BranchDescription> const&
+  BranchMapReader::productDescriptions() const
+  {
+    return productIDToDescriptionMap_;
+  }
+
+  cet::exempt_ptr<art::BranchIDLists const>
+  BranchMapReader::branchIDLists() const
+  {
+    return branchIDLists_.get();
   }
 
   bool

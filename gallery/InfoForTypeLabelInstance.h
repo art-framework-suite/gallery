@@ -18,7 +18,7 @@ class TClass;
 
 namespace gallery {
 
-  using uupair = std::pair<unsigned int, unsigned int>;
+  using IndexProductIDPair = std::pair<unsigned int, art::ProductID>;
 
   class InfoForTypeLabelInstance {
   public:
@@ -34,9 +34,8 @@ namespace gallery {
     bool isAssns() const noexcept;
     art::TypeID const& partnerType() const noexcept;
 
-    std::vector<uupair>& processIndexToBranchDataIndex() const noexcept;
+    std::vector<IndexProductIDPair>& processIndexToProductID() const noexcept;
     std::vector<art::ProductID>& productIDsOrderedByHistory() const noexcept;
-    std::vector<art::ProductID>& productIDs() const noexcept;
 
   private:
     art::TypeID const type_;
@@ -54,17 +53,12 @@ namespace gallery {
     // need to exist in the current input file).  These are maintained
     // in the order of the processIndex. The second part of the pair
     // is an index into branchDataVector_.
-    mutable std::vector<uupair> processIndexToBranchDataIndex_;
+    mutable std::vector<IndexProductIDPair> processIndexToProductID_;
 
     // There is an entry here for each process in the current process
     // history with a branch in the current input ROOT file.  They are
     // maintained in process history order.
     mutable std::vector<art::ProductID> productIDsOrderedByHistory_;
-
-    // The ProductIDs for the processes in processNames_ This vector
-    // is sorted in the same order and has the same size as
-    // processNames_.
-    mutable std::vector<art::ProductID> productIDs_;
   };
 } // namespace gallery
 

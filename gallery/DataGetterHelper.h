@@ -68,9 +68,9 @@ class TTree;
 namespace gallery {
 
   class EventNavigator;
-  using ProductIDWithProduct = std::pair<art::ProductID, art::EDProduct const*>;
+  using ProductWithID = std::pair<art::EDProduct const*, art::ProductID>;
 
-  class DataGetterHelper : art::PrincipalBase {
+  class DataGetterHelper : public art::PrincipalBase {
   public:
     explicit DataGetterHelper(
       EventNavigator const* eventNavigator,
@@ -81,10 +81,10 @@ namespace gallery {
     DataGetterHelper& operator=(DataGetterHelper const&) = delete;
     DataGetterHelper& operator=(DataGetterHelper&&) = delete;
 
-    ProductIDWithProduct getByLabel(std::type_info const& typeInfoOfWrapper,
-                                    art::InputTag const& inputTag) const;
+    ProductWithID getByLabel(std::type_info const& typeInfoOfWrapper,
+                             art::InputTag const& inputTag) const;
 
-    std::vector<ProductIDWithProduct> getManyByType(
+    std::vector<ProductWithID> getManyByType(
       std::type_info const& typeInfoOfWrapper) const;
 
     art::BranchDescription const& getProductDescription(art::ProductID) const;
@@ -125,16 +125,15 @@ namespace gallery {
     art::EDProduct const* readProduct(art::ProductID const productID,
                                       art::TypeID const& type) const;
 
-    std::pair<unsigned int, bool> getBranchDataIndex(
-      std::vector<uupair> const& processIndexToBranchDataIndex,
+    art::ProductID getMaybeValidProductID(
+      std::vector<IndexProductIDPair> const& processIndexToProductID,
       unsigned int processIndex) const;
 
     void updateBranchDataIndexOrderedByHistory(
       InfoForTypeLabelInstance const& info) const;
 
-    BranchData const* getBranchData(
-      std::vector<uupair> const& processIndexToBranchDataIndex,
-      unsigned int processIndex) const;
+    BranchData const* getBranchData(InfoForTypeLabelInstance const& info,
+                                    unsigned int processIndex) const;
 
     BranchData const* getBranchData(art::BranchDescription const&) const;
 
@@ -166,38 +165,39 @@ namespace gallery {
     // These are ordered by the current ProcessHistory
     mutable std::vector<unsigned int> orderedProcessIndexes_{};
 
-    // Note we just add to this, the order is never changed
-    // so an index into this can be cached. Entries are only
-    // added if and when data is requested via a getValidHandle
-    // function call or another similar function call.
+    // Note we just add to this, the order is never changed so an
+    // index into this can be cached. Entries are only added if and
+    // when data is requested via a getValidHandle function call or
+    // another similar function call.  We should be able to combine
+    // the infoVector_ and infoMap_ into one object.
     mutable std::vector<InfoForTypeLabelInstance> infoVector_{};
 
     // Use this to find the desired entry in the infoVector_ using a
     // key with type, label, and instance.
     mutable std::map<TypeLabelInstanceKey, unsigned int> infoMap_{};
 
-    // The BranchData object contains the object which ROOT fills when
+    // The BranchData object contains the object that ROOT fills when
     // reading the data. It also contains related items.  Note we just
-    // add to this vector, the order is never changed so an index into
-    // this can be cached. The TBranch* in BranchData will be set to
+    // add to this map. The TBranch* in BranchData will be set to
     // nullptr if the TBranch does not exist in the current
     // file. There are entries here when the data product is not
     // "present" because the producer declared it but never put
     // it. You have to read the data and check the isPresent bit to
     // determine that. There will be one entry in a
-    // processIndexToBranchDataIndex_ that points at each element in
-    // this vector. These are only created when needed (3 possible
-    // things can cause new BranchData objects to be constructed,
-    // 1. when a new InfoForTypeLabelInstance is constructed 2. when a
-    // new process is encountered in a process history 3. when a new
-    // input file is opened with new entries in its product registry).
-    mutable std::vector<std::unique_ptr<BranchData>> branchDataVector_{};
+    // processIndexToProductID_ that points at each element in this
+    // vector. These are only created when needed, which can happen at
+    // three distinct points:
+    //   1. when a new InfoForTypeLabelInstance is constructed
+    //   2. when a new process is encountered in a process history
+    //   3. when a new input file is opened with new entries in its
+    //      product registry.
+    mutable std::map<art::ProductID, std::unique_ptr<BranchData>>
+      branchDataMap_{};
 
     BranchData invalidBranchData_{};
 
     // Use this for get functions that use the ProductID. These are
     // mostly used when dereferencing a Ptr.
-    mutable std::map<art::ProductID, BranchData const*> branchDataMap_{};
 
     mutable std::set<art::ProductID> branchDataMissingSet_{};
 

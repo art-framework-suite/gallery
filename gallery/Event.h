@@ -120,10 +120,10 @@ namespace gallery {
     using HandleT = Handle<T>;
 
   private:
-    ProductIDWithProduct getByLabel(std::type_info const& typeInfoOfWrapper,
-                                    art::InputTag const& inputTag) const;
+    ProductWithID getByLabel(std::type_info const& typeInfoOfWrapper,
+                             art::InputTag const& inputTag) const;
 
-    std::vector<ProductIDWithProduct> getManyByType(
+    std::vector<ProductWithID> getManyByType(
       std::type_info const& typeInfoOfWrapper) const;
 
     [[noreturn]] void throwProductNotFoundException(
@@ -154,7 +154,7 @@ gallery::Event::getValidHandle(art::InputTag const& inputTag) const
   checkForEnd();
   std::type_info const& typeInfoOfWrapper{typeid(art::Wrapper<PROD>)};
   auto res = getByLabel(typeInfoOfWrapper, inputTag);
-  auto edProduct = res.second;
+  auto edProduct = res.first;
 
   auto ptrToWrapper = dynamic_cast<art::Wrapper<PROD> const*>(edProduct);
   if (ptrToWrapper == nullptr) {
@@ -162,7 +162,7 @@ gallery::Event::getValidHandle(art::InputTag const& inputTag) const
   }
 
   auto product = ptrToWrapper->product();
-  return ValidHandle<PROD>{product, res.first};
+  return ValidHandle<PROD>{product, res.second};
 }
 
 template <typename PROD>
@@ -173,7 +173,7 @@ gallery::Event::getByLabel(art::InputTag const& inputTag,
   checkForEnd();
   std::type_info const& typeInfoOfWrapper{typeid(art::Wrapper<PROD>)};
   auto res = getByLabel(typeInfoOfWrapper, inputTag);
-  auto edProduct = res.second;
+  auto edProduct = res.first;
 
   auto ptrToWrapper = dynamic_cast<art::Wrapper<PROD> const*>(edProduct);
 
@@ -182,7 +182,7 @@ gallery::Event::getByLabel(art::InputTag const& inputTag,
     return false;
   }
   auto product = ptrToWrapper->product();
-  result = Handle<PROD>{product, res.first};
+  result = Handle<PROD>{product, res.second};
   return true;
 }
 
@@ -194,12 +194,12 @@ gallery::Event::getManyByType(std::vector<Handle<PROD>>& result) const
   auto products = getManyByType(typeInfoOfWrapper);
   std::vector<Handle<PROD>> tmp;
   cet::transform_all(products, back_inserter(tmp), [](auto const& pr) {
-    auto product = pr.second;
+    auto product = pr.first;
     auto wrapped_product = dynamic_cast<art::Wrapper<PROD> const*>(product);
     assert(wrapped_product != nullptr);
     auto user_product = wrapped_product->product();
     assert(user_product != nullptr);
-    return Handle<PROD>{user_product, pr.first};
+    return Handle<PROD>{user_product, pr.second};
   });
   swap(tmp, result);
 }
