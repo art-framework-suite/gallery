@@ -6,6 +6,7 @@
 // things have been removed but otherwise the interface is identical.
 // ==================================================================
 
+#include "canvas/Persistency/Provenance/ProductID.h"
 #include "canvas/Utilities/Exception.h"
 
 #include <memory>
@@ -20,7 +21,7 @@ namespace gallery {
     };
 
     Handle() = default;
-    explicit Handle(T const*);
+    explicit Handle(T const*, art::ProductID);
     explicit Handle(std::shared_ptr<art::Exception const>);
     Handle(Handle const&) = default;
     Handle& operator=(Handle const&) = default;
@@ -30,19 +31,22 @@ namespace gallery {
     T const* operator->() const noexcept(false); // alias for product()
     T const* product() const noexcept(false);
 
-    // inspectors:
+    // inspectors
     bool isValid() const noexcept;
+    art::ProductID id() const noexcept;
     std::shared_ptr<art::Exception const> whyFailed() const noexcept;
 
   private:
     [[noreturn]] void throwHandleWhyFailed_() const noexcept(false);
 
     T const* prod_{nullptr};
+    art::ProductID productID_{art::ProductID::invalid()};
     std::shared_ptr<art::Exception const> whyFailed_;
   };
 
   template <class T>
-  Handle<T>::Handle(T const* prod) : prod_{prod}
+  Handle<T>::Handle(T const* prod, art::ProductID const productID)
+    : prod_{prod}, productID_{productID}
   {}
 
   template <class T>
@@ -76,6 +80,13 @@ namespace gallery {
   Handle<T>::isValid() const noexcept
   {
     return prod_ != nullptr;
+  }
+
+  template <class T>
+  art::ProductID
+  Handle<T>::id() const noexcept
+  {
+    return productID_;
   }
 
   template <class T>

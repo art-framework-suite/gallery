@@ -79,12 +79,10 @@ namespace gallery {
     initializeStreamers();
   }
 
-  void
+  ProductIDWithProduct
   DataGetterHelper::getByLabel(type_info const& typeInfoOfWrapper,
-                               art::InputTag const& inputTag,
-                               art::EDProduct const*& edProduct) const
+                               art::InputTag const& inputTag) const
   {
-    edProduct = nullptr; // this nullptr indicates product not found yet
     if (!initializedForProcessHistory_) {
       initializeForProcessHistory();
     }
@@ -98,11 +96,10 @@ namespace gallery {
                 iEnd = info.productIDsOrderedByHistory().rend();
            reverseIter != iEnd;
            ++reverseIter) {
-        edProduct = readProduct(*reverseIter, type);
-        // If the product was present in the input file and we
-        // successfully read it then we are done
-        if (edProduct) {
-          return;
+        if (auto edProduct = readProduct(*reverseIter, type)) {
+          // If the product was present in the input file and we
+          // successfully read it then we are done
+          return std::make_pair(*reverseIter, edProduct);
         }
       }
     } else { // process is not empty
@@ -112,17 +109,22 @@ namespace gallery {
         auto branchData =
           getBranchData(info.processIndexToBranchDataIndex(), processIndex);
         if (branchData) {
-          edProduct = branchData->uniqueProduct_(type);
+          auto pd = branchMapReader_.productDescription(info, itProcess->first);
+          assert(pd);
+          auto product = branchData->uniqueProduct_(type);
+          auto productID =
+            (product == nullptr) ? art::ProductID::invalid() : pd->productID();
+          return std::make_pair(productID, product);
         }
       }
     }
+    return std::make_pair(art::ProductID::invalid(), nullptr);
   }
 
-  void
-  DataGetterHelper::getManyByType(
-    std::type_info const& typeInfoOfWrapper,
-    std::vector<art::EDProduct const*>& products) const
+  std::vector<ProductIDWithProduct>
+  DataGetterHelper::getManyByType(std::type_info const& typeInfoOfWrapper) const
   {
+    std::vector<ProductIDWithProduct> products;
     if (!initializedForProcessHistory_) {
       initializeForProcessHistory();
     }
@@ -149,9 +151,10 @@ namespace gallery {
       }
 
       if (auto product = branchData->uniqueProduct_(type)) {
-        products.emplace_back(product);
+        products.emplace_back(pr.first, product);
       }
     }
+    return products;
   }
 
   void

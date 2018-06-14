@@ -181,20 +181,17 @@ namespace gallery {
     return eventNavigator_->getTTree();
   }
 
-  void
+  ProductIDWithProduct
   Event::getByLabel(std::type_info const& typeInfoOfWrapper,
-                    art::InputTag const& inputTag,
-                    art::EDProduct const*& edProduct) const
+                    art::InputTag const& inputTag) const
   {
-
-    dataGetterHelper_->getByLabel(typeInfoOfWrapper, inputTag, edProduct);
+    return dataGetterHelper_->getByLabel(typeInfoOfWrapper, inputTag);
   }
 
-  void
-  Event::getManyByType(std::type_info const& typeInfoOfWrapper,
-                       std::vector<art::EDProduct const*>& result) const
+  std::vector<ProductIDWithProduct>
+  Event::getManyByType(std::type_info const& typeInfoOfWrapper) const
   {
-    dataGetterHelper_->getManyByType(typeInfoOfWrapper, result);
+    return dataGetterHelper_->getManyByType(typeInfoOfWrapper);
   }
 
   void

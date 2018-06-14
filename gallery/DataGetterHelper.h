@@ -59,7 +59,7 @@ namespace art {
   class EDProduct;
   class EDProductGetter;
   class BranchDescription;
-} // namespace art
+}
 
 class TClass;
 class TFile;
@@ -68,6 +68,7 @@ class TTree;
 namespace gallery {
 
   class EventNavigator;
+  using ProductIDWithProduct = std::pair<art::ProductID, art::EDProduct const*>;
 
   class DataGetterHelper : art::PrincipalBase {
   public:
@@ -80,12 +81,11 @@ namespace gallery {
     DataGetterHelper& operator=(DataGetterHelper const&) = delete;
     DataGetterHelper& operator=(DataGetterHelper&&) = delete;
 
-    void getByLabel(std::type_info const& typeInfoOfWrapper,
-                    art::InputTag const& inputTag,
-                    art::EDProduct const*& edProduct) const;
+    ProductIDWithProduct getByLabel(std::type_info const& typeInfoOfWrapper,
+                                    art::InputTag const& inputTag) const;
 
-    void getManyByType(std::type_info const& typeInfoOfWrapper,
-                       std::vector<art::EDProduct const*>& products) const;
+    std::vector<ProductIDWithProduct> getManyByType(
+      std::type_info const& typeInfoOfWrapper) const;
 
     art::BranchDescription const& getProductDescription(art::ProductID) const;
 

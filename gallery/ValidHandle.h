@@ -5,6 +5,8 @@
 // functions, data members, typedefs, and dependences not needed in
 // gallery.
 
+#include "canvas/Persistency/Provenance/ProductID.h"
+
 namespace gallery {
 
   void throwValidHandleNullPointer();
@@ -17,7 +19,7 @@ namespace gallery {
     };
 
     ValidHandle() = delete;
-    explicit ValidHandle(T const* prod) noexcept(false);
+    explicit ValidHandle(T const* prod, art::ProductID) noexcept(false);
     ValidHandle(ValidHandle const&) = default;
     ValidHandle& operator=(ValidHandle const&) = default;
 
@@ -26,12 +28,17 @@ namespace gallery {
     T const* operator->() const noexcept; // alias for product()
     T const* product() const noexcept;
 
+    art::ProductID id() const noexcept;
+
   private:
     T const* prod_;
+    art::ProductID productID_;
   };
 
   template <class T>
-  ValidHandle<T>::ValidHandle(T const* prod) noexcept(false) : prod_{prod}
+  ValidHandle<T>::ValidHandle(T const* prod,
+                              art::ProductID const productID) noexcept(false)
+    : prod_{prod}, productID_{productID}
   {
     if (prod == nullptr) {
       throwValidHandleNullPointer();
@@ -55,6 +62,13 @@ namespace gallery {
   ValidHandle<T>::product() const noexcept
   {
     return prod_;
+  }
+
+  template <class T>
+  inline art::ProductID
+  ValidHandle<T>::id() const noexcept
+  {
+    return productID_;
   }
 } // namespace gallery
 

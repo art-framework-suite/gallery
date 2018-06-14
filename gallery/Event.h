@@ -120,12 +120,11 @@ namespace gallery {
     using HandleT = Handle<T>;
 
   private:
-    void getByLabel(std::type_info const& typeInfoOfWrapper,
-                    art::InputTag const& inputTag,
-                    art::EDProduct const*& edProduct) const;
+    ProductIDWithProduct getByLabel(std::type_info const& typeInfoOfWrapper,
+                                    art::InputTag const& inputTag) const;
 
-    void getManyByType(std::type_info const& typeInfoOfWrapper,
-                       std::vector<art::EDProduct const*>& products) const;
+    std::vector<ProductIDWithProduct> getManyByType(
+      std::type_info const& typeInfoOfWrapper) const;
 
     [[noreturn]] void throwProductNotFoundException(
       std::type_info const& typeInfo,
@@ -154,9 +153,8 @@ gallery::Event::getValidHandle(art::InputTag const& inputTag) const
 {
   checkForEnd();
   std::type_info const& typeInfoOfWrapper{typeid(art::Wrapper<PROD>)};
-  art::EDProduct const* edProduct{nullptr};
-
-  getByLabel(typeInfoOfWrapper, inputTag, edProduct);
+  auto res = getByLabel(typeInfoOfWrapper, inputTag);
+  auto edProduct = res.second;
 
   auto ptrToWrapper = dynamic_cast<art::Wrapper<PROD> const*>(edProduct);
   if (ptrToWrapper == nullptr) {
@@ -164,7 +162,7 @@ gallery::Event::getValidHandle(art::InputTag const& inputTag) const
   }
 
   auto product = ptrToWrapper->product();
-  return ValidHandle<PROD>{product};
+  return ValidHandle<PROD>{product, res.first};
 }
 
 template <typename PROD>
@@ -174,9 +172,8 @@ gallery::Event::getByLabel(art::InputTag const& inputTag,
 {
   checkForEnd();
   std::type_info const& typeInfoOfWrapper{typeid(art::Wrapper<PROD>)};
-  art::EDProduct const* edProduct{nullptr};
-
-  getByLabel(typeInfoOfWrapper, inputTag, edProduct);
+  auto res = getByLabel(typeInfoOfWrapper, inputTag);
+  auto edProduct = res.second;
 
   auto ptrToWrapper = dynamic_cast<art::Wrapper<PROD> const*>(edProduct);
 
@@ -185,7 +182,7 @@ gallery::Event::getByLabel(art::InputTag const& inputTag,
     return false;
   }
   auto product = ptrToWrapper->product();
-  result = Handle<PROD>{product};
+  result = Handle<PROD>{product, res.first};
   return true;
 }
 
@@ -194,15 +191,15 @@ inline void
 gallery::Event::getManyByType(std::vector<Handle<PROD>>& result) const
 {
   std::type_info const& typeInfoOfWrapper{typeid(art::Wrapper<PROD>)};
-  std::vector<art::EDProduct const*> products;
-  getManyByType(typeInfoOfWrapper, products);
+  auto products = getManyByType(typeInfoOfWrapper);
   std::vector<Handle<PROD>> tmp;
-  cet::transform_all(products, back_inserter(tmp), [](auto const& product) {
+  cet::transform_all(products, back_inserter(tmp), [](auto const& pr) {
+    auto product = pr.second;
     auto wrapped_product = dynamic_cast<art::Wrapper<PROD> const*>(product);
     assert(wrapped_product != nullptr);
     auto user_product = wrapped_product->product();
     assert(user_product != nullptr);
-    return Handle<PROD>{user_product};
+    return Handle<PROD>{user_product, pr.first};
   });
   swap(tmp, result);
 }
