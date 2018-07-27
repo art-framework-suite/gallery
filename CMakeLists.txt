@@ -76,6 +76,7 @@ find_ups_product(cetlib_except v1_01_00)
 find_ups_product(cetbuildtools)
 find_ups_product(clhep)
 find_ups_root()
+find_ups_boost()
 
 # art_dictionary
 include(ArtDictionary)
