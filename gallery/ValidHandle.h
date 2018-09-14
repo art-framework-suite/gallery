@@ -15,8 +15,7 @@ namespace gallery {
   class ValidHandle {
   public:
     using element_type = T;
-    class HandleTag {
-    };
+    class HandleTag {};
 
     ValidHandle() = delete;
     explicit ValidHandle(T const* prod, art::ProductID) noexcept(false);
