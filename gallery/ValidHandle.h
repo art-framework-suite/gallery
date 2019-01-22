@@ -13,8 +13,7 @@ namespace gallery {
   class ValidHandle {
   public:
     using element_type = T;
-    class HandleTag {
-    };
+    class HandleTag {};
 
     ValidHandle() = delete;
     ValidHandle(T const* prod);

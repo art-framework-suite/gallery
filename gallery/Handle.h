@@ -14,8 +14,7 @@ namespace gallery {
   class Handle {
   public:
     using element_type = T;
-    class HandleTag {
-    };
+    class HandleTag {};
 
     Handle() = default;
     Handle(T const*);

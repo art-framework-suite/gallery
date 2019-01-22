@@ -111,7 +111,8 @@ namespace gallery {
     updateAfterEventChange(oldFileEntry);
   }
 
-  Event& Event::operator++()
+  Event&
+  Event::operator++()
   {
     auto const oldFileEntry = fileEntry();
     eventNavigator_->next();
@@ -119,7 +120,8 @@ namespace gallery {
     return *this;
   }
 
-  Event& Event::operator--()
+  Event&
+  Event::operator--()
   {
     if (!randomAccessOK_)
       throwIllegalRandomAccess();
@@ -197,8 +199,9 @@ namespace gallery {
                                       art::InputTag const& tag) const
   {
     auto e = std::make_shared<art::Exception>(art::errors::ProductNotFound);
-    *e << "Failed to find product for \n  type = '" << art::TypeID{typeInfo}.className()
-       << "'\n  module = '" << tag.label() << "'\n  productInstance = '"
+    *e << "Failed to find product for \n  type = '"
+       << art::TypeID{typeInfo}.className() << "'\n  module = '" << tag.label()
+       << "'\n  productInstance = '"
        << ((!tag.instance().empty()) ? tag.instance().c_str() : "")
        << "'\n  process='"
        << ((!tag.process().empty()) ? tag.process().c_str() : "") << "'\n";
