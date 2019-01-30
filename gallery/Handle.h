@@ -17,8 +17,7 @@ namespace gallery {
   class Handle {
   public:
     using element_type = T;
-    class HandleTag {
-    };
+    class HandleTag {};
 
     Handle() = default;
     explicit Handle(T const*, art::ProductID);
