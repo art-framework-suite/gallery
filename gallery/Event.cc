@@ -117,7 +117,8 @@ namespace gallery {
     updateAfterEventChange(oldFileEntry);
   }
 
-  Event& Event::operator++()
+  Event&
+  Event::operator++()
   {
     auto const oldFileEntry = fileEntry();
     eventNavigator_->next();
@@ -125,7 +126,8 @@ namespace gallery {
     return *this;
   }
 
-  Event& Event::operator--()
+  Event&
+  Event::operator--()
   {
     if (!randomAccessOK_)
       throwIllegalRandomAccess();
