@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-*gallery* library
-=================
+*gallery* 
+=========
 
 .. toctree::
    :maxdepth: 2
@@ -13,7 +13,9 @@
 
    Depends on<depends>
 
+gallery is a package that provides the ability to read event data from art/ROOT data files.
 
-Library Overview
-----------------
-gallery docs
+A high-level description of gallery is available at: http://art.fnal.gov/gallery/.
+
+Tutorial information is available at GitHub: https://github.com/marcpaterno/gallery-demo.
+
