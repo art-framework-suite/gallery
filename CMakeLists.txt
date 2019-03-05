@@ -69,7 +69,7 @@ endif()
 
 cet_report_compiler_flags()
 
-# these are minimum required versions, not the actual product versions
+# test -these are minimum required versions, not the actual product versions
 find_ups_product(canvas_root_io)
 find_ups_product(canvas)
 find_ups_product(messagefacility)
