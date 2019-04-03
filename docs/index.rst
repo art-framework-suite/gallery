@@ -9,9 +9,9 @@
 .. toctree::
    :maxdepth: 2
 
-   Release notes<releaseNotes>
+* `Release notes <releaseNotes.html>`_
 
-   Depends on<depends>
+* `Depends on <depends.html>`_
 
 gallery is a package that provides the ability to read event data from art/ROOT data files.
 
