@@ -14,7 +14,7 @@
 
 
 # use cmake 3.11 or later
-cmake_minimum_required (VERSION 3.11)
+cmake_minimum_required (VERSION 3.11...3.14 FATAL_ERROR)
 
 project(gallery VERSION 1.12.03 LANGUAGES CXX)
 
