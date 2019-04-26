@@ -19,7 +19,7 @@ cmake_minimum_required (VERSION 3.11...3.14 FATAL_ERROR)
 project(gallery VERSION 1.12.03 LANGUAGES CXX)
 
 # cetmodules contains our cmake modules
-find_package(cetmodules REQUIRED)
+find_package(cetmodules 1.01.01 REQUIRED)
 
 list(APPEND CMAKE_MODULE_PATH $ENV{CANVAS_ROOT_IO_DIR}/Modules)
 
