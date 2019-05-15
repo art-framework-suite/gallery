@@ -29,6 +29,10 @@ src = os.environ['MRB_SOURCE']
 top = os.environ['MRB_TOP']
 html = os.environ['HTML_DIR']#+'/'project
 
+if(not html):
+    print("You haven't set an install dir ($HTML_DIR). Please set one and try again.")
+    sys.exit() 
+
 def dotted_version(normal_version):
     return normal_version.lstrip('v').replace('_', '.')
 
@@ -44,7 +48,7 @@ release = dotted_version('@version@')
 #built_docs_path = src+'/'+project
 built_docs_path = top+'/all_docs/'+project
 
-#print("\n\n\ninvestigating the version tab stuff..")
+print("Building ", project, " html files..\n")
 files = os.listdir(built_docs_path)
 #print(files)
 subdirs = [subdir for subdir in files
@@ -90,7 +94,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path .
-exclude_patterns = []
+exclude_patterns = ['series_notes/*', 'suite_notes/*', '*temp.rst']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -220,6 +224,7 @@ with open(src+'/'+project+'/ups/product_deps') as deps_file:
 
 
 with open(src+'/'+project+'/docs/depends.rst', 'w+') as deps_page:
+  deps_page.write(':orphan:\n\n')
   deps_page.write('|release| depends on')
   deps_page.write('\n====================\n')
   for pkg in depends_on:

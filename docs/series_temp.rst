@@ -1,3 +1,5 @@
+:orphan:
+
 *gallery* series 1.12
 =====================
 
