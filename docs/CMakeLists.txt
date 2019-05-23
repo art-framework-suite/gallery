@@ -9,7 +9,7 @@ if(NOT DEFINED SPHINX_THEME_DIR)
 endif()
 
 # configured documentation tools and intermediate build results
-set(BINARY_BUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}/_build")
+#set(BINARY_BUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}/_build")
 
 # Sphinx cache with pickled ReST documents
 set(SPHINX_CACHE_DIR "${CMAKE_CURRENT_BINARY_DIR}/_doctrees")
@@ -28,51 +28,52 @@ set(SPHINX_CACHE_DIR "${CMAKE_CURRENT_BINARY_DIR}/_doctrees")
 #set(SPHINX_HTML_DIR "${CMAKE_CURRENT_BINARY_DIR}/html")
 #set(SPHINX_HTML_DIR "$ENV{MRB_TOP}/all_docs/gallery")
 #set(SPHINX_HTML_DIR "$ENV{MRB_TOP}/all_docs/${PROJECT_NAME}/$ENV{}")
-message("\n\n\n\n\n\n")
+#message("\n\n\n\n\n\n")
 
 set(TOP_DOCS_DIR "$ENV{MRB_TOP}/all_docs")
 
 # looking for top level dir
 if(EXISTS "${TOP_DOCS_DIR}")
-  message("I can use exists this way. all_docs is there.")
+  #message("I can use exists this way. all_docs is there.")
   set(PROJ_DOCS_DIR "${TOP_DOCS_DIR}/${PROJECT_NAME}")
   
 
   # looking for project dir
   if(EXISTS "${PROJ_DOCS_DIR}")
-    message("gallery dir is here")
+    #message("gallery dir is here")
     string(TOUPPER ${PROJECT_NAME} ENV_PROJ_NAME)
     set(VERSION_DOCS_DIR "${PROJ_DOCS_DIR}/$ENV{${ENV_PROJ_NAME}_VERSION}")
-    message("looking for.. ${DUMB_TEMP_VAR}")
+    set(VERSION_NUMBER $ENV{${ENV_PROJ_NAME}_VERSION})
+    #message("looking for.. ${DUMB_TEMP_VAR}")
     #if(EXISTS "$ENV{MRB_TOP}/all_docs/${PROJECT_NAME}/$ENV{${ENV_PROJ_NAME}_VERSION}")
 
     if(EXISTS "${VERSION_DOCS_DIR}")
       #set(DUMB_TEMP_VAR "$ENV{MRB_TOP}/all_docs/${PROJECT_NAME}/$ENV{${ENV_PROJ_NAME}_VERSION}")
-      message("version dir is here")
+      #message("version dir is here")
     else()
-      message("You don't have a version dir")
+      #message("You don't have a version dir")
       add_custom_target(build_gallery_version_dir ALL COMMAND 
                         ${CMAKE_COMMAND} -E make_directory 
                         ${VERSION_DOCS_DIR})
     endif()
   else()
-    message("You don't have a gallery dir")
+    #message("You don't have a gallery dir")
     add_custom_target(build_gallery_proj_dir ALL COMMAND 
                       ${CMAKE_COMMAND} -E make_directory 
                       ${PROJ_DOCS_DIR})
-        
+    
     # Going back through now assuming it exists ! 
-    message("gallery dir is here")
+    #message("gallery dir is here")
     string(TOUPPER ${PROJECT_NAME} ENV_PROJ_NAME)
     set(VERSION_DOCS_DIR "${PROJ_DOCS_DIR}/$ENV{${ENV_PROJ_NAME}_VERSION}")
-    message("looking for.. ${DUMB_TEMP_VAR}")
+    #message("looking for.. ${DUMB_TEMP_VAR}")
     #if(EXISTS "$ENV{MRB_TOP}/all_docs/${PROJECT_NAME}/$ENV{${ENV_PROJ_NAME}_VERSION}")
 
     if(EXISTS "${VERSION_DOCS_DIR}")
       #set(DUMB_TEMP_VAR "$ENV{MRB_TOP}/all_docs/${PROJECT_NAME}/$ENV{${ENV_PROJ_NAME}_VERSION}")
-      message("version dir is here")
+      #message("version dir is here")
     else()
-      message("You don't have a version dir")
+      #message("You don't have a version dir")
       add_custom_target(build_gallery_version_dir ALL COMMAND 
                         ${CMAKE_COMMAND} -E make_directory 
                         ${VERSION_DOCS_DIR})
@@ -84,9 +85,11 @@ endif()
   
 
 
-message("\n\n\n\n\n\n")
+#message("\n\n\n\n\n\n")
 
-set(SPHINX_HTML_DIR "${VERSION_DOCS_DIR}")
+set(BINARY_BUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}/${VERSION_NUMBER}")
+message("BINARY_BUILD_DIR: ${BINARY_BUILD_DIR}")
+set(SPHINX_HTML_DIR "${BINARY_BUILD_DIR}")
 
 
 
@@ -99,7 +102,7 @@ configure_file(
     "${BINARY_BUILD_DIR}/conf.py"
     @ONLY)
 
-message(STATUS "SPHINX_EXECUTABLE: ${SPHINX_EXECUTABLE}")
+#message(STATUS "SPHINX_EXECUTABLE: ${SPHINX_EXECUTABLE}")
 
 add_custom_target(gallery_docs ALL
   ${SPHINX_EXECUTABLE}
@@ -110,3 +113,13 @@ add_custom_target(gallery_docs ALL
   "${SPHINX_HTML_DIR}"
   COMMENT "Building HTML documentation with Sphinx"
   SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/_extensions/redmineRoles.py)
+
+# Install the built html files to an instal dir (HTML DIR)
+
+install(DIRECTORY "${BINARY_BUILD_DIR}" 
+        #DESTINATION "${VERSION_DOCS_DIR}"
+        DESTINATION "${PROJ_DOCS_DIR}"
+        PATTERN "${BINARY_BUILD_DIR}/*")
+
+
+# EOF
