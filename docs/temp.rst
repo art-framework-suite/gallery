@@ -18,12 +18,12 @@
     h3(#releases){background:darkorange}. %{color:white}&nbsp; _gallery_ releases%
 
 
-*gallery* suite release notes 1.12.01 (2019/02/07)
+*gallery* suite release notes 1.12.04 (2019/05/29)
 ==================================================
 
 
 * An *gallery 1.12* `release <releaseNotes>`_
-* `Download page <https://scisoft.fnal.gov/scisoft/bundles/gallery/1.12.01/gallery-1.12.01.html>`_
+* `Download page <https://scisoft.fnal.gov/scisoft/bundles/gallery/1.12.04/gallery-1.12.04.html>`_
 
 .. External package changes
 
@@ -37,13 +37,13 @@
 
 .. Depends on
 
-* canvas 3.07.01 
-* canvas_root_io 1.03.01 
-* cetlib 3.07.01 
-* cetlib_except 1.03.02 
-* fhicl-cpp 4.09.01 
-* hep_concurrency 1.03.02 
-* messagefacility 2.04.01 
+* canvas 3.07.04 
+* canvas_root_io 1.03.04 
+* cetlib 3.07.02 
+* cetlib_except 1.03.03 
+* fhicl-cpp 4.09.03 
+* hep_concurrency 1.03.03 
+* messagefacility 2.04.03 
 
 
 ..
