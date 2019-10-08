@@ -21,8 +21,8 @@ namespace gallery {
   BranchMapReader::updateFile(TFile* tFile)
   {
 
-    TTree* metaDataTree = dynamic_cast<TTree*>(
-      tFile->Get(art::rootNames::metaDataTreeName().c_str()));
+    std::unique_ptr<TTree> metaDataTree{
+      tFile->Get<TTree>(art::rootNames::metaDataTreeName().c_str())};
     if (!metaDataTree) {
       throwTreeNotFound(art::rootNames::metaDataTreeName());
     }
