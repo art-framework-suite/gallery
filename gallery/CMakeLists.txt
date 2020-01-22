@@ -21,9 +21,9 @@ set(gallery_libraries
   fhiclcpp
   cetlib
   cetlib_except
-  ${ROOT_CORE}
-  ${ROOT_RIO}
-  ${ROOT_TREE}
+  ROOT::Core
+  ROOT::RIO
+  ROOT::Tree
   )
 
 cet_make(LIBRARIES
