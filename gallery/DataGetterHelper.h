@@ -84,6 +84,9 @@ namespace gallery {
     ProductWithID getByLabel(std::type_info const& typeInfoOfWrapper,
                              art::InputTag const& inputTag) const;
 
+    std::vector<art::InputTag> getInputTags(
+      std::type_info const& typeInfoOfWrapper) const;
+
     std::vector<ProductWithID> getManyByType(
       std::type_info const& typeInfoOfWrapper) const;
 
@@ -131,6 +134,9 @@ namespace gallery {
 
     void updateBranchDataIndexOrderedByHistory(
       InfoForTypeLabelInstance const& info) const;
+
+    std::vector<art::BranchDescription const*> getProductDescriptions(
+      art::TypeID const& typeIDOfWrapper) const;
 
     BranchData const* getBranchData(InfoForTypeLabelInstance const& info,
                                     unsigned int processIndex) const;

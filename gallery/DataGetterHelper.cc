@@ -115,28 +115,50 @@ namespace gallery {
     return std::make_pair(nullptr, art::ProductID::invalid());
   }
 
-  std::vector<ProductWithID>
-  DataGetterHelper::getManyByType(std::type_info const& typeInfoOfWrapper) const
+  std::vector<art::BranchDescription const*>
+  DataGetterHelper::getProductDescriptions(
+    art::TypeID const& typeIDOfWrapper) const
   {
-    std::vector<ProductWithID> products;
+    std::vector<art::BranchDescription const*> result;
     if (!initializedForProcessHistory_) {
       initializeForProcessHistory();
     }
-    art::TypeID const type{typeInfoOfWrapper};
-    auto const fcn = type.friendlyClassName();
+    auto const fcn = typeIDOfWrapper.friendlyClassName();
     for (auto const& pr : branchMapReader_.productDescriptions()) {
       auto const& pd = pr.second;
       if (pd.friendlyClassName() != fcn) {
         continue;
       }
 
-      auto itProcess = processNameToProcessIndex_.find(pd.processName());
+      result.push_back(&pd);
+    }
+    return result;
+  }
+
+  std::vector<art::InputTag>
+  DataGetterHelper::getInputTags(std::type_info const& typeInfoOfWrapper) const
+  {
+    std::vector<art::InputTag> result;
+    art::TypeID const type{typeInfoOfWrapper};
+    for (auto const* pd : getProductDescriptions(type)) {
+      result.push_back(pd->inputTag());
+    }
+    return result;
+  }
+
+  std::vector<ProductWithID>
+  DataGetterHelper::getManyByType(std::type_info const& typeInfoOfWrapper) const
+  {
+    std::vector<ProductWithID> result;
+    art::TypeID const type{typeInfoOfWrapper};
+    for (auto const* pd : getProductDescriptions(type)) {
+      auto itProcess = processNameToProcessIndex_.find(pd->processName());
       if (itProcess == cend(processNameToProcessIndex_)) {
         continue;
       }
 
       auto const& info = getInfoForTypeLabelInstance(
-        type, pd.moduleLabel(), pd.productInstanceName());
+        type, pd->moduleLabel(), pd->productInstanceName());
 
       unsigned int const processIndex = itProcess->second;
       auto branchData = getBranchData(info, processIndex);
@@ -145,10 +167,10 @@ namespace gallery {
       }
 
       if (auto product = branchData->uniqueProduct_(type)) {
-        products.emplace_back(product, pr.first);
+        result.emplace_back(product, pd->productID());
       }
     }
-    return products;
+    return result;
   }
 
   void

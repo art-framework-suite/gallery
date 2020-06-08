@@ -14,6 +14,7 @@
 #include "canvas/Persistency/Provenance/ProcessHistory.h"
 #include "canvas/Persistency/Provenance/ProcessHistoryID.h"
 #include "canvas/Persistency/Provenance/ProductID.h"
+#include "canvas/Persistency/Provenance/ProductToken.h"
 #include "canvas/Utilities/InputTag.h"
 #include "cetlib/container_algorithms.h"
 #include "gallery/DataGetterHelper.h"
@@ -68,6 +69,15 @@ namespace gallery {
     // std::vector<Handle>.
     template <typename PROD>
     void getManyByType(std::vector<Handle<PROD>>& result) const;
+
+    // Return all input tags corresponding to products of type PROD.
+    // This function call *does not* read or provide access to any
+    // products.
+    template <typename PROD>
+    std::vector<art::InputTag> getInputTags() const;
+
+    template <typename PROD>
+    std::vector<art::ProductToken<PROD>> getProductTokens() const;
 
     art::EventAuxiliary const& eventAuxiliary() const;
     art::History const& history() const;
@@ -202,6 +212,26 @@ gallery::Event::getManyByType(std::vector<Handle<PROD>>& result) const
     return Handle<PROD>{user_product, pr.second};
   });
   swap(tmp, result);
+}
+
+template <typename PROD>
+inline std::vector<art::InputTag>
+gallery::Event::getInputTags() const
+{
+  std::type_info const& typeInfoOfWrapper{typeid(art::Wrapper<PROD>)};
+  return dataGetterHelper_->getInputTags(typeInfoOfWrapper);
+}
+
+template <typename PROD>
+inline std::vector<art::ProductToken<PROD>>
+gallery::Event::getProductTokens() const
+{
+  std::vector<art::ProductToken<PROD>> result;
+  auto const tags = getInputTags<PROD>();
+  cet::transform_all(tags, back_inserter(result), [](auto const& tag) {
+    return art::ProductToken<PROD>{tag};
+  });
+  return result;
 }
 
 inline void
