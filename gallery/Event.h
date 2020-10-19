@@ -171,6 +171,11 @@ gallery::Event::getByLabel(art::InputTag const& inputTag,
                            Handle<PROD>& result) const
 {
   checkForEnd();
+  if (inputTag.empty()) {
+    result = Handle<PROD>{makeProductNotFoundException(typeid(PROD), inputTag)};
+    return false;
+  }
+
   std::type_info const& typeInfoOfWrapper{typeid(art::Wrapper<PROD>)};
   auto res = getByLabel(typeInfoOfWrapper, inputTag);
   auto edProduct = res.first;
