@@ -7,4 +7,5 @@ include(CetTest)
 # re-initialize the test environment.
 cet_test_env("FHICL_FILE_PATH=.")
 
-cet_test(gallery_class_traits_t SOURCES class_traits_t.cc LIBRARIES ROOT::Core)
+cet_test(gallery_class_traits_t SOURCES class_traits_t.cc
+  LIBRARIES ${CANVAS} ROOT::Core)

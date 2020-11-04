@@ -26,7 +26,7 @@ set(gallery_libraries
   ROOT::Tree
   )
 
-cet_make(LIBRARIES
+cet_make(LIBRARIES ### MIGRATE-ACTION-RECOMMENDED: use cet_make_library(), build_dictionary(), basic_plugin() with explicit source lists
   ${gallery_libraries}
   NO_DICTIONARY
   )
