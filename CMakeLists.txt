@@ -17,7 +17,7 @@ cmake_policy(VERSION 3.14)
 # VERSION set by project().
 cmake_policy(SET CMP0096 NEW)
 
-find_package(cetmodules 2.03.00 REQUIRED)
+find_package(cetmodules 2.04.00 REQUIRED)
 project(gallery VERSION 1.15.02 LANGUAGES CXX)
 
 include(CetCMakeEnv)
