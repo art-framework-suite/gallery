@@ -166,6 +166,7 @@ defaultqual	e19
 #
 #>  testdir		product_dir	test
 #
+<<<<<<< HEAD
 #     Tests.
 #
 #>  wpdir
@@ -248,7 +249,7 @@ perllib	product_dir
 #
 ####################################
 product		version		qual	flags		<table_format=2>
-canvas_root_io	v1_06_02	-
+canvas_root_io	v1_07_00	-
 cetmodules	v2_06_01	-	only_for_build
 end_product_list
 ####################################
