@@ -1,5 +1,10 @@
 include(CetMake)
 
+cet_find_package(canvas_root_io REQUIRED)
+cet_find_package(ROOT PRIVATE COMPONENTS Core RIO Tree REQUIRED)
+
+include(ArtDictionary)
+
 cet_make_library(
   LIBRARY_NAME gallery
   SOURCE
@@ -22,7 +27,7 @@ cet_make_library(
     ROOT::Tree
   )
 
-art_dictionary(DICTIONARY_LIBRARIES PRIVATE gallery::gallery)
+art_dictionary(DICTIONARY_LIBRARIES gallery::gallery)
 
 add_subdirectory(test)
 

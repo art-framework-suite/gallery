@@ -44,16 +44,6 @@ endif()
 
 cet_report_compiler_flags(REPORT_THRESHOLD VERBOSE)
 
-cet_find_package(canvas_root_io REQUIRED)
-cet_find_package(canvas REQUIRED)
-cet_find_package(cetlib REQUIRED)
-cet_find_package(cetlib_except REQUIRED)
-cet_find_package(CLHEP REQUIRED)
-find_ups_root()
-
-# art_dictionary
-include(ArtDictionary)
-
 # source
 add_subdirectory(gallery)
 
