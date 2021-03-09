@@ -1,7 +1,11 @@
 include(CetMake)
 
-cet_make_library(
-  LIBRARY_NAME gallery
+cet_find_package(ROOT PRIVATE COMPONENTS Core RIO Tree REQUIRED)
+cet_find_package(canvas_root_io REQUIRED)
+
+include(ArtDictionary)
+
+cet_make_library(HEADERS_TARGET
   SOURCE
     AssnsBranchData.cc
     BranchData.cc
@@ -15,14 +19,18 @@ cet_make_library(
     throwFunctions.cc
     ValidHandle.cc
   LIBRARIES
+  PUBLIC
     canvas_root_io::canvas_root_io
-  PRIVATE
-    ROOT::Core
+    canvas::canvas
+    cetlib::headers
+    cetlib::container_algorithms
     ROOT::RIO
+  PRIVATE
     ROOT::Tree
+    ROOT::Core
   )
 
-art_dictionary(DICTIONARY_LIBRARIES PRIVATE gallery::gallery)
+art_dictionary(DICTIONARY_LIBRARIES gallery::gallery)
 
 add_subdirectory(test)
 
