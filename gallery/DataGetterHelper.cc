@@ -2,16 +2,15 @@
 // vim: set sw=2 expandtab :
 
 #include "canvas/Persistency/Provenance/BranchDescription.h"
-#include "canvas/Persistency/Provenance/Compatibility/type_aliases.h"
-#include "canvas/Persistency/Provenance/History.h"
+#include "canvas/Persistency/Provenance/ProcessConfiguration.h"
 #include "canvas/Persistency/Provenance/ProcessHistory.h"
 #include "canvas/Persistency/Provenance/ProductID.h"
 #include "canvas/Persistency/Provenance/canonicalProductName.h"
 
 #include "canvas/Utilities/Exception.h"
-#include "canvas/Utilities/WrappedClassName.h"
 #include "canvas/Utilities/uniform_type_name.h"
 #include "gallery/AssnsBranchData.h"
+#include "gallery/EventHistoryGetter.h"
 #include "gallery/EventNavigator.h"
 
 #include "canvas_root_io/Streamers/AssnsStreamer.h"
@@ -21,13 +20,12 @@
 #include "canvas_root_io/Streamers/RefCoreStreamer.h"
 #include "canvas_root_io/Streamers/TransientStreamer.h"
 #include "canvas_root_io/Streamers/setPtrVectorBaseStreamer.h"
-#include "canvas_root_io/Utilities/TypeTools.h"
 
 #include "TClass.h"
 #include "TTree.h"
 
 #include <algorithm>
-#include <cstring>
+#include <cassert>
 
 namespace {
 

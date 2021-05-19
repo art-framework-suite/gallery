@@ -13,11 +13,8 @@ class TBranch;
 class TClass;
 
 namespace art {
-
-  class EDProduct;
   class PrincipalBase;
-
-} // namespace art
+}
 
 namespace gallery {
 

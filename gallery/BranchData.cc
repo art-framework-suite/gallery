@@ -4,7 +4,6 @@
 #include "canvas/Persistency/Common/EDProduct.h"
 #include "canvas/Utilities/Exception.h"
 #include "canvas/Utilities/TypeID.h"
-#include "canvas_root_io/Streamers/ProductIDStreamer.h"
 #include "canvas_root_io/Streamers/RefCoreStreamer.h"
 #include "gallery/EventNavigator.h"
 

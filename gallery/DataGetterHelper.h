@@ -33,17 +33,15 @@
 // entry number using the Event interface.
 
 #include "canvas/Persistency/Common/PrincipalBase.h"
-#include "canvas/Persistency/Provenance/Compatibility/BranchIDList.h"
 #include "canvas/Persistency/Provenance/ProcessHistoryID.h"
 #include "canvas/Persistency/Provenance/ProductID.h"
 #include "canvas/Utilities/InputTag.h"
-#include "canvas/Utilities/TypeID.h"
+#include "canvas/Utilities/fwd.h"
 
 #include "canvas_root_io/Utilities/DictionaryChecker.h"
 
 #include "gallery/BranchData.h"
 #include "gallery/BranchMapReader.h"
-#include "gallery/EventHistoryGetter.h"
 #include "gallery/InfoForTypeLabelInstance.h"
 #include "gallery/TypeLabelInstanceKey.h"
 
@@ -67,6 +65,7 @@ class TTree;
 
 namespace gallery {
 
+  class EventHistoryGetter;
   class EventNavigator;
   using ProductWithID = std::pair<art::EDProduct const*, art::ProductID>;
 
