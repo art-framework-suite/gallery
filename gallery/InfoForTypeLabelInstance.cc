@@ -1,5 +1,6 @@
 #include "gallery/InfoForTypeLabelInstance.h"
 #include "canvas/Utilities/Exception.h"
+#include "canvas/Utilities/WrappedClassName.h"
 #include "canvas_root_io/Utilities/TypeTools.h"
 
 #include "TClass.h"
