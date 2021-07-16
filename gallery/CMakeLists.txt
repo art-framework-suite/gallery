@@ -1,7 +1,7 @@
 include(CetMake)
 
-cet_find_package(ROOT PRIVATE COMPONENTS Core RIO Tree REQUIRED)
-cet_find_package(canvas_root_io REQUIRED)
+find_package(ROOT PRIVATE COMPONENTS Core RIO Tree REQUIRED)
+find_package(canvas_root_io REQUIRED PUBLIC)
 
 include(ArtDictionary)
 
