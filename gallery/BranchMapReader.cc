@@ -1,11 +1,10 @@
 #include "gallery/BranchMapReader.h"
 
 #include "canvas/Persistency/Provenance/BranchType.h"
-#include "canvas/Persistency/Provenance/History.h"
 #include "canvas/Persistency/Provenance/ProductID.h"
 #include "canvas/Persistency/Provenance/rootNames.h"
 #include "canvas_root_io/Streamers/BranchDescriptionStreamer.h"
-#include "gallery/EventHistoryGetter.h"
+#include "gallery/InfoForTypeLabelInstance.h"
 #include "gallery/throwFunctions.h"
 
 #include "TFile.h"

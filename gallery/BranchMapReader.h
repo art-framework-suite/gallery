@@ -11,8 +11,8 @@
 #include "canvas/Persistency/Provenance/BranchDescription.h"
 #include "canvas/Persistency/Provenance/Compatibility/BranchIDList.h"
 #include "canvas/Persistency/Provenance/ProductID.h"
+#include "canvas/Utilities/fwd.h"
 #include "cetlib/exempt_ptr.h"
-#include "gallery/InfoForTypeLabelInstance.h"
 
 #include <map>
 #include <memory>
@@ -22,7 +22,7 @@ class TFile;
 
 namespace gallery {
 
-  class EventHistoryGetter;
+  class InfoForTypeLabelInstance;
 
   class BranchMapReader {
   public:

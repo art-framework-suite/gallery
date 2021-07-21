@@ -7,8 +7,6 @@
 #include "gallery/EventNavigator.h"
 #include "gallery/throwFunctions.h"
 
-#include "TFile.h"
-
 namespace gallery {
 
   Event::Event(std::vector<std::string> const& fileNames,

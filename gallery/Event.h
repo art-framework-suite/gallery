@@ -9,12 +9,11 @@
 
 #include "canvas/Persistency/Common/EDProduct.h"
 #include "canvas/Persistency/Common/Wrapper.h"
-#include "canvas/Persistency/Provenance/EventAuxiliary.h"
-#include "canvas/Persistency/Provenance/History.h"
-#include "canvas/Persistency/Provenance/ProcessHistory.h"
 #include "canvas/Persistency/Provenance/ProcessHistoryID.h"
 #include "canvas/Persistency/Provenance/ProductID.h"
 #include "canvas/Persistency/Provenance/ProductToken.h"
+#include "canvas/Persistency/Provenance/ProvenanceFwd.h"
+#include "canvas/Utilities/Exception.h"
 #include "canvas/Utilities/InputTag.h"
 #include "cetlib/container_algorithms.h"
 #include "gallery/DataGetterHelper.h"
@@ -22,22 +21,17 @@
 #include "gallery/Handle.h"
 #include "gallery/ValidHandle.h"
 
-#include "TFile.h"
-#include "TTree.h"
-
+#include <cassert>
 #include <memory>
 #include <string>
 #include <typeinfo>
+#include <utility>
 #include <vector>
 
-namespace cet {
-  class exception;
-}
+class TFile;
+class TTree;
 
 namespace gallery {
-
-  class DataGetterHelper;
-  class EventNavigator;
 
   // The gallery::Event provides read-only access to event data
   // products. It also provides the means to iterate through one or
