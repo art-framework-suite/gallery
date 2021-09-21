@@ -248,7 +248,7 @@ perllib	product_dir
 #
 ####################################
 product		version		qual	flags		<table_format=2>
-canvas_root_io	v1_09_04	-
+canvas_root_io	v1_09_05	-
 cetmodules	v2_25_01	-	only_for_build
 end_product_list
 ####################################
