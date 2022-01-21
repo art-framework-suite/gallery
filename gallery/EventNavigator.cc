@@ -128,7 +128,6 @@ namespace gallery {
     eventEntry_ = 0;
     previousEventAuxiliaryEntry_ = -1;
     previousEventHistoryEntry_ = -1;
-    historyMap_.clear();
     return;
   }
 
@@ -145,6 +144,7 @@ namespace gallery {
   art::History const&
   EventNavigator::history() const
   {
+    assert(fileFormatVersion_.value_ < 15);
     if (previousEventHistoryEntry_ != eventEntry_) {
       eventHistoryBranch_->GetEntry(eventEntry_);
       previousEventHistoryEntry_ = eventEntry_;
@@ -155,38 +155,16 @@ namespace gallery {
   art::ProcessHistoryID const&
   EventNavigator::processHistoryID() const
   {
-    if (previousEventHistoryEntry_ != eventEntry_) {
-      eventHistoryBranch_->GetEntry(eventEntry_);
-      previousEventHistoryEntry_ = eventEntry_;
+    if (fileFormatVersion_.value_ < 15) {
+      return history().processHistoryID();
     }
-    return eventHistory_.processHistoryID();
+    return eventAuxiliary().processHistoryID();
   }
 
   art::ProcessHistory const&
   EventNavigator::processHistory() const
   {
-
-    if (historyMap_.empty()) {
-
-      std::unique_ptr<TTree> metaDataTree{
-        file_->Get<TTree>(art::rootNames::metaDataTreeName().c_str())};
-
-      if (!metaDataTree) {
-        throwTreeNotFound(art::rootNames::metaDataTreeName());
-      }
-
-      auto pHistMapPtr = &historyMap_;
-      TBranch* processHistoryBranch = metaDataTree->GetBranch(
-        art::rootNames::metaBranchRootName<art::ProcessHistoryMap>());
-
-      if (!processHistoryBranch) {
-        throwBranchNotFound(
-          art::rootNames::metaBranchRootName<art::ProcessHistoryMap>());
-      }
-      processHistoryBranch->SetAddress(&pHistMapPtr);
-      processHistoryBranch->GetEntry(0);
-    }
-    return historyMap_[processHistoryID()];
+    return historyMap_.at(processHistoryID());
   }
 
   TFile*
@@ -213,10 +191,43 @@ namespace gallery {
         << "Unable to get the number of entries in events TTree.\n"
            "This might be a corrupted file.\n";
     }
-    eventHistoryTree_ =
-      file_->Get<TTree>(art::rootNames::eventHistoryTreeName().c_str());
-    if (eventHistoryTree_ == nullptr) {
-      throwTreeNotFound(art::rootNames::eventHistoryTreeName());
+
+    std::unique_ptr<TTree> metaDataTree{
+      file_->Get<TTree>(art::rootNames::metaDataTreeName().c_str())};
+
+    if (!metaDataTree) {
+      throwTreeNotFound(art::rootNames::metaDataTreeName());
+    }
+
+    auto pFileFormatVersionPtr = &fileFormatVersion_;
+    TBranch* fileFormatVersionBranch = metaDataTree->GetBranch(
+      art::rootNames::metaBranchRootName<art::FileFormatVersion>());
+
+    if (!fileFormatVersionBranch) {
+      throwBranchNotFound(
+        art::rootNames::metaBranchRootName<art::FileFormatVersion>());
+    }
+    fileFormatVersionBranch->SetAddress(&pFileFormatVersionPtr);
+    fileFormatVersionBranch->GetEntry(0);
+
+    historyMap_.clear();
+    auto pHistMapPtr = &historyMap_;
+    TBranch* processHistoryBranch = metaDataTree->GetBranch(
+      art::rootNames::metaBranchRootName<art::ProcessHistoryMap>());
+
+    if (!processHistoryBranch) {
+      throwBranchNotFound(
+        art::rootNames::metaBranchRootName<art::ProcessHistoryMap>());
+    }
+    processHistoryBranch->SetAddress(&pHistMapPtr);
+    processHistoryBranch->GetEntry(0);
+
+    if (fileFormatVersion_.value_ < 15) {
+      eventHistoryTree_ =
+        file_->Get<TTree>(art::rootNames::eventHistoryTreeName().c_str());
+      if (eventHistoryTree_ == nullptr) {
+        throwTreeNotFound(art::rootNames::eventHistoryTreeName());
+      }
     }
   }
 
@@ -230,6 +241,10 @@ namespace gallery {
       throwBranchNotFound(art::BranchTypeToAuxiliaryBranchName(art::InEvent));
     }
     eventAuxiliaryBranch_->SetAddress(&pEventAuxiliary_);
+
+    // No EventHistory required for file format versions of 15 and greater.
+    if (fileFormatVersion_.value_ >= 15)
+      return;
 
     eventHistoryBranch_ = eventHistoryTree_->GetBranch(
       art::rootNames::eventHistoryBranchName().c_str());

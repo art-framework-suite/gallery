@@ -2,11 +2,7 @@
 #define gallery_EventHistoryGetter_h
 
 #include "canvas/Persistency/Provenance/ProcessHistoryID.h"
-
-namespace art {
-  class History;
-  class ProcessHistory;
-} // namespace art
+#include "canvas/Persistency/Provenance/fwd.h"
 
 namespace gallery {
 
@@ -22,7 +18,6 @@ namespace gallery {
 
     virtual art::ProcessHistoryID const& processHistoryID() const;
     virtual art::ProcessHistory const& processHistory() const;
-    virtual art::History const& history() const;
 
   private:
     EventNavigator const* eventNavigator_;
