@@ -21,11 +21,15 @@
 #include "canvas_root_io/Streamers/TransientStreamer.h"
 #include "canvas_root_io/Streamers/setPtrVectorBaseStreamer.h"
 
+#include "range/v3/view.hpp"
+
 #include "TClass.h"
 #include "TTree.h"
 
 #include <algorithm>
 #include <cassert>
+
+using namespace ranges;
 
 namespace {
 
@@ -117,20 +121,14 @@ namespace gallery {
   DataGetterHelper::getProductDescriptions(
     art::TypeID const& typeIDOfWrapper) const
   {
-    std::vector<art::BranchDescription const*> result;
     if (!initializedForProcessHistory_) {
       initializeForProcessHistory();
     }
     auto const fcn = typeIDOfWrapper.friendlyClassName();
-    for (auto const& pr : branchMapReader_.productDescriptions()) {
-      auto const& pd = pr.second;
-      if (pd.friendlyClassName() != fcn) {
-        continue;
-      }
-
-      result.push_back(&pd);
-    }
-    return result;
+    return branchMapReader_.productDescriptions() | views::values |
+           views::filter(
+             [&fcn](auto const& pd) { return pd.friendlyClassName() == fcn; }) |
+           views::addressof | to<std::vector>();
   }
 
   std::vector<art::InputTag>
@@ -188,9 +186,8 @@ namespace gallery {
       std::vector<IndexProductIDPair> old;
       old.swap(info.processIndexToProductID());
       info.processIndexToProductID().reserve(processNames_.size());
-      for (unsigned int processIndex{}; processIndex < processNames_.size();
-           ++processIndex) {
-        auto const& processName = processNames_[processIndex];
+      for (auto const& [processIndex, processName] :
+           views::enumerate(processNames_)) {
         auto bd = branchMapReader_.productDescription(info, processName);
         if (bd == nullptr) {
           // Product not available.
@@ -258,8 +255,8 @@ namespace gallery {
     tree_->SetCacheSize();
     tree_->AddBranchToCache(eventNavigator_->eventAuxiliaryBranch(), kTRUE);
     for (auto const& info : infoVector_) {
-      for (auto const& i : info.processIndexToProductID()) {
-        auto const productID = i.second;
+      for (auto const productID :
+           info.processIndexToProductID() | views::values) {
         auto& branchData = *branchDataMap_.at(productID);
         if (auto branch = branchData.branch()) {
           tree_->AddBranchToCache(branch, kTRUE);
@@ -437,14 +434,13 @@ namespace gallery {
     if (info.isAssns()) {
       insertIntoInfoMap(info.partnerType(), label, instance, infoIndex);
     }
-    unsigned int processIndex{};
-    for (auto const& processName : processNames_) {
+    for (auto const& [processIndex, processName] :
+         views::enumerate(processNames_)) {
       std::string branchName{buildBranchName(info, processName)};
       art::ProductID const productID{branchName};
       if (branchMapReader_.branchInRegistryOfAnyOpenedFile(productID)) {
         addBranchData(move(branchName), processIndex, info);
       }
-      ++processIndex;
     }
     updateBranchDataIndexOrderedByHistory(info);
   }
@@ -475,7 +471,7 @@ namespace gallery {
     auto itBranchDataIndex = lower_bound(
       processIndexToProductID.cbegin(),
       processIndexToProductID.cend(),
-      std::make_pair(processIndex, art::ProductID::invalid()),
+      std::pair{processIndex, art::ProductID::invalid()},
       [](auto const& l, auto const& r) { return l.first < r.first; });
     if (itBranchDataIndex != processIndexToProductID.cend() &&
         itBranchDataIndex->first == processIndex) {

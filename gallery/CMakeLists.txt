@@ -28,6 +28,7 @@ cet_make_library(HEADERS_TARGET
   PRIVATE
     ROOT::Tree
     ROOT::Core
+    range-v3::range-v3
   )
 
 art_dictionary(DICTIONARY_LIBRARIES gallery::gallery)
