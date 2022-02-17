@@ -2,8 +2,8 @@
 #define gallery_ValidHandle_h
 
 // Should be identical to art::ValidHandle except it is missing
-// functions, data members, typedefs, and dependences not needed in
-// gallery.
+// functions, data members, type aliases, and dependencies not needed
+// in gallery.
 
 #include "canvas/Persistency/Provenance/ProductID.h"
 
