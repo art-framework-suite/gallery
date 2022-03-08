@@ -37,12 +37,6 @@ namespace gallery {
     return eventNavigator_->eventAuxiliary();
   }
 
-  art::History const&
-  Event::history() const
-  {
-    return eventNavigator_->history();
-  }
-
   art::ProcessHistoryID const&
   Event::processHistoryID() const
   {

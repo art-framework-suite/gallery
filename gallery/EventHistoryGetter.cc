@@ -25,9 +25,4 @@ namespace gallery {
     return eventNavigator_->processHistory();
   }
 
-  art::History const&
-  EventHistoryGetter::history() const
-  {
-    return eventNavigator_->history();
-  }
 } // namespace gallery

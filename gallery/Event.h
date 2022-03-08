@@ -74,7 +74,6 @@ namespace gallery {
     std::vector<art::ProductToken<PROD>> getProductTokens() const;
 
     art::EventAuxiliary const& eventAuxiliary() const;
-    art::History const& history() const;
     art::ProcessHistoryID const& processHistoryID() const;
     art::ProcessHistory const& processHistory() const;
 

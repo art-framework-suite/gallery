@@ -1,14 +1,14 @@
 #ifndef gallery_EventNavigator_h
 #define gallery_EventNavigator_h
 
-// Manages iteration over the events in a vector of
-// input files.  It handles the iteration, opening
-// the files, opening TTrees, reading EventAuxilliary
-// objects and reading History objects from the input
-// files.
+// Manages iteration over the events in a vector of input files.  It
+// handles the iteration, opening the files, opening TTrees, reading
+// EventAuxilliary objects and (if necessary) reading History objects
+// from the input files.
 
+#include "canvas/Persistency/Provenance/Compatibility/History.h"
 #include "canvas/Persistency/Provenance/EventAuxiliary.h"
-#include "canvas/Persistency/Provenance/History.h"
+#include "canvas/Persistency/Provenance/FileFormatVersion.h"
 #include "canvas/Persistency/Provenance/ProcessHistory.h"
 #include "canvas/Persistency/Provenance/ProcessHistoryID.h"
 
@@ -52,7 +52,6 @@ namespace gallery {
     void nextFile();
 
     art::EventAuxiliary const& eventAuxiliary() const;
-    art::History const& history() const;
     art::ProcessHistoryID const& processHistoryID() const;
     art::ProcessHistory const& processHistory() const;
 
@@ -81,6 +80,7 @@ namespace gallery {
     }
 
   private:
+    art::History const& history() const;
     void initializeTTreePointers();
     void initializeTBranchPointers();
 
@@ -102,11 +102,12 @@ namespace gallery {
 
     TTree* eventHistoryTree_{nullptr};
     TBranch* eventHistoryBranch_{nullptr};
-    mutable art::History eventHistory_{};
+    art::History eventHistory_{};
     art::History* pEventHistory_{&eventHistory_};
     mutable long long previousEventHistoryEntry_{-1};
 
-    mutable art::ProcessHistoryMap historyMap_{};
+    art::FileFormatVersion fileFormatVersion_{};
+    art::ProcessHistoryMap historyMap_{};
   };
 } // namespace gallery
 
