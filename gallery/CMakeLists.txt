@@ -1,10 +1,10 @@
 include(CetMake)
 
-find_package(Range-v3 REQUIRED PRIVATE)
-find_package(ROOT COMPONENTS Core RIO Tree REQUIRED PRIVATE)
-find_package(cetlib REQUIRED PUBLIC)
-find_package(canvas REQUIRED PUBLIC)
-find_package(canvas_root_io REQUIRED PUBLIC)
+find_package(Range-v3 REQUIRED)
+find_package(ROOT COMPONENTS Core RIO Tree REQUIRED)
+find_package(cetlib REQUIRED EXPORT)
+find_package(canvas REQUIRED EXPORT)
+find_package(canvas_root_io REQUIRED EXPORT)
 
 include(ArtDictionary)
 
