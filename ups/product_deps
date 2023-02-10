@@ -305,10 +305,10 @@ end_product_list
 #
 ####################################
 qualifier	canvas_root_io	notes
-c7:debug	c7:debug
-c7:prof		c7:prof
 c14:debug	c14:debug
 c14:prof	c14:prof
+c15:debug	c15:debug
+c15:prof	c15:prof
 e20:debug	e20:debug
 e20:prof	e20:prof
 e26:debug	e26:debug
