@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.18.2 FATAL_ERROR)
 
 find_package(cetmodules 2.13.00 REQUIRED)
-project(gallery VERSION 1.18.04 LANGUAGES CXX)
-set(${PROJECT_NAME}_CMAKE_PROJECT_VERSION_STRING 1.18.04a)
+project(gallery VERSION 1.18.05 LANGUAGES CXX)
 
 include(CetCMakeEnv)
 cet_cmake_env()
