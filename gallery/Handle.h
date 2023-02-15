@@ -54,13 +54,15 @@ namespace gallery {
   {}
 
   template <class T>
-  inline T const& Handle<T>::operator*() const noexcept(false)
+  inline T const&
+  Handle<T>::operator*() const noexcept(false)
   {
     return *product();
   }
 
   template <class T>
-  inline T const* Handle<T>::operator->() const noexcept(false)
+  inline T const*
+  Handle<T>::operator->() const noexcept(false)
   {
     return product();
   }
