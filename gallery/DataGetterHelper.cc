@@ -222,7 +222,7 @@ namespace gallery {
                                                   branch,
                                                   eventNavigator_,
                                                   this,
-                                                  move(branchName),
+                                                  std::move(branchName),
                                                   info.type(),
                                                   info.partnerType());
             }
@@ -358,7 +358,7 @@ namespace gallery {
                                           branch,
                                           eventNavigator_,
                                           this,
-                                          move(branchName),
+                                          std::move(branchName),
                                           info.type(),
                                           info.partnerType());
     } else {
@@ -368,7 +368,7 @@ namespace gallery {
                                      branch,
                                      eventNavigator_,
                                      this,
-                                     move(branchName));
+                                     std::move(branchName));
     }
     info.processIndexToProductID().emplace_back(processIndex, productID);
     if (initializeTheCache && branch) {
@@ -439,7 +439,7 @@ namespace gallery {
       std::string branchName{buildBranchName(info, processName)};
       art::ProductID const productID{branchName};
       if (branchMapReader_.branchInRegistryOfAnyOpenedFile(productID)) {
-        addBranchData(move(branchName), processIndex, info);
+        addBranchData(std::move(branchName), processIndex, info);
       }
     }
     updateBranchDataIndexOrderedByHistory(info);

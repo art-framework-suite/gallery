@@ -25,7 +25,7 @@ namespace gallery {
                  iBranch,
                  eventNavigator,
                  finder,
-                 move(iBranchName)}
+                 std::move(iBranchName)}
   {
     if (type == infoType) {
       secondary_wrapper_type_ = infoPartnerType;

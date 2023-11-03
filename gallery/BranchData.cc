@@ -48,7 +48,7 @@ namespace gallery {
     , eventNavigator_{eventNavigator}
     , finder_{finder}
     , lastProduct_{-1}
-    , branchName_{move(iBranchName)}
+    , branchName_{std::move(iBranchName)}
   {
     if (tClass_ == nullptr) {
       throw art::Exception(art::errors::LogicError)
