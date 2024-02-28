@@ -54,6 +54,10 @@ namespace gallery {
     template <typename PROD>
     gallery::ValidHandle<PROD> getValidHandle(art::InputTag const&) const;
 
+    // Get access to a data product of type PROD, via a ValidHandle.
+    template <typename PROD>
+    PROD const& getProduct(art::InputTag const&) const;
+
     // Get access to a data product of type PROD, using a Handle.
     // Only if the return value is 'true' is the Handle valid.
     template <typename PROD>
@@ -166,6 +170,13 @@ gallery::Event::getValidHandle(art::InputTag const& inputTag) const
 
   auto product = ptrToWrapper->product();
   return ValidHandle<PROD>{product, res.second};
+}
+
+template <typename PROD>
+inline PROD const&
+gallery::Event::getProduct(art::InputTag const& inputTag) const
+{
+  return *getValidHandle<PROD>(inputTag);
 }
 
 template <typename PROD>
