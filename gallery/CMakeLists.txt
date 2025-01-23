@@ -1,12 +1,13 @@
-include(CetMake)
+include(ArtDictionary)
+include(CetMakeLibrary)
+include(InstallHeaders)
+include(InstallSource)
 
 find_package(Range-v3 REQUIRED)
 find_package(ROOT COMPONENTS Core RIO Tree REQUIRED)
 find_package(cetlib REQUIRED EXPORT)
 find_package(canvas REQUIRED EXPORT)
 find_package(canvas_root_io REQUIRED EXPORT)
-
-include(ArtDictionary)
 
 cet_make_library(HEADERS_TARGET
   SOURCE
