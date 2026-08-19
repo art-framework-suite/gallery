@@ -10,6 +10,7 @@
 #include "TFile.h"
 #include "TTree.h"
 
+#include <algorithm>
 #include <memory>
 
 class TBranch;
